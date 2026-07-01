@@ -1,0 +1,360 @@
+"use client";
+
+import { useState } from "react";
+import {
+  Save, Building, Paintbrush, Globe, Mail, Phone, MapPin,
+  CheckCircle2, ShieldAlert, Share2, ToggleLeft, ToggleRight
+} from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { MODULES_LIST } from "@/lib/constants";
+import PageHeader from "@/components/shared/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+const COMPANY_SPECIFIC_MODULES = [
+  "Applicants", "Staff", "Tasks", "Interviews", "Leave Requests", "Staff Requests",
+  "Vehicles", "Documents", "Attendance", "Payroll", "Placement Agreements",
+  "Suppliers", "Members", "Visa Expiry", "Staff Birthdays", "Reports"
+];
+
+export default function SettingsPage() {
+  const { currentRole, companies, updateCompany, siteSettings, updateSiteSettings, addActivityLog, currentUser } = useAuthStore();
+
+  const [form, setForm] = useState({
+    siteName:     siteSettings.siteName || "",
+    email:        siteSettings.email || "",
+    phone:        siteSettings.phone || "",
+    whatsapp:     siteSettings.whatsapp || "",
+    address:      siteSettings.address || "",
+    footerText:   siteSettings.footerText || "",
+    primaryColor: siteSettings.primaryColor || "",
+    sidebarColor: siteSettings.sidebarColor || "",
+    linkedin:     siteSettings.linkedin || "",
+    twitter:      siteSettings.twitter || "",
+    facebook:     siteSettings.facebook || "",
+    instagram:    siteSettings.instagram || "",
+    website:      siteSettings.website || "",
+    terms:        "",
+    privacyPolicy: ""
+  });
+
+  const [selectedCompanyId, setSelectedCompanyId] = useState(companies[0]?.id || "");
+  const selectedCompany = companies.find(c => c.id === selectedCompanyId);
+
+  // Build module enabled state for selected company
+  const getEnabledModules = () => {
+    const defaults: Record<string, boolean> = {};
+    COMPANY_SPECIFIC_MODULES.forEach(m => { defaults[m] = true; });
+    return { ...defaults, ...(selectedCompany?.enabledModules || {}) };
+  };
+  const [moduleToggles, setModuleToggles] = useState<Record<string, boolean>>(getEnabledModules());
+
+  const handleCompanyChange = (id: string) => {
+    setSelectedCompanyId(id);
+    const comp = companies.find(c => c.id === id);
+    const defaults: Record<string, boolean> = {};
+    COMPANY_SPECIFIC_MODULES.forEach(m => { defaults[m] = true; });
+    setModuleToggles({ ...defaults, ...(comp?.enabledModules || {}) });
+  };
+
+  const handleToggleModule = (mod: string) => {
+    setModuleToggles(prev => ({ ...prev, [mod]: !prev[mod] }));
+  };
+
+  const handleSaveModules = () => {
+    if (!selectedCompany) return;
+    updateCompany({ ...selectedCompany, enabledModules: moduleToggles });
+    toast.success(`Module settings saved for "${selectedCompany.name}"`);
+  };
+
+  const isSuperAdmin = currentRole === "Super Admin";
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isSuperAdmin) { toast.error("Only Super Admin can save settings"); return; }
+    updateSiteSettings({
+      siteName:     form.siteName,
+      email:        form.email,
+      phone:        form.phone,
+      whatsapp:     form.whatsapp,
+      address:      form.address,
+      footerText:   form.footerText,
+      primaryColor: form.primaryColor,
+      sidebarColor: form.sidebarColor,
+      linkedin:     form.linkedin,
+      twitter:      form.twitter,
+      facebook:     form.facebook,
+      instagram:    form.instagram,
+      logo:         siteSettings.logo,
+      website:      form.website
+    });
+    addActivityLog({
+      id: `LOG-${Date.now()}`,
+      dateTime: new Date().toISOString().replace("T", " ").slice(0, 19),
+      userName: currentUser.name,
+      role: currentUser.role,
+      company: currentUser.company,
+      branch: currentUser.branch,
+      action: "Edited",
+      module: "Site Settings",
+      oldValue: null,
+      newValue: `Site settings updated by ${currentUser.name}`,
+      ipAddress: "192.168.1.102",
+    });
+    toast.success("Settings saved successfully");
+  };
+
+  if (!isSuperAdmin) {
+    return (
+      <div className="flex flex-col h-full">
+        <PageHeader title="Site Settings" />
+        <div className="p-12 max-w-2xl mx-auto w-full">
+          <Card className="rounded-2xl border-amber-200 bg-amber-50 p-8 text-center flex flex-col items-center shadow-sm">
+            <ShieldAlert className="w-12 h-12 text-amber-500 mb-4"/>
+            <h2 className="text-lg font-bold text-amber-800 mb-2">Access Restricted</h2>
+            <p className="text-sm text-amber-700">You do not have permission to view or modify system settings. Please contact a Super Admin.</p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-full pb-12">
+      <PageHeader title="Global Settings" subtitle="Configure platform-wide settings, branding, and per-company modules"
+        actions={<Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Save className="w-4 h-4"/>Save Configuration</Button>}
+      />
+
+      <div className="p-4 md:p-6 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Sticky nav sidebar */}
+        <div className="hidden lg:block space-y-1.5 sticky top-24">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Settings Menu</div>
+          {[
+            { href: "#general", icon: <Building className="w-4 h-4 inline mr-2"/>, label: "General" },
+            { href: "#appearance", icon: <Paintbrush className="w-4 h-4 inline mr-2"/>, label: "Appearance" },
+            { href: "#contact", icon: <Globe className="w-4 h-4 inline mr-2"/>, label: "Contact Info" },
+            { href: "#social", icon: <Share2 className="w-4 h-4 inline mr-2"/>, label: "Social Media" },
+            { href: "#modules", icon: <ToggleRight className="w-4 h-4 inline mr-2"/>, label: "Module Toggles" },
+          ].map((item, i) => (
+            <a key={i} href={item.href}
+              className={`block px-4 py-2.5 rounded-xl font-bold text-xs transition-colors ${i === 0 ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100"}`}>
+              {item.icon}{item.label}
+            </a>
+          ))}
+        </div>
+
+        <div className="lg:col-span-2 space-y-6">
+
+          {/* General */}
+          <Card id="general" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <Building className="w-4 h-4 text-blue-600"/> General Settings
+            </h3>
+            <div className="space-y-4 pt-2">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Site / System Name</Label>
+                <Input value={form.siteName} onChange={e => setForm(f => ({...f, siteName: e.target.value}))} className="bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Footer Text</Label>
+                <Input value={form.footerText} onChange={e => setForm(f => ({...f, footerText: e.target.value}))} className="bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+              </div>
+            </div>
+          </Card>
+
+          {/* Appearance */}
+          <Card id="appearance" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <Paintbrush className="w-4 h-4 text-blue-600"/> Appearance & Branding
+            </h3>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              {[
+                { label: "Primary Color", key: "primaryColor" },
+                { label: "Sidebar Color", key: "sidebarColor" },
+              ].map(({ label, key }) => (
+                <div key={key} className="space-y-1.5">
+                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+                  <div className="flex gap-2">
+                    <input type="color" value={(form as any)[key]}
+                      onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
+                      className="w-11 h-11 rounded-xl cursor-pointer border-0 p-0" />
+                    <Input value={(form as any)[key]}
+                      onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
+                      className="bg-slate-50 border-slate-200 rounded-xl font-mono text-sm h-11 uppercase flex-1" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Contact Info */}
+          <Card id="contact" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-blue-600"/> Contact Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Support Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"/>
+                  <Input type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} className="pl-9 bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone Number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"/>
+                  <Input value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} className="pl-9 bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp Contact</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"/>
+                  <Input value={form.whatsapp} onChange={e => setForm(f => ({...f, whatsapp: e.target.value}))} className="pl-9 bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Website URL</Label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-500"/>
+                  <Input value={form.website} onChange={e => setForm(f => ({...f, website: e.target.value}))} className="pl-9 bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+                </div>
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Main Office Address</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-4 w-4 h-4 text-slate-400"/>
+                  <textarea rows={2} value={form.address} onChange={e => setForm(f => ({...f, address: e.target.value}))}
+                    className="w-full pl-9 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold p-3 outline-none focus:bg-white focus:border-blue-400 resize-none" />
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Social Media Links */}
+          <Card id="social" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-blue-600"/> Social Media Links
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {[
+                { label: "LinkedIn", key: "linkedin", icon: <Globe className="w-4 h-4 text-[#0077b5]"/>, placeholder: "https://linkedin.com/company/..." },
+                { label: "Twitter / X", key: "twitter", icon: <Mail className="w-4 h-4 text-[#1da1f2]"/>, placeholder: "https://twitter.com/..." },
+                { label: "Facebook", key: "facebook", icon: <Share2 className="w-4 h-4 text-[#1877f2]"/>, placeholder: "https://facebook.com/..." },
+                { label: "Instagram", key: "instagram", icon: <CheckCircle2 className="w-4 h-4 text-[#e1306c]"/>, placeholder: "https://instagram.com/..." },
+              ].map(({ label, key, icon, placeholder }) => (
+                <div key={key} className="space-y-1.5">
+                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>
+                    <Input
+                      value={(form as any)[key]}
+                      onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
+                      placeholder={placeholder}
+                      className="pl-9 bg-slate-50 border-slate-200 rounded-xl text-sm h-11 focus:bg-white focus:border-blue-400"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card id="legal" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-blue-600"/> Legal & Compliance
+            </h3>
+            <div className="space-y-4 pt-2">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Terms and Conditions</Label>
+                <textarea
+                  value={form.terms}
+                  onChange={e => setForm(f => ({ ...f, terms: e.target.value }))}
+                  rows={4}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none focus:bg-white focus:border-blue-400 resize-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Privacy Policy</Label>
+                <textarea
+                  value={form.privacyPolicy}
+                  onChange={e => setForm(f => ({ ...f, privacyPolicy: e.target.value }))}
+                  rows={4}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none focus:bg-white focus:border-blue-400 resize-none"
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Per-Company Module Toggles */}
+          <Card id="modules" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <ToggleRight className="w-4 h-4 text-blue-600"/> Per-Company Module Access
+              </h3>
+              <Button onClick={handleSaveModules} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-8 px-4 gap-1.5">
+                <Save className="w-3.5 h-3.5"/>Save
+              </Button>
+            </div>
+            <p className="text-[11px] text-slate-400 font-semibold -mt-1">
+              Enable or disable specific modules per company. Disabled modules are hidden from that company's users.
+            </p>
+
+            {/* Company picker */}
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select Company</Label>
+              <select
+                value={selectedCompanyId}
+                onChange={e => handleCompanyChange(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400 font-semibold text-slate-700"
+              >
+                {companies.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Module grid toggles */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+              {COMPANY_SPECIFIC_MODULES.map(mod => {
+                const enabled = moduleToggles[mod] !== false;
+                return (
+                  <button
+                    key={mod}
+                    type="button"
+                    onClick={() => handleToggleModule(mod)}
+                    className={`flex items-center justify-between px-4 py-3 rounded-xl border text-xs font-bold transition-all ${
+                      enabled
+                        ? "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                        : "bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span>{mod}</span>
+                    {enabled
+                      ? <ToggleRight className="w-5 h-5 text-emerald-500 flex-shrink-0"/>
+                      : <ToggleLeft className="w-5 h-5 text-slate-300 flex-shrink-0"/>
+                    }
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
+          <div className="flex justify-end pt-2">
+            <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm px-8 h-12 shadow-md gap-2">
+              <CheckCircle2 className="w-5 h-5"/> Apply All Settings
+            </Button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+

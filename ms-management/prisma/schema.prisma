@@ -1,0 +1,486 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  mobile      String
+  whatsapp    String
+  role        String
+  company     String
+  branch      String
+  status      String   // "Active" | "Disabled" | "Suspended" | "Pending"
+  lastLogin   String
+  photo       String?
+  permissions Json?
+}
+
+model Company {
+  id                  String   @id @default(cuid())
+  name                String
+  logo                String?
+  telephone           String
+  hrMobile            String
+  ownerMobile         String
+  whatsapp            String
+  email               String
+  address             String
+  status              String   // "Active" | "Inactive" | "Suspended"
+  branches            Int      @default(0)
+  staff               Int      @default(0)
+  applicants          Int      @default(0)
+  createdAt           String
+  createdBy           String
+  notes               String?
+  enabledModules      Json?    // Record<string, boolean>
+  googleMapLink       String?
+  documents           Json?    // Document[]
+  jobDemands          Json?    // JobDemand[]
+  tradeLicenseNumber  String?
+  licenseIssueDate    String?
+  licenseExpiryDate   String?
+  companyType         String?
+  ownerName           String?
+  emirateLocation     String?
+  trnNumber           String?
+  separateDatabase    Boolean  @default(false)
+  databaseStatus      String   @default("Not Provisioned") // "Not Provisioned" | "Provisioning" | "Ready"
+}
+
+model InternalCompany {
+  id               String   @id @default(cuid())
+  name             String
+  logo             String?
+  telephone        String
+  email            String
+  address          String
+  status           String   // "Active" | "Inactive" | "Suspended"
+  branches         Int      @default(0)
+  staff            Int      @default(0)
+  createdAt        String
+  createdBy        String
+  notes            String?
+  subscriptionPlan String   // "Basic" | "Pro" | "Enterprise"
+  licenseExpiry    String
+  maxUsers         Int      @default(10)
+  maxStorage       Int      @default(5)
+  type             String?  // "Main Company" | "Sub Company"
+  branch           String?
+  location         String?
+  country          String?
+  district         String?
+  province         String?
+  city             String?
+}
+
+model Branch {
+  id                 String   @id @default(cuid())
+  name               String
+  company            String
+  companyId          String
+  address            String
+  phone              String
+  email              String
+  status             String   // "Active" | "Inactive"
+  staff              Int      @default(0)
+  createdAt          String
+  tradeLicenseNumber String?
+  location           String?
+  contactPerson      String?
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  permissions Json     // Record<string, { view: boolean, create: boolean, edit: boolean, delete: boolean }>
+  isCustom    Boolean  @default(true)
+  company     String?  // Scoped to a specific company, or null for system roles
+}
+
+model Staff {
+  id                 String   @id @default(cuid())
+  photo              String?
+  name               String
+  nationality        String
+  nationalityFlag    String
+  mobile             String
+  whatsapp           String
+  email              String
+  birthday           String
+  position           String
+  joiningDate        String
+  passportExpiry     String
+  visaExpiry         String
+  passportNumber     String
+  emiratesId         String
+  status             String   // "Active" | "Inactive" | "Suspended"
+  company            String
+  branch             String
+  createdBy          String
+  createdAt          String
+  documents          Json?    // Document[]
+  basicSalary        Float?   @default(3000)
+  housingAllowance   Float?   @default(1000)
+  transportAllowance Float?   @default(500)
+  overtimeRate       Float?   @default(15)
+  shiftId            String?  @default("")
+  salaryType         String?  @default("Monthly")
+  permissions        Json?
+}
+
+model Applicant {
+  id                 String   @id @default(cuid())
+  photo              String?
+  applicationDate    String
+  fullName           String
+  dateOfBirth        String
+  email              String
+  mobile             String
+  whatsapp           String
+  nationality        String
+  nationalityFlag    String
+  currentCountry     String
+  applyingPositions  Json     // string[]
+  salaryExpectation  Float
+  applyCountry       String
+  visaType           String
+  visaExpiry         String
+  passportExpiry     String
+  passportNumber     String
+  status             String   // "Pending" | "Processing" | "Interview Scheduled" | "Selected" | "Visa Processing" | "Placed" | "Rejected" | "Returned"
+  trackingCode       String   @unique
+  company            String
+  branch             String
+  createdBy          String
+  createdAt          String
+  documents          Json?    // Document[]
+  statusHistory      Json?    // StatusHistory[]
+  clientName         String?
+  clientPhoto        String?
+  clientMobile       String?
+  clientWhatsapp     String?
+  clientEmail        String?
+  memberActive       Boolean? @default(false)
+}
+
+model Task {
+  id               String   @id @default(cuid())
+  title            String
+  description      String
+  assignedTo       String   // staffId or name
+  assignedToId     String   @default("")
+  assignedToRole   String?
+  status           String   // "Pending" | "In Progress" | "Completed"
+  priority         String   // "Low" | "Medium" | "High" | "Urgent"
+  dueDate          String
+  deadline         String?
+  assignedDate     String?
+  company          String
+  branch           String
+  createdBy        String
+  createdAt        String
+  completedAt      String?
+  feedback         String?
+  applicantId      String?
+  applicantName    String?
+  targetDocument   String?
+  incompleteReason String?
+  history          Json?
+}
+
+model Interview {
+  id                String   @id @default(cuid())
+  applicantId       String?
+  applicantName     String
+  type              String   // "Interview" | "Meeting"
+  conductPersonName String
+  personName        String
+  mobileNumber      String
+  whatsAppNumber    String
+  emailId           String
+  nationality       String
+  meetingType       String?
+  interviewPosition String?
+  dateTime          String
+  onlinePhysical    String   // "Online" | "Physical"
+  meetingMode       String   // "Zoom" | "Google Meet" | "Microsoft Teams" | "WhatsApp" | "Phone call"
+  meetingLink       String?
+  googleMapLink     String?
+  notes             String?
+  status            String   // Status of meeting
+  company           String   @default("MS COMPANY")
+  branch            String   @default("UAE")
+}
+
+model LeaveRequest {
+  id          String   @id @default(cuid())
+  staffId     String
+  staffName   String
+  type        String   // "Annual" | "Sick" | "Emergency" | "Unpaid" | "Maternity" | "Paternity"
+  startDate   String
+  endDate     String
+  days        Int
+  reason      String
+  status      String   // "Pending" | "Approved" | "Rejected" | "Cancelled"
+  company     String
+  branch      String
+  createdAt   String
+  approvedBy  String?
+}
+
+model StaffRequest {
+  id          String   @id @default(cuid())
+  staffId     String
+  name        String
+  mobile      String
+  whatsapp    String
+  email       String
+  requestType String
+  description String
+  attachment  String?
+  date        String
+  signature   String?
+  status      String   // "Pending" | "Processing" | "Approved" | "Rejected" | "Returned"
+  reason      String?
+  reply       String?
+  company     String
+  branch      String
+  history     Json?    // list of status audits
+}
+
+model Vehicle {
+  id                  String   @id @default(cuid())
+  plateNumber         String
+  model               String
+  make                String
+  year                Int
+  status              String   // "Available" | "Assigned" | "Maintenance" | "Returned"
+  assignedTo          String?  // staffName
+  assignedToId        String?
+  company             String
+  branch              String
+  createdAt           String
+  vehicleType         String   @default("Sedan")
+  brand               String   @default("")
+  plateCode           String   @default("Dubai")
+  registrationCountry String   @default("UAE")
+  emirate             String   @default("Dubai")
+  colour              String   @default("White")
+  km                  Int      @default(0)
+  picture             String?
+  insuranceExpiry     String   @default("")
+  registrationExpiry  String   @default("")
+  licenseExpiry       String   @default("")
+  notes               String?
+  createdBy           String   @default("")
+  assignmentHistory   Json?
+  documents           Json?
+}
+
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  contactName String
+  email       String
+  phone       String
+  status      String   // "Active" | "Inactive"
+  company     String
+  createdAt   String
+}
+
+model Placement {
+  id                 String   @id @default(cuid())
+  applicantId        String
+  applicantName      String
+  companyId          String
+  companyName        String
+  position           String
+  salary             Float
+  placementDate      String
+  status             String   // "Placed" | "Trial" | "Terminated" | "Resigned"
+  company            String
+  branch             String
+  createdAt          String
+  agreementStatus    String   @default("Pending")
+  applicantSign      String?  @default("")
+  companySign        String?  @default("")
+  termsAndConditions String?  @default("")
+  agreementHistory   Json?    
+  passportNumber     String?  @default("")
+  mobileNumber       String?  @default("")
+  registrationDate   String?  @default("")
+  placementDeadline  String?  @default("")
+  registrationFee    Float?   @default(0)
+  placementFee       Float?   @default(0)
+  refundStatus       String?  @default("Not Applicable")
+  agreementAccepted  Boolean? @default(false)
+  notes              String?  @default("")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   // "Info" | "Alert" | "Success" | "Warning"
+  read      Boolean  @default(false)
+  createdAt String
+  userId    String
+  company   String?
+  link      String?
+  branch    String?
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  dateTime  String
+  userName  String
+  role      String
+  company   String
+  branch    String
+  action    String
+  module    String
+  oldValue  String?
+  newValue  String?
+  ipAddress String?
+  archived  Boolean  @default(false)
+}
+
+model PayrollRecord {
+  id               String   @id @default(cuid())
+  staffId          String
+  staffName        String
+  position         String   @default("")
+  month            String   // "YYYY-MM"
+  year             Int      @default(2026)
+  basicSalary      Float
+  allowances       Float
+  deductions       Float
+  allowanceDetails Json?
+  deductionDetails Json?
+  advanceDeduction Float    @default(0)
+  loanDeduction    Float    @default(0)
+  overtimeHours    Float    @default(0)
+  overtimeRate     Float    @default(0)
+  overtime         Float    @default(0)
+  netSalary        Float
+  status           String   // "Draft" | "Pending Approval" | "Approved" | "Paid"
+  company          String
+  branch           String
+  createdAt        String
+}
+
+model StaffAttendance {
+  id        String   @id @default(cuid())
+  staffId   String
+  staffName String
+  month     String
+  year      Int
+  records   Json     // List of AttendanceRecord
+  company   String
+  branch    String
+}
+
+model Shift {
+  id            String  @id @default(cuid())
+  name          String
+  clockIn       String
+  clockOut      String
+  gracePeriod   Int     @default(15)
+  breakDuration Int     @default(60)
+  description   String?
+  company       String
+  branch        String
+  createdBy     String  @default("")
+  createdAt     String  @default("")
+  overtimeEligible String  @default("Yes")
+  status        String  @default("Active")
+}
+
+model OvertimeRequest {
+  id        String   @id @default(cuid())
+  staffId   String
+  staffName String
+  date      String
+  hours     Float
+  reason    String
+  status    String   // "Pending" | "Approved" | "Rejected"
+  company   String
+  branch    String
+  createdAt String
+}
+
+model AttendanceCorrection {
+  id               String   @id @default(cuid())
+  staffId          String
+  staffName        String
+  date             String
+  requestedClockIn String
+  requestedClockOut String
+  reason           String
+  status           String   // "Pending" | "Approved" | "Rejected"
+  company          String
+  branch           String
+  createdAt        String
+}
+
+model PasswordResetRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  email       String
+  requestedAt String
+  status      String   // "Pending" | "Sent" | "Completed" | "Failed"
+  requestedBy String
+  note        String
+}
+
+model SiteSettings {
+  id           String  @id @default("SETTINGS")
+  siteName     String
+  email        String
+  phone        String
+  whatsapp     String
+  address      String
+  footerText   String
+  primaryColor String
+  sidebarColor String
+  linkedin     String?
+  twitter      String?
+  facebook     String?
+  instagram    String?
+  logo         String?
+  website      String? @default("www.mshorizon.ae")
+}
+
+model SentEmail {
+  id             String   @id @default(cuid())
+  to             String
+  subject        String
+  body           String
+  sentAt         String
+  company        String?
+  branch         String?
+  candidateName  String?
+  deliveryStatus String?  @default("Sent")
+  sentBy         String?  @default("System")
+  type           String?  @default("Email")
+}
+
+model SentWhatsApp {
+  id            String   @id @default(cuid())
+  to            String
+  message       String
+  sentAt        String
+  company       String?
+  branch        String?
+  candidateName String?
+}
+

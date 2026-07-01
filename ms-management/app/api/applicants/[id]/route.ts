@@ -1,0 +1,177 @@
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getSessionUser } from "@/lib/auth-helpers";
+import { sendEmail, sendWhatsApp } from "@/lib/notifications";
+
+type RouteParams = {
+  params: Promise<{ id: string }>;
+};
+
+export async function PUT(request: Request, { params }: RouteParams) {
+  try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const data = await request.json();
+
+    const existing = await prisma.applicant.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
+    }
+
+    // Tenancy Check
+    if (user.role !== "Super Admin") {
+      if (existing.company !== user.company) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      if (user.role === "Branch Admin" && existing.branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+
+    const updated = await prisma.applicant.update({
+      where: { id },
+      data: {
+        photo: data.photo !== undefined ? data.photo : undefined,
+        applicationDate: data.applicationDate ?? undefined,
+        fullName: data.fullName ?? undefined,
+        dateOfBirth: data.dateOfBirth ?? undefined,
+        email: data.email ?? undefined,
+        mobile: data.mobile ?? undefined,
+        whatsapp: data.whatsapp ?? undefined,
+        nationality: data.nationality ?? undefined,
+        nationalityFlag: data.nationalityFlag ?? undefined,
+        currentCountry: data.currentCountry ?? undefined,
+        applyingPositions: data.applyingPositions ?? undefined,
+        salaryExpectation: data.salaryExpectation !== undefined ? Number(data.salaryExpectation) : undefined,
+        applyCountry: data.applyCountry ?? undefined,
+        visaType: data.visaType ?? undefined,
+        visaExpiry: data.visaExpiry ?? undefined,
+        passportExpiry: data.passportExpiry ?? undefined,
+        passportNumber: data.passportNumber ?? undefined,
+        status: data.status ?? undefined,
+        trackingCode: data.trackingCode ?? undefined,
+        company: data.company ?? undefined,
+        branch: data.branch ?? undefined,
+        documents: data.documents !== undefined ? data.documents : undefined,
+        statusHistory: data.statusHistory !== undefined ? data.statusHistory : undefined,
+        clientName: data.clientName !== undefined ? data.clientName : undefined,
+        clientPhoto: data.clientPhoto !== undefined ? data.clientPhoto : undefined,
+        clientMobile: data.clientMobile !== undefined ? data.clientMobile : undefined,
+        clientWhatsapp: data.clientWhatsapp !== undefined ? data.clientWhatsapp : undefined,
+        clientEmail: data.clientEmail !== undefined ? data.clientEmail : undefined,
+        memberActive: data.memberActive !== undefined ? data.memberActive : undefined
+      }
+    });
+
+    // If status has changed, trigger real-time notifications
+    if (data.status && data.status !== existing.status && updated.email) {
+      const emailBody = `Dear ${updated.fullName},
+
+Your application status has been updated to: ${updated.status}.
+
+Registration Details:
+- Tracking Code: ${updated.trackingCode}
+- Position: ${Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions}
+
+You can track your application details anytime at http://localhost:3000/apply.
+
+Best regards,
+MS Horizon F.Z.E Recruitment Team`;
+
+      sendEmail({
+        to: updated.email,
+        subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
+        body: emailBody,
+        candidateName: updated.fullName,
+        company: updated.company,
+        branch: updated.branch
+      }).catch(err => console.error("Async status update email error:", err));
+    } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
+      // General profile update
+      const emailBody = `Dear ${updated.fullName},
+
+This is to notify you that your application profile details have been updated in our recruitment system.
+
+Profile Details:
+- Tracking Code: ${updated.trackingCode}
+- Position: ${Array.isArray(updated.applyingPositions) ? (updated.applyingPositions as string[]).join(", ") : updated.applyingPositions}
+
+If you did not authorize this change or have questions, please contact our support team.
+
+Best regards,
+MS Horizon F.Z.E Recruitment Team`;
+
+      sendEmail({
+        to: updated.email,
+        subject: `Application Profile Updated - Tracking Code: ${updated.trackingCode}`,
+        body: emailBody,
+        candidateName: updated.fullName,
+        company: updated.company,
+        branch: updated.branch
+      }).catch(err => console.error("Async general update email error:", err));
+    }
+
+    if (data.status && data.status !== existing.status && (updated.whatsapp || updated.mobile)) {
+      const waNumber = updated.whatsapp || updated.mobile;
+      const waMessage = `Dear ${updated.fullName}, your application status has been updated to: ${updated.status}. You can track it using code: ${updated.trackingCode}.`;
+
+      sendWhatsApp({
+        to: waNumber,
+        message: waMessage,
+        candidateName: updated.fullName,
+        company: updated.company,
+        branch: updated.branch
+      }).catch(err => console.error("Async status update WhatsApp error:", err));
+    }
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error("PUT applicant error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request, { params }: RouteParams) {
+  try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    const existing = await prisma.applicant.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
+    }
+
+    // Tenancy Check
+    if (user.role !== "Super Admin") {
+      if (existing.company !== user.company) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      if (user.role === "Branch Admin" && existing.branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+
+    await prisma.applicant.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true, message: "Applicant deleted" });
+  } catch (error: any) {
+    console.error("DELETE applicant error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

@@ -1,0 +1,287 @@
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { sendEmail, sendWhatsApp } from "@/lib/notifications";
+
+export async function GET() {
+  try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Determine if the user's company is a Client Company
+    const clientCompany = await prisma.company.findFirst({
+      where: { name: user.company }
+    });
+    const isClient = !!clientCompany;
+
+    let filter: any = {};
+    if (user.role !== "Super Admin" && isClient) {
+      filter = {
+        OR: [
+          { company: user.company },
+          { clientName: user.company }
+        ]
+      };
+      if (user.role === "Branch Admin" && user.branch && user.branch !== "All") {
+        filter.branch = user.branch;
+      }
+    } else {
+      // Internal recruitment agency users (e.g. MS Company Management Solutions) can see all applicants.
+      // Filter by branch only if they are a Branch Admin.
+      if (user.role === "Branch Admin" && user.branch && user.branch !== "All") {
+        filter.branch = user.branch;
+      }
+    }
+
+    const applicants = await prisma.applicant.findMany({
+      where: filter,
+      orderBy: { createdAt: "desc" }
+    });
+
+    return NextResponse.json(applicants);
+  } catch (error: any) {
+    console.error("GET applicants error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const user = await getSessionUser();
+    const data = await request.json();
+
+    if (!data.fullName || !data.company || !data.branch) {
+      return NextResponse.json(
+        { error: "Full name, company, and branch are required" },
+        { status: 400 }
+      );
+    }
+
+    // Tenancy Check: only if session exists
+    if (!user) {
+      // Guest registering via public portal
+      if (data.company !== "Not Placed" || data.branch !== "Not Placed") {
+        return NextResponse.json({ error: "Unauthorized: External registration must be 'Not Placed'" }, { status: 401 });
+      }
+    } else {
+      if (user.role !== "Super Admin") {
+        if (data.company !== user.company) {
+          return NextResponse.json({ error: "Cannot create applicant for another company" }, { status: 403 });
+        }
+        if (user.role === "Branch Admin" && data.branch !== user.branch) {
+          return NextResponse.json({ error: "Cannot create applicant for another branch" }, { status: 403 });
+        }
+      }
+    }
+
+    // Generate tracking code if not provided
+    let trackingCode = data.trackingCode;
+    if (!trackingCode) {
+      const year = new Date().getFullYear();
+      const count = await prisma.applicant.count();
+      trackingCode = `TRK-${year}-${String(count + 1).padStart(3, "0")}`;
+    }
+
+    const applicant = await prisma.applicant.create({
+      data: {
+        id: data.id || undefined,
+        photo: data.photo || null,
+        applicationDate: data.applicationDate || new Date().toISOString().slice(0, 10),
+        fullName: data.fullName,
+        dateOfBirth: data.dateOfBirth || "",
+        email: data.email ? data.email.trim().toLowerCase() : "",
+        mobile: data.mobile || "",
+        whatsapp: data.whatsapp || "",
+        nationality: data.nationality || "",
+        nationalityFlag: data.nationalityFlag || "",
+        currentCountry: data.currentCountry || "",
+        applyingPositions: data.applyingPositions || [],
+        salaryExpectation: Number(data.salaryExpectation) || 0,
+        applyCountry: data.applyCountry || "",
+        visaType: data.visaType || "",
+        visaExpiry: data.visaExpiry || "",
+        passportExpiry: data.passportExpiry || "",
+        passportNumber: data.passportNumber || "",
+        status: data.status || "Pending",
+        trackingCode: trackingCode,
+        company: data.company,
+        branch: data.branch,
+        createdBy: user ? user.name : (data.fullName || "Online Application"),
+        createdAt: data.createdAt || new Date().toISOString().slice(0, 10),
+        documents: data.documents || [],
+        statusHistory: data.statusHistory || [],
+        clientName: data.clientName || null,
+        clientPhoto: data.clientPhoto || null,
+        clientMobile: data.clientMobile || null,
+        clientWhatsapp: data.clientWhatsapp || null,
+        clientEmail: data.clientEmail || null,
+        memberActive: data.memberActive || false
+      }
+    });
+
+    // Trigger real-time notifications asynchronously
+    if (applicant.email && applicant.email.trim() !== "") {
+      const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Horizon F.Z.E";
+      const emailBody = `Dear ${applicant.fullName},
+
+Thank you for registering your application with ${companyName}.
+
+Here are your registration details:
+- Applicant Name: ${applicant.fullName}
+- Position(s) Applied: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions}
+- Application Tracking Code: ${applicant.trackingCode}
+
+You can track your application status anytime at http://localhost:3000/apply by entering your email or tracking code.
+
+Best regards,
+${companyName} Recruitment Team`;
+
+      sendEmail({
+        to: applicant.email,
+        subject: `Application Registered successfully - Tracking Code: ${applicant.trackingCode}`,
+        body: emailBody,
+        candidateName: applicant.fullName,
+        company: companyName,
+        branch: applicant.branch
+      }).catch(err => console.error("Async email sending error:", err));
+    }
+
+    // Link applicant with Client Company, create Placement + Agreement, and dispatch email alerts
+    const targetClientCompany = applicant.clientName || data.clientName;
+    if (targetClientCompany && targetClientCompany !== "Not Placed" && targetClientCompany !== "System") {
+      try {
+        const clientCompany = await prisma.company.findFirst({
+          where: { name: targetClientCompany }
+        });
+
+        if (clientCompany) {
+          // 1. Sync the applicant profile's client fields to ensure they match clientCompany details
+          await prisma.applicant.update({
+            where: { id: applicant.id },
+            data: {
+              clientName: clientCompany.name,
+              clientEmail: clientCompany.email,
+              clientMobile: clientCompany.telephone || "",
+              clientWhatsapp: clientCompany.whatsapp || "",
+            }
+          });
+
+          // 2. Automatically create a Placement & Agreement record for this applicant and Client Company
+          const placementId = `PLM-${Math.floor(100 + Math.random() * 900)}-${Date.now().toString().slice(-4)}`;
+          
+          await prisma.placement.create({
+            data: {
+              id: placementId,
+              applicantId: applicant.id,
+              applicantName: applicant.fullName,
+              companyId: clientCompany.id,
+              companyName: clientCompany.name,
+              position: (() => {
+                const pos = applicant.applyingPositions;
+                if (Array.isArray(pos) && pos.length > 0) {
+                  return String(pos[0]);
+                }
+                if (pos && typeof pos === "string") {
+                  return pos;
+                }
+                return "General Staff";
+              })(),
+              salary: Number(applicant.salaryExpectation) || 4000,
+              placementDate: applicant.applicationDate || new Date().toISOString().slice(0, 10),
+              status: "Trial", // Initial status
+              company: applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Company Management Solutions",
+              branch: applicant.branch && applicant.branch !== "Not Placed" ? applicant.branch : "Dubai Main Branch",
+              createdAt: applicant.createdAt || new Date().toISOString().slice(0, 10),
+              agreementStatus: "Pending",
+              termsAndConditions: `Standard Recruitment and Placement Agreement terms apply for ${clientCompany.name}.\n\nRegistration fee: AED 500, Placement fee: AED 1000.\nAll invoices are payable within 14 business days of candidates placement date.`,
+              registrationFee: 500,
+              placementFee: 1000,
+              refundStatus: "Not Applicable",
+              agreementAccepted: false,
+              notes: `Auto-linked placement and agreement for client ${clientCompany.name}`,
+              agreementHistory: [
+                `Placement and Payment Agreement automatically initialized for candidate ${applicant.fullName} under hiring client ${clientCompany.name} on ${new Date().toISOString().slice(0, 10)}.`
+              ],
+              passportNumber: applicant.passportNumber || "",
+              mobileNumber: applicant.mobile || "",
+              registrationDate: applicant.applicationDate || "",
+              placementDeadline: ""
+            }
+          });
+
+          // 3. Prepare and send notification emails to Company Email & HR Email
+          const recipients: string[] = [];
+          if (clientCompany.email) {
+            recipients.push(clientCompany.email.trim());
+          }
+          if (clientCompany.hrMobile && clientCompany.hrMobile.includes("@")) {
+            recipients.push(clientCompany.hrMobile.trim());
+          }
+
+          const docsText = applicant.documents && Array.isArray(applicant.documents) && applicant.documents.length > 0
+            ? applicant.documents.map((d: any) => `- ${d.type || 'Doc'}: ${d.name}`).join("\n")
+            : "No documents uploaded.";
+
+          const hrEmailBody = `Dear Team at ${clientCompany.name},
+
+A new online application has been registered for your company.
+
+Candidate Details:
+- Name: ${applicant.fullName}
+- Position Applied: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions}
+- Nationality: ${applicant.nationality || "N/A"}
+- Mobile Number: ${applicant.mobile || "N/A"}
+- WhatsApp Number: ${applicant.whatsapp || "N/A"}
+- Email Address: ${applicant.email || "N/A"}
+- Application Date: ${applicant.applicationDate}
+- Tracking Code: ${applicant.trackingCode}
+
+Uploaded Documents:
+${docsText}
+
+You can view the full applicant details by clicking the link below:
+http://localhost:3000/applicants/${applicant.id}
+
+Best regards,
+MS Company Management Solutions Operations Team`;
+
+          for (const recipient of recipients) {
+            sendEmail({
+              to: recipient,
+              subject: `[New Application] ${applicant.fullName} - ${clientCompany.name}`,
+              body: hrEmailBody,
+              candidateName: applicant.fullName,
+              company: clientCompany.name,
+              branch: applicant.branch && applicant.branch !== "Not Placed" ? applicant.branch : "Dubai Main Branch",
+              sentBy: "System",
+              type: "Email"
+            }).catch(err => console.error(`Error sending email to ${recipient}:`, err));
+          }
+        }
+      } catch (err) {
+        console.error("Error creating linked placement agreement & dispatching notifications:", err);
+      }
+    }
+
+    if (applicant.whatsapp || applicant.mobile) {
+      const waNumber = applicant.whatsapp || applicant.mobile;
+      const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Horizon F.Z.E";
+      const waMessage = `Dear ${applicant.fullName}, your application for positions: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions} has been registered successfully. Track your status using code: ${applicant.trackingCode}. Welcome to ${companyName}!`;
+
+      sendWhatsApp({
+        to: waNumber,
+        message: waMessage,
+        candidateName: applicant.fullName,
+        company: applicant.company,
+        branch: applicant.branch
+      }).catch(err => console.error("Async WhatsApp sending error:", err));
+    }
+
+    return NextResponse.json(applicant);
+  } catch (error: any) {
+    console.error("POST applicant error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

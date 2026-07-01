@@ -1,0 +1,661 @@
+"use client";
+
+import { useState } from "react";
+import { Plus, Calendar, Clock, Video, Phone, MapPin, Trash2, Globe, User, Mail } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { useFilterStore } from "@/store/filterStore";
+import { exportToCSV } from "@/lib/utils";
+import PageHeader from "@/components/shared/PageHeader";
+import FilterBar from "@/components/shared/FilterBar";
+import StatusBadge from "@/components/shared/StatusBadge";
+import EmptyState from "@/components/shared/EmptyState";
+import Pagination from "@/components/shared/Pagination";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Interview } from "@/lib/types";
+import { NATIONALITIES, MEETING_MODES } from "@/lib/constants";
+import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+
+export default function InterviewsPage() {
+  const { currentRole, currentUser, interviews, applicants, companies, branches, addInterview, updateInterview, deleteInterview, addSentEmail, addSentWhatsApp } = useAuthStore();
+  const { filters } = useFilterStore();
+  const [modal, setModal] = useState(false);
+  const [editInt, setEditInt] = useState<Interview | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    applicantId: "",
+    type: "Interview" as Interview["type"],
+    conductPerson: currentUser.name,
+    personName: "",
+    mobile: "",
+    whatsapp: "",
+    email: "",
+    nationality: "India",
+    position: "",
+    meetingType: "",
+    isOnline: true,
+    dateTime: "",
+    mode: "Zoom" as Interview["mode"],
+    meetingLink: "",
+    locationLink: "",
+    notes: "",
+    company: currentUser.company === "System" ? "" : currentUser.company,
+    branch: currentUser.branch === "All" ? "" : currentUser.branch,
+    autoEmail: true,
+    autoWhatsapp: true,
+  });
+
+  const isSuperAdmin = currentRole === "Super Admin";
+  const allowedCompanies = isSuperAdmin ? companies : companies.filter(c => c.name === currentUser.company);
+  const branchCompany = form.company || (isSuperAdmin ? "" : currentUser.company);
+  const allowedBranches = isSuperAdmin
+    ? branches.filter(b => branchCompany === "" || b.company === branchCompany)
+    : branches.filter(b => b.company === currentUser.company && (currentUser.branch === "All" || b.name === currentUser.branch));
+
+  // Filter applicant dropdown based on selected company & branch
+  const filteredApplicants = applicants.filter(app => {
+    if (form.company && app.company !== form.company) return false;
+    if (form.branch && form.branch !== "All" && app.branch !== form.branch) return false;
+    if (!isSuperAdmin && currentUser.company !== "System") {
+      if (app.company !== currentUser.company) return false;
+      if (currentUser.branch !== "All" && app.branch !== currentUser.branch) return false;
+    }
+    return true;
+  });
+
+  const f = filters.interviews;
+  let list = interviews;
+  if (currentRole !== "Super Admin" && currentUser.company !== "System") list = list.filter(i => i.company === currentUser.company);
+  if (f.search) { const q = f.search.toLowerCase(); list = list.filter(i => i.personName.toLowerCase().includes(q) || i.conductPerson.toLowerCase().includes(q)); }
+  if (f.status && f.status !== "all") list = list.filter(i => i.status === f.status);
+  if (f.company && f.company !== "all") list = list.filter(i => i.company === f.company);
+  if (f.fromDate) list = list.filter(i => i.dateTime.slice(0,10) >= f.fromDate);
+  if (f.toDate) list = list.filter(i => i.dateTime.slice(0,10) <= f.toDate);
+
+  const sortBy = f.sortBy || "newest";
+  list = [...list].sort((a,b) => sortBy === "oldest" ? a.dateTime.localeCompare(b.dateTime) : b.dateTime.localeCompare(a.dateTime));
+
+  const totalItems = list.length;
+  const page = f.page || 1;
+  const pageSize = f.pageSize || 10;
+  const paginated = list.slice((page-1)*pageSize, page*pageSize);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.personName || !form.dateTime || !form.conductPerson) { 
+      toast.error("Required fields: name, conductor, and date/time"); 
+      return; 
+    }
+    const flag = NATIONALITIES.find(n => n.name === form.nationality)?.flag || "🏳️";
+    const onlineState = form.isOnline;
+    const locationLink = form.isOnline ? null : form.locationLink || null;
+    const meetingLink = form.meetingLink || null;
+
+    if (editInt) {
+      updateInterview({
+        ...editInt,
+        ...form,
+        nationalityFlag: flag,
+        isOnline: onlineState,
+        meetingLink,
+        locationLink,
+      });
+      toast.success("Schedule updated successfully");
+    } else {
+      const id = `INT-${Math.floor(100+Math.random()*900)}`;
+      addInterview({
+        ...form,
+        id,
+        nationalityFlag: flag,
+        isOnline: onlineState,
+        meetingLink,
+        locationLink,
+        status: "Scheduled",
+        company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
+        branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
+        createdBy: currentUser.name,
+        createdAt: new Date().toISOString().slice(0,10),
+      });
+
+      // Send auto invites if configured
+      if (form.autoEmail && form.email) {
+        addSentEmail({
+          id: `EML-${Math.floor(100+Math.random()*900)}`,
+          to: form.email,
+          subject: `Interview Invitation: ${form.type === "Interview" ? form.position : form.meetingType} - ${form.personName}`,
+          body: `Dear ${form.personName},\n\nYou have been scheduled for an ${form.type} conducted by ${form.conductPerson}.\n\nDate & Time: ${form.dateTime.replace("T", " ")}\nFormat: ${form.isOnline ? `Online (${form.mode})` : "Physical Assessment"}\n${form.meetingLink ? `Meeting Link: ${form.meetingLink}\n` : ""}${form.locationLink ? `Location Link: ${form.locationLink}\n` : ""}\nNotes: ${form.notes || "N/A"}\n\nBest regards,\nHR Department`,
+          sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+          company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
+          branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
+          candidateName: form.personName
+        });
+        toast.success("Auto invite email sent successfully");
+      }
+
+      if (form.autoWhatsapp && form.whatsapp) {
+        addSentWhatsApp({
+          id: `WHA-${Math.floor(100+Math.random()*900)}`,
+          to: form.whatsapp,
+          message: `Hello ${form.personName}, your ${form.type} (${form.type === "Interview" ? form.position : form.meetingType}) is scheduled with ${form.conductPerson} on ${form.dateTime.replace("T", " ")}. Join here: ${form.meetingLink || "N/A"}`,
+          sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+          company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
+          branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
+          candidateName: form.personName
+        });
+        toast.success("Auto WhatsApp message dispatched");
+      }
+
+      toast.success("Interview/meeting scheduled");
+    }
+    setModal(false);
+    setEditInt(null);
+    setForm({
+      applicantId: "",
+      type: "Interview",
+      conductPerson: currentUser.name,
+      personName: "",
+      mobile: "",
+      whatsapp: "",
+      email: "",
+      nationality: "India",
+      position: "",
+      meetingType: "",
+      isOnline: true,
+      dateTime: "",
+      mode: "Zoom",
+      meetingLink: "",
+      locationLink: "",
+      notes: "",
+      company: currentUser.company === "System" ? "" : currentUser.company,
+      branch: currentUser.branch === "All" ? "" : currentUser.branch,
+      autoEmail: true,
+      autoWhatsapp: true,
+    });
+  };
+
+  const [statusModal, setStatusModal] = useState<{ int: Interview; targetStatus: Interview["status"] } | null>(null);
+  const [statusReason, setStatusReason] = useState("");
+  const [rescheduleDateTime, setRescheduleDateTime] = useState("");
+
+  const handleStatusChange = (int: Interview, status: Interview["status"]) => {
+    if (status === "Cancelled" || status === "Rescheduled") {
+      setStatusModal({ int, targetStatus: status });
+      setStatusReason("");
+      setRescheduleDateTime(int.dateTime ? int.dateTime.replace(" ", "T") : "");
+    } else {
+      updateInterview({ ...int, status });
+      toast.success(`Status → ${status}`);
+    }
+  };
+
+  const modeIcon = (mode: string) => {
+    if (mode === "Zoom" || mode === "Google Meet" || mode === "Microsoft Teams") return <Video className="w-3.5 h-3.5"/>;
+    if (mode === "Phone call" || mode === "WhatsApp") return <Phone className="w-3.5 h-3.5"/>;
+    return <MapPin className="w-3.5 h-3.5"/>;
+  };
+
+  return (
+    <div className="flex flex-col h-full select-none">
+      <PageHeader title="Interviews & Meetings" subtitle="Schedule and manage all interviews and team meetings"
+        actions={<Button onClick={() => { setEditInt(null); setForm({ applicantId:"", type:"Interview", conductPerson:currentUser.name, personName:"", mobile:"", whatsapp:"", email:"", nationality:"India", position:"", meetingType:"", isOnline:true, dateTime:"", mode:"Zoom", meetingLink:"", locationLink:"", notes:"", company: currentUser.company === "System" ? "" : currentUser.company, branch: currentUser.branch === "All" ? "" : currentUser.branch, autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5 shadow-sm"><Plus className="w-4 h-4"/>Schedule</Button>}
+      />
+      <FilterBar moduleKey="interviews" statusOptions={["Scheduled","Completed","Cancelled","Rescheduled"]} onExport={() => { exportToCSV(list.map(i=>({ID:i.id,Type:i.type,Person:i.personName,DateTime:i.dateTime,Mode:i.mode,Status:i.status})),"interviews"); toast.success("Exported"); }} />
+
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+        {paginated.length === 0 ? (
+          <EmptyState title="No interviews scheduled" description="Schedule your first interview or meeting." action={<Button onClick={() => setModal(true)} className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9">Schedule Now</Button>} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {paginated.map(int => {
+              const linkedApp = applicants.find(a => a.id === int.applicantId);
+              return (
+                <Card key={int.id} className="rounded-2xl border-slate-100 p-5 bg-white shadow-sm hover:shadow-md transition-all flex flex-col gap-3 relative">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-xl flex-shrink-0">
+                        {linkedApp?.photo ? (
+                          <AvatarImage src={linkedApp.photo} className="object-cover rounded-xl" />
+                        ) : null}
+                        <AvatarFallback className="rounded-xl font-bold bg-slate-100 text-slate-700 text-xs">
+                          {int.personName.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border uppercase ${int.type === "Interview" ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-purple-50 text-purple-600 border-purple-100"}`}>{int.type}</span>
+                        </div>
+                        <div className="text-sm font-bold text-slate-800 leading-tight truncate">{int.personName} {int.nationalityFlag}</div>
+                        <div className="text-[10px] text-slate-500 mt-0.5 font-semibold truncate">
+                          {int.type === "Interview" ? `Position: ${int.position || "N/A"}` : `Type: ${int.meetingType || "N/A"}`}
+                        </div>
+                      </div>
+                    </div>
+                    <StatusBadge status={int.status} />
+                  </div>
+
+                  {int.applicantId && (
+                    <div className="text-[10px] text-slate-400 font-semibold border-t border-slate-50 pt-2 flex items-center gap-1">
+                      <span className="text-slate-400">Linked applicant:</span>
+                      <a href={`/applicants/${int.applicantId}`} className="text-blue-600 font-bold hover:underline">
+                        Profile ({int.applicantId})
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600">
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"><Calendar className="w-3.5 h-3.5 text-slate-400"/>{int.dateTime.split("T")[0] || int.dateTime.split(" ")[0]}</div>
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"><Clock className="w-3.5 h-3.5 text-slate-400"/>{int.dateTime.split("T")[1] || int.dateTime.split(" ")[1]}</div>
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border col-span-2 ${int.isOnline ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-amber-50 text-amber-600 border-amber-100"}`}>{modeIcon(int.mode)}{int.isOnline ? `Online (${int.mode})` : "Physical Assessment"}</div>
+                  </div>
+
+                  {/* Styled buttons for Meeting link and physical Location link */}
+                  <div className="flex gap-2">
+                    {int.meetingLink && (
+                      <Button asChild size="sm" variant="outline" className="h-8 rounded-xl text-[10px] font-bold border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-100 flex-1">
+                        <a href={int.meetingLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5">
+                          <Video className="w-3.5 h-3.5" />
+                          Link Button
+                        </a>
+                      </Button>
+                    )}
+                    {!int.isOnline && int.locationLink && (
+                      <Button asChild size="sm" variant="outline" className="h-8 rounded-xl text-[10px] font-bold border-amber-100 bg-amber-50 text-amber-600 hover:bg-amber-100 flex-1">
+                        <a href={int.locationLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5" />
+                          Location Button
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] text-slate-500 font-semibold border-t border-slate-50 pt-2">
+                    {int.whatsapp && <div>WhatsApp: <span className="font-normal text-slate-700">{int.whatsapp}</span></div>}
+                    {int.email && <div>Email: <span className="font-normal text-slate-700 truncate block">{int.email}</span></div>}
+                    {int.nationality && <div>Nationality: <span className="font-normal text-slate-700">{int.nationality}</span></div>}
+                    {int.mobile && <div>Mobile: <span className="font-normal text-slate-700">{int.mobile}</span></div>}
+                  </div>
+                  
+                  <div className="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Conductor: <span className="text-slate-800 font-bold">{int.conductPerson}</span></span>
+                  </div>
+
+                  {int.notes && (
+                    <div className="text-[10px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100 italic">
+                      Notes: {int.notes}
+                    </div>
+                  )}
+
+                  {/* Manual notifications invite buttons */}
+                  <div className="flex gap-2 border-t border-slate-50 pt-2.5">
+                    {int.email && (
+                      <button 
+                        onClick={() => {
+                          addSentEmail({
+                            id: `EML-${Math.floor(100+Math.random()*900)}`,
+                            to: int.email!,
+                            subject: `Interview Invitation Notice: ${int.type === "Interview" ? int.position : int.meetingType} - ${int.personName}`,
+                            body: `Dear ${int.personName},\n\nThis is a manual reminder for your ${int.type} scheduled with ${int.conductPerson} on ${int.dateTime}.\n\nMeeting link: ${int.meetingLink || "N/A"}\nLocation: ${int.locationLink || "N/A"}\nNotes: ${int.notes || "N/A"}`,
+                            sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+                            company: int.company || currentUser.company,
+                            branch: int.branch || currentUser.branch,
+                            candidateName: int.personName
+                          });
+                          toast.success(`Invitation Email manually sent to ${int.personName}`);
+                        }}
+                        className="text-[9px] font-bold px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 hover:border-blue-200 transition-colors flex items-center gap-1 flex-1 justify-center"
+                      >
+                        <Mail className="w-3 h-3"/> Send Email Invite
+                      </button>
+                    )}
+                    {int.whatsapp && (
+                      <button 
+                        onClick={() => {
+                          addSentWhatsApp({
+                            id: `WHA-${Math.floor(100+Math.random()*900)}`,
+                            to: int.whatsapp!,
+                            message: `Manual Reminder: Hello ${int.personName}, your ${int.type} is scheduled on ${int.dateTime}. Join link: ${int.meetingLink || "N/A"}`,
+                            sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+                            company: int.company || currentUser.company,
+                            branch: int.branch || currentUser.branch,
+                            candidateName: int.personName
+                          });
+                          toast.success(`WhatsApp message manually sent to ${int.personName}`);
+                        }}
+                        className="text-[9px] font-bold px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 border border-slate-200 hover:border-emerald-200 transition-colors flex items-center gap-1 flex-1 justify-center"
+                      >
+                        <Phone className="w-3 h-3 text-emerald-500"/> Send WhatsApp Invite
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-3 flex gap-1 flex-wrap">
+                    {(["Completed","Cancelled","Rescheduled"] as Interview["status"][]).filter(s => s !== int.status).map(s => (
+                      <button key={s} onClick={() => handleStatusChange(int, s)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">→ {s}</button>
+                    ))}
+                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:int.dateTime.replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors ml-auto">Edit</button>
+                    <button onClick={() => setDeleteId(int.id)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-rose-100 bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <Pagination moduleKey="interviews" totalItems={totalItems} />
+
+      <Dialog open={modal} onOpenChange={setModal}>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-hidden flex flex-col">
+          <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
+            <DialogHeader className="p-6 pb-4 border-b border-slate-100 flex-shrink-0">
+              <DialogTitle className="text-base font-bold text-slate-800">{editInt ? "Edit Schedule" : "Schedule Interview / Meeting"}</DialogTitle>
+              <DialogDescription className="text-xs text-slate-400">Select type, fill candidate or meeting details, and set date/time.</DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 p-6 overflow-y-auto space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Column 1: Candidate / Participant Details */}
+                <div className="space-y-4 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/80">
+                  <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 flex-shrink-0">
+                    <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      {form.type === "Interview" ? "Candidate Details" : "Participant Details"}
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    {isSuperAdmin && (
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Company</Label>
+                        <select
+                          value={form.company}
+                          onChange={e => setForm(f => ({ ...f, company: e.target.value || "", branch: "", applicantId: "", personName: "", mobile: "", whatsapp: "", email: "", nationality: "India", position: "", meetingType: "" }))}
+                          className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                        >
+                          <option value="">Select Company</option>
+                          {allowedCompanies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Branch Selection (Super Admin & Company Admin / users with multiple branches) */}
+                    {(isSuperAdmin || (currentRole === "Company Admin" && currentUser.branch === "All")) && (
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Branch</Label>
+                        <select
+                          value={form.branch}
+                          onChange={e => setForm(f => ({ ...f, branch: e.target.value || "", applicantId: "", personName: "", mobile: "", whatsapp: "", email: "", nationality: "India", position: "", meetingType: "" }))}
+                          className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                        >
+                          <option value="">All Branches</option>
+                          {allowedBranches.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                        </select>
+                      </div>
+                    )}
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Link Applicant</Label>
+                      <select
+                        value={form.applicantId}
+                        onChange={e => {
+                          const val = e.target.value;
+                          const selected = applicants.find(a => a.id === val);
+                          setForm(f => ({
+                            ...f,
+                            applicantId: val || "",
+                            personName: selected?.fullName || f.personName,
+                            mobile: selected?.mobile || f.mobile,
+                            whatsapp: selected?.whatsapp || f.whatsapp,
+                            email: selected?.email || f.email,
+                            nationality: selected?.nationality || f.nationality,
+                            position: selected?.applyingPositions?.[0] || f.position,
+                          }));
+                        }}
+                        className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                      >
+                        <option value="">No applicant</option>
+                        {filteredApplicants.map(app => <option key={app.id} value={app.id}>{app.fullName} ({app.id})</option>)}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        {form.type === "Interview" ? "Candidate Name" : "Person Name"} <span className="text-rose-500">*</span>
+                      </Label>
+                      <Input required value={form.personName} onChange={e => setForm(f => ({...f, personName: e.target.value}))} placeholder="Enter full name" className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp</Label>
+                        <Input value={form.whatsapp} onChange={e => setForm(f => ({...f, whatsapp: e.target.value}))} placeholder="WhatsApp..." className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile</Label>
+                        <Input value={form.mobile} onChange={e => setForm(f => ({...f, mobile: e.target.value}))} placeholder="Mobile..." className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email Address</Label>
+                      <Input type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} placeholder="email@example.com" className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nationality</Label>
+                        <select
+                          value={form.nationality}
+                          onChange={e => setForm(f => ({...f, nationality: e.target.value || "India"}))}
+                          className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                        >
+                          {NATIONALITIES.map(n => <option key={n.name} value={n.name}>{n.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          {form.type === "Interview" ? "Position" : "Meeting Type"}
+                        </Label>
+                        <Input value={form.type === "Interview" ? form.position : form.meetingType} onChange={e => setForm(f => form.type === "Interview" ? ({...f, position: e.target.value}) : ({...f, meetingType: e.target.value}))} placeholder={form.type === "Interview" ? "e.g. Developer" : "e.g. Sync"} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: Schedule & Format */}
+                <div className="space-y-4 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/80">
+                  <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 flex-shrink-0">
+                    <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Schedule & Format</h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</Label>
+                        <select
+                          value={form.type}
+                          onChange={e => setForm(f => ({...f, type: (e.target.value as Interview["type"]) || "Interview"}))}
+                          className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                        >
+                          <option value="Interview">Interview</option>
+                          <option value="Meeting">Meeting</option>
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Conducted By <span className="text-rose-500">*</span></Label>
+                        <Input required value={form.conductPerson} onChange={e => setForm(f => ({...f, conductPerson: e.target.value}))} placeholder="Conductor name" className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Date & Time <span className="text-rose-500">*</span></Label>
+                      <Input required type="datetime-local" value={form.dateTime} onChange={e => setForm(f => ({...f, dateTime: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400 text-slate-800" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Format</Label>
+                        <select
+                          value={form.isOnline ? "Online" : "Physical"}
+                          onChange={e => setForm(f => ({...f, isOnline: e.target.value === "Online"}))}
+                          className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                        >
+                          <option value="Online">Online</option>
+                          <option value="Physical">Physical</option>
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Platform</Label>
+                        <select
+                          value={form.mode}
+                          onChange={e => setForm(f => ({...f, mode: (e.target.value as Interview["mode"]) || "Zoom"}))}
+                          className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                        >
+                          {MEETING_MODES.map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Meeting Link</Label>
+                      <Input value={form.meetingLink} onChange={e => setForm(f => ({...f, meetingLink: e.target.value}))} placeholder="https://zoom.us/j/..." className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                    </div>
+
+                    {!form.isOnline && (
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Google Map Location Link</Label>
+                        <Input value={form.locationLink} onChange={e => setForm(f => ({...f, locationLink: e.target.value}))} placeholder="https://maps.app.goo.gl/..." className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                      </div>
+                    )}
+
+                    {/* Auto Notifications */}
+                    <div className="space-y-2 pt-2.5 border-t border-slate-100">
+                      <Label className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Auto Notifications</Label>
+                      <div className="flex items-center justify-between p-2.5 border border-slate-150 rounded-xl bg-white shadow-sm">
+                        <div className="space-y-0.5">
+                          <div className="text-[11px] font-bold text-slate-800">Auto Send Email Invite</div>
+                          <div className="text-[9px] text-slate-400 font-semibold">Instantly email details to candidate</div>
+                        </div>
+                        <Switch 
+                          checked={form.autoEmail} 
+                          onCheckedChange={v => setForm(f => ({ ...f, autoEmail: v }))} 
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-2.5 border border-slate-150 rounded-xl bg-white shadow-sm">
+                        <div className="space-y-0.5">
+                          <div className="text-[11px] font-bold text-slate-800">Auto Send WhatsApp Invite</div>
+                          <div className="text-[9px] text-slate-400 font-semibold">WhatsApp message to candidate</div>
+                        </div>
+                        <Switch 
+                          checked={form.autoWhatsapp} 
+                          onCheckedChange={v => setForm(f => ({ ...f, autoWhatsapp: v }))} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Notes</Label>
+                <textarea rows={2} value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} placeholder="Enter any extra details or instructions..." className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none transition-all" />
+              </div>
+            </div>
+            
+            <DialogFooter className="p-4 px-6 border-t border-slate-100 bg-slate-50/50 flex gap-2 justify-end flex-shrink-0">
+              <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
+              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9">{editInt ? "Update" : "Schedule"}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reschedule/Cancel Status Update Modal */}
+      <Dialog open={!!statusModal} onOpenChange={open => !open && setStatusModal(null)}>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!statusModal) return;
+            const { int, targetStatus } = statusModal;
+            if (targetStatus === "Rescheduled" && !rescheduleDateTime) {
+              toast.error("Please pick a new date and time");
+              return;
+            }
+            if (!statusReason.trim()) {
+              toast.error("Please enter a reason");
+              return;
+            }
+
+            updateInterview({
+              ...int,
+              status: targetStatus,
+              dateTime: targetStatus === "Rescheduled" ? rescheduleDateTime.replace("T", " ") : int.dateTime,
+              reason: statusReason
+            } as any);
+
+            toast.success(`Schedule ${targetStatus === "Rescheduled" ? "Rescheduled" : "Cancelled"}`);
+            setStatusModal(null);
+            setStatusReason("");
+          }} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-slate-800">
+                {statusModal?.targetStatus === "Rescheduled" ? "Reschedule Interview / Meeting" : "Cancel Interview / Meeting"}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-400">
+                Please provide the reason for {statusModal?.targetStatus === "Rescheduled" ? "rescheduling" : "cancelling"} this event. Candidate will be notified via email immediately.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3">
+              {statusModal?.targetStatus === "Rescheduled" && (
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New Date & Time <span className="text-rose-500">*</span></Label>
+                  <Input 
+                    required 
+                    type="datetime-local" 
+                    value={rescheduleDateTime} 
+                    onChange={e => setRescheduleDateTime(e.target.value)} 
+                    className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reason <span className="text-rose-500">*</span></Label>
+                <textarea 
+                  required
+                  rows={3} 
+                  value={statusReason} 
+                  onChange={e => setStatusReason(e.target.value)} 
+                  className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" 
+                  placeholder={`Write the reason manually here...`}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="flex gap-2 justify-end pt-2">
+              <Button type="button" variant="ghost" onClick={() => setStatusModal(null)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
+              <Button type="submit" className={`text-white font-bold rounded-xl text-xs px-5 h-9 ${statusModal?.targetStatus === "Rescheduled" ? "bg-blue-600 hover:bg-blue-700" : "bg-rose-600 hover:bg-rose-700"}`}>
+                Submit
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog isOpen={!!deleteId} onOpenChange={open => !open && setDeleteId(null)} onConfirm={() => { deleteInterview(deleteId!); toast.success("Deleted"); setDeleteId(null); }} title="Delete Schedule" description="Remove this interview/meeting from the calendar." confirmText="Delete" variant="danger" />
+    </div>
+  );
+}

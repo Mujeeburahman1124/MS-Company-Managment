@@ -1,0 +1,565 @@
+/* stylelint-disable */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: 'Inter', system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Premium Corporate Color Palette */
+  --background: oklch(0.99 0.005 255);
+  --foreground: oklch(0.12 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.02 260);
+  --primary: oklch(0.55 0.22 260);
+  /* Vibrant Pro Blue */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.965 0.005 260);
+  --secondary-foreground: oklch(0.2 0.02 260);
+  --muted: oklch(0.965 0.005 260);
+  --muted-foreground: oklch(0.55 0.015 260);
+  --accent: oklch(0.94 0.03 260);
+  --accent-foreground: oklch(0.2 0.02 260);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.91 0.01 260);
+  --input: oklch(0.91 0.01 260);
+  --ring: oklch(0.55 0.22 260);
+  --chart-1: oklch(0.55 0.2 260);
+  --chart-2: oklch(0.6 0.18 160);
+  /* Emerald */
+  --chart-3: oklch(0.65 0.15 30);
+  --chart-4: oklch(0.55 0.2 300);
+  --chart-5: oklch(0.55 0.15 180);
+  --radius: 0.75rem;
+  /* Softer corners for modern feel */
+  --sidebar: oklch(0.15 0.025 260);
+  --sidebar-foreground: oklch(0.92 0 0);
+  --sidebar-primary: oklch(0.55 0.2 260);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.22 0.025 260);
+  --sidebar-accent-foreground: oklch(0.92 0 0);
+  --sidebar-border: oklch(0.25 0.02 260);
+  --sidebar-ring: oklch(0.55 0.18 260);
+
+  /* Custom premium tokens */
+  --ms-gradient-start: #0f172a;
+  --ms-gradient-mid: #1e40af;
+  --ms-gradient-end: #3b82f6;
+  --ms-glow: 0 0 35px rgba(37, 99, 235, 0.18);
+  --ms-card-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 12px 24px -4px rgba(0, 0, 0, 0.02);
+  --ms-card-shadow-hover: 0 20px 40px -12px rgba(37, 99, 235, 0.12), 0 0 0 1px oklch(0.55 0.22 260 / 10%);
+
+  /* Extended Status Palette for Req 4, 15, 16 */
+  --ms-status-processing: #3b82f6;
+  --ms-status-placed: #10b981;
+  --ms-status-returned: #f59e0b;
+  --ms-status-rejected: #ef4444;
+
+  /* Brand Gradient Palette */
+  --ms-brand-grad: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --ms-success-grad: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+
+.dark {
+  --background: oklch(0.13 0.015 260);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.18 0.015 260);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.18 0.015 260);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.65 0.2 260);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.22 0.015 260);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.22 0.015 260);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.22 0.015 260);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.65 0.2 260);
+  --chart-2: oklch(0.65 0.2 150);
+  --chart-3: oklch(0.65 0.15 30);
+  --chart-4: oklch(0.65 0.2 300);
+  --chart-5: oklch(0.65 0.15 180);
+  --sidebar: oklch(0.15 0.02 260);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.65 0.2 260);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.22 0.02 260);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ─── Base Layer ─── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background: linear-gradient(135deg, #f8faff 0%, #eef2ff 40%, #f5f3ff 70%, #fdf4ff 100%);
+    background-attachment: fixed;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+}
+
+/* ─── Premium Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.8 0.005 260);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.7 0.01 260);
+}
+
+/* ─── Page Transition Animations ─── */
+@keyframes ms-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ms-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ms-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ms-glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 12px 4px rgba(59, 130, 246, 0.12);
+  }
+}
+
+@keyframes ms-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes ms-counter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ms-bell-ring {
+  0% {
+    transform: rotate(0);
+  }
+
+  10% {
+    transform: rotate(14deg);
+  }
+
+  20% {
+    transform: rotate(-12deg);
+  }
+
+  30% {
+    transform: rotate(10deg);
+  }
+
+  40% {
+    transform: rotate(-8deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+
+  60% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes ms-dot-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.3);
+  }
+}
+
+/* ─── Utility Animation Classes ─── */
+.ms-animate-in {
+  animation: ms-fade-in 0.35s ease-out both;
+}
+
+.ms-animate-slide-up {
+  animation: ms-slide-up 0.4s ease-out both;
+}
+
+.ms-animate-scale-in {
+  animation: ms-scale-in 0.3s ease-out both;
+}
+
+.ms-glow-pulse {
+  animation: ms-glow-pulse 2.5s ease-in-out infinite;
+}
+
+.ms-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: ms-shimmer 2.5s ease-in-out infinite;
+}
+
+.ms-bell-ring {
+  animation: ms-bell-ring 1.2s ease-in-out;
+  transform-origin: top center;
+}
+
+.ms-dot-pulse {
+  animation: ms-dot-pulse 1.8s ease-in-out infinite;
+}
+
+.ms-counter-rise {
+  animation: ms-counter-rise 0.5s ease-out both;
+}
+
+/* ─── Staggered Entry Animation for Lists ─── */
+.ms-stagger>* {
+  animation: ms-fade-in 0.35s ease-out both;
+}
+
+.ms-stagger>*:nth-child(1) {
+  animation-delay: 0.03s;
+}
+
+.ms-stagger>*:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.ms-stagger>*:nth-child(3) {
+  animation-delay: 0.09s;
+}
+
+.ms-stagger>*:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.ms-stagger>*:nth-child(5) {
+  animation-delay: 0.15s;
+}
+
+.ms-stagger>*:nth-child(6) {
+  animation-delay: 0.18s;
+}
+
+.ms-stagger>*:nth-child(7) {
+  animation-delay: 0.21s;
+}
+
+.ms-stagger>*:nth-child(8) {
+  animation-delay: 0.24s;
+}
+
+/* ─── Modern Grid Pattern Utility ─── */
+.ms-grid-pattern {
+  background-size: 40px 40px;
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+}
+
+/* ─── Premium Card Styles ─── */
+.ms-card {
+  box-shadow: var(--ms-card-shadow);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.ms-card:hover {
+  box-shadow: var(--ms-card-shadow-hover);
+  transform: translateY(-2px);
+  border-color: oklch(0.55 0.22 260 / 30%);
+}
+
+.ms-surface-glass {
+  @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/10;
+}
+
+/* ─── Nav Active States & Indicators ─── */
+.ms-sidebar-link-active {
+  @apply bg-sidebar-accent text-sidebar-foreground font-semibold;
+  box-shadow: inset 4px 0 0 0 var(--color-sidebar-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.ms-sidebar-link-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, var(--color-sidebar-primary), transparent);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.ms-nav-indicator {
+  @apply absolute bottom-0 h-1 bg-primary rounded-t-full transition-all duration-300 ease-out;
+  box-shadow: 0 -2px 10px var(--color-primary);
+}
+
+/* ─── StatCard & Shared Polish ─── */
+.ms-icon-gradient {
+  background: linear-gradient(135deg, var(--ms-gradient-start), var(--ms-gradient-end));
+  @apply flex items-center justify-center rounded-xl text-white shadow-lg shadow-primary/20;
+}
+
+.ms-empty-state-container {
+  @apply flex flex-col items-center justify-center p-12 text-center rounded-3xl border border-dashed border-border/60 bg-gradient-to-b from-transparent to-muted/30;
+}
+
+/* ─── Glassmorphism Header ─── */
+.ms-glass {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* ─── Frosted Bottom Nav ─── */
+.ms-frost {
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+/* ─── Sidebar Gradient ─── */
+.ms-sidebar-gradient {
+  background: linear-gradient(180deg, #0c1529 0%, #101d3a 40%, #0e1a33 100%);
+}
+
+/* ─── Global Search & Filter (Req 28) ─── */
+.ms-search-container {
+  @apply relative flex items-center w-full max-w-md transition-all duration-300;
+}
+
+.ms-search-input {
+  @apply w-full pl-10 pr-4 py-2 bg-muted/50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-background transition-all;
+}
+
+/* ─── Breadcrumb Navigation (Req 29.3) ─── */
+.ms-breadcrumb {
+  @apply flex items-center space-x-2 text-sm text-muted-foreground mb-6;
+}
+
+.ms-breadcrumb-item {
+  @apply hover:text-primary transition-colors flex items-center gap-2;
+}
+
+.ms-breadcrumb-separator {
+  @apply w-1 h-1 rounded-full bg-border mx-2;
+}
+
+/* ─── Dashboard Shortcut Cards ─── */
+.ms-shortcut-card {
+  @apply relative overflow-hidden p-6 rounded-2xl transition-all duration-300 cursor-pointer border border-transparent;
+  background: var(--card);
+  box-shadow: var(--ms-card-shadow);
+}
+
+.ms-shortcut-card:hover {
+  @apply -translate-y-1 shadow-2xl;
+  border-color: var(--primary);
+}
+
+.ms-shortcut-card::before {
+  content: '';
+  @apply absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 transition-transform duration-500;
+  background: var(--primary);
+}
+
+.ms-shortcut-card:hover::before {
+  @apply scale-150 opacity-10;
+}
+
+/* ─── Premium Status Dot Utility ─── */
+.ms-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.ms-status-dot--active {
+  background: #10b981;
+}
+
+.ms-status-dot--processing {
+  background: var(--ms-status-processing);
+}
+
+.ms-status-dot--pending {
+  background: #f59e0b;
+}
+
+.ms-status-dot--placed {
+  background: var(--ms-status-placed);
+  box-shadow: 0 0 8px var(--ms-status-placed);
+}
+
+.ms-status-dot--danger {
+  background: #ef4444;
+}
+
+.ms-status-dot--info {
+  background: #3b82f6;
+}
+
+/* ─── Responsive Table Scroll ─── */
+.ms-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ms-table-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+/* ─── Soft Delete / Disabled State (Req 26) ─── */
+.ms-soft-deleted {
+  @apply opacity-50 grayscale pointer-events-none select-none;
+  background: repeating-linear-gradient(45deg, transparent, transparent 10px, var(--border) 10px, var(--border) 11px);
+}
+
+/* ─── Gradient Accent Line (for PageHeader) ─── */
+.ms-accent-line {
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #06b6d4 100%);
+  border-radius: 100px;
+  width: 60px;
+  margin-top: 4px;
+}
+
+/* ─── Smooth Focus Rings ─── */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}

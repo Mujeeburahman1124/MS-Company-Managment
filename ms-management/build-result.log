@@ -1,0 +1,274 @@
+
+> ms-management@0.1.0 build
+> next build
+
+▲ Next.js 16.2.7 (Turbopack)
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 8 errors:
+./app/settings/page.tsx:4:1
+Export Facebook doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Facebook was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Webhook?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Facebook doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Facebook was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Webhook?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Instagram doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Instagram was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Star?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Instagram doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Instagram was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Star?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Linkedin doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Linkedin was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Link?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Linkedin doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Linkedin was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Link?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Twitter doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Twitter was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-client] (ecmascript).
+Did you mean to import Timer?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+./app/settings/page.tsx:4:1
+Export Twitter doesn't exist in target module
+  [90m 2 |[0m
+  [90m 3 |[0m [36mimport[0m { useState } [36mfrom[0m [32m"react"[0m;
+[31m[1m>[0m [90m 4 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 5 |[0m   [33mSave[0m, [33mBuilding[0m, [33mPaintbrush[0m, [33mGlobe[0m, [33mMail[0m, [33mPhone[0m, [33mMapPin[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 6 |[0m   [33mCheckCircle2[0m, [33mShieldAlert[0m, [33mShare2[0m, [33mToggleLeft[0m, [33mToggleRight[0m, [33mInstagram[0m,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 7 |[0m   [33mFacebook[0m, [33mTwitter[0m, [33mLinkedin[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m 8 |[0m } [36mfrom[0m [32m"lucide-react"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 9 |[0m [36mimport[0m { useAuthStore } [36mfrom[0m [32m"@/store/authStore"[0m;
+  [90m10 |[0m [36mimport[0m { [33mMODULES_LIST[0m } [36mfrom[0m [32m"@/lib/constants"[0m;
+  [90m11 |[0m [36mimport[0m [33mPageHeader[0m [36mfrom[0m [32m"@/components/shared/PageHeader"[0m;
+
+The export Twitter was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.mjs [app-ssr] (ecmascript).
+Did you mean to import Timer?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/settings/page.tsx [Client Component Browser]
+    ./app/settings/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/settings/page.tsx [Client Component SSR]
+    ./app/settings/page.tsx [Server Component]
+
+
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
+    at <unknown> (./app/settings/page.tsx:4:1)
