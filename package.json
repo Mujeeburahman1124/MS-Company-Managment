@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix \"ms-management\" run dev",
+    "prebuild": "npm --prefix \"ms-management\" install",
     "build": "npm --prefix \"ms-management\" run build",
     "start": "npm --prefix \"ms-management\" run start"
   }
