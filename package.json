@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "npm --prefix \"ms-management\" run dev",
-    "prebuild": "npm --prefix \"ms-management\" install",
-    "build": "npm --prefix \"ms-management\" run build",
-    "start": "npm --prefix \"ms-management\" run start"
+    "dev": "npm --prefix ms-management run dev",
+    "build": "npm --prefix ms-management install && npm --prefix ms-management run build",
+    "start": "npm --prefix ms-management run start"
   }
 }

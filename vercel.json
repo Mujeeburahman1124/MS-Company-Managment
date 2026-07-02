@@ -1,6 +1,4 @@
 {
-  "framework": "nextjs",
-  "installCommand": "npm --prefix ms-management install",
-  "buildCommand": "npm --prefix ms-management run build",
-  "outputDirectory": "ms-management/.next"
+  "outputDirectory": "ms-management/.next",
+  "framework": "nextjs"
 }
