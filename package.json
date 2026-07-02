@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm --prefix ms-management run dev",
-    "build": "npm --prefix ms-management install && npm --prefix ms-management run build",
+    "build": "bash build.sh",
     "start": "npm --prefix ms-management run start"
   }
 }
