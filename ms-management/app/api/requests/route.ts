@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { sendEmail } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -82,6 +83,35 @@ export async function POST(request: Request) {
         history: [{ date: new Date().toISOString().replace("T", " ").slice(0, 19), action: "Created", user: user.name }]
       }
     });
+
+    // Send email alert to HR/Management about the new request
+    try {
+      let recipientEmail = "aqeelamrahman@gmail.com"; // default fallback
+      const targetComp = await prisma.internalCompany.findFirst({
+        where: { name: user.company }
+      });
+      if (targetComp && targetComp.email) {
+        recipientEmail = targetComp.email.trim();
+      } else {
+        const siteSettings = await prisma.siteSettings.findUnique({
+          where: { id: "SETTINGS" }
+        });
+        if (siteSettings && siteSettings.email) {
+          recipientEmail = siteSettings.email.trim();
+        }
+      }
+
+      await sendEmail({
+        to: recipientEmail,
+        subject: `[New Staff Request] ${user.name} - ${newRequest.requestType}`,
+        body: `Dear HR Team,\n\nA new staff request has been submitted.\n\nRequest Details:\n- Employee Name: ${user.name}\n- Company: ${user.company}\n- Request Type: ${newRequest.requestType}\n- Date: ${newRequest.date}\n- Description: ${newRequest.description}\n\nPlease review this request in the system dashboard.\n\nBest regards,\nMS Horizon System Support`,
+        candidateName: user.name,
+        company: user.company,
+        branch: user.branch
+      });
+    } catch (e) {
+      console.error("Failed to send staff request email notification:", e);
+    }
 
     return NextResponse.json(newRequest);
   } catch (error: any) {

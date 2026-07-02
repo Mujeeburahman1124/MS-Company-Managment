@@ -80,47 +80,52 @@ const buildPermissionMatrixFromRole = (role: Role): Role["permissions"] => {
 };
 
 export default function RolesPage() {
-  const { currentRole, roles, addRole, updateRole, deleteRole, hasPermission } = useAuthStore();
+  const { currentRole, roles, addRole, updateRole, deleteRole, hasPermission, companies, ownCompanies } = useAuthStore();
   const [selectedRoleId, setSelectedRoleId] = useState(roles[0]?.id || "");
   const canViewRoles = hasPermission("roles", "view");
   const canEditRoles = hasPermission("roles", "edit");
-
+ 
   if (!canViewRoles) {
     return <AccessDenied />;
   }
   const [matrix, setMatrix] = useState<Role["permissions"]>(() => roles[0] ? buildPermissionMatrixFromRole(roles[0]) : buildDefaultMatrix("Super Admin"));
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newRoleName, setNewRoleName] = useState("");
-
+  const [newRoleCompany, setNewRoleCompany] = useState("System");
+ 
   const selectedRole = roles.find((role) => role.id === selectedRoleId) || roles[0] || null;
-
+ 
   useEffect(() => {
     if (selectedRole) {
       setMatrix(buildPermissionMatrixFromRole(selectedRole));
     }
   }, [selectedRole?.id]);
-
+ 
   const handleRoleChange = (roleId: string) => {
     setSelectedRoleId(roleId);
   };
-
+ 
   const handleCreateRole = () => {
     if (!newRoleName.trim()) {
       toast.error("Role name is required to create a new role.");
       return;
     }
-
+ 
     const id = `ROL${Date.now()}`;
     const role: Role = {
       id,
       name: newRoleName.trim(),
+      description: `Custom role for ${newRoleCompany === "System" ? "System-wide use" : newRoleCompany}`,
       userCount: 0,
-      permissions: buildDefaultMatrix(newRoleName.trim())
+      permissions: buildDefaultMatrix(newRoleName.trim()),
+      isCustom: true,
+      company: newRoleCompany === "System" ? null : newRoleCompany
     };
-
+ 
     addRole(role);
     setSelectedRoleId(id);
     setNewRoleName("");
+    setNewRoleCompany("System");
     setShowCreateModal(false);
     toast.success(`Role "${role.name}" was created successfully.`);
   };
@@ -278,14 +283,30 @@ export default function RolesPage() {
             <DialogDescription className="text-xs text-slate-400">Add a custom role and initialize it with default permissions.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Role name</label>
-            <input
-              type="text"
-              value={newRoleName}
-              onChange={(e) => setNewRoleName(e.target.value)}
-              placeholder="Enter new role name"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-200"
-            />
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Role name</label>
+              <input
+                type="text"
+                value={newRoleName}
+                onChange={(e) => setNewRoleName(e.target.value)}
+                placeholder="Enter new role name"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-200"
+              />
+            </div>
+            {currentRole === "Super Admin" && (
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Assign to Company</label>
+                <select
+                  value={newRoleCompany}
+                  onChange={(e) => setNewRoleCompany(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-200"
+                >
+                  <option value="System">System (All Companies)</option>
+                  {ownCompanies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                  {companies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                </select>
+              </div>
+            )}
           </div>
           <DialogFooter className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)} className="text-xs rounded-xl px-4">Cancel</Button>

@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   CheckCircle2, XCircle, Clock, AlertTriangle, Calendar, Save,
   Home, Monitor, ChevronLeft, ChevronRight, Users, Activity,
-  ChevronDown, ChevronUp, Zap, Download
+  ChevronDown, ChevronUp, Zap, Download, Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -194,6 +194,7 @@ export default function AttendanceRecords() {
   const [date, setDate] = useState(today);
   const [companyFilter, setCompanyFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [viewMode, setViewMode] = useState<"sheet" | "cards">("sheet");
@@ -205,6 +206,9 @@ export default function AttendanceRecords() {
     : staff.filter(s => s.company === currentUser?.company);
   if (companyFilter !== "all") allowedStaff = allowedStaff.filter(s => s.company === companyFilter);
   if (branchFilter !== "all") allowedStaff = allowedStaff.filter(s => s.branch === branchFilter);
+  if (searchTerm.trim() !== "") {
+    allowedStaff = allowedStaff.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  }
 
   // ── Build records map for the selected date ──
   const buildRecordsForDate = useCallback((d: string) => {
@@ -395,9 +399,20 @@ export default function AttendanceRecords() {
               </button>
             )}
 
-            {/* Company/Branch filters — Super Admin / System User */}
+            {/* Search Input for everyone */}
+            <div className="relative w-full max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+              <Input
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                placeholder="Search staff by name..."
+                className="pl-9 h-9 text-xs rounded-xl bg-slate-50 border-slate-200 focus:border-blue-400"
+              />
+            </div>
+
+            {/* Company filter for Super Admin / System User */}
             {(currentRole === "Super Admin" || isSystemUser) && (
-              <div className="flex gap-2 flex-1 min-w-0 max-w-xs">
+              <div className="w-full max-w-[150px]">
                 <Select value={companyFilter} onValueChange={v => { setCompanyFilter(v ?? "all"); setBranchFilter("all"); }}>
                   <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 min-w-0">
                     <SelectValue placeholder="All Companies" />
@@ -407,15 +422,27 @@ export default function AttendanceRecords() {
                     {ownCompanies.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+
+            {/* Branch filter for Super Admin / System User OR Company Admin */}
+            {(currentRole === "Super Admin" || isSystemUser || currentRole === "Company Admin") && (
+              <div className="w-full max-w-[150px]">
                 <Select value={branchFilter} onValueChange={v => setBranchFilter(v ?? "all")}>
                   <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 min-w-0">
                     <SelectValue placeholder="All Branches" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Branches</SelectItem>
-                    {branches.filter(b => companyFilter === "all" || b.company === companyFilter).map(b =>
-                      <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
-                    )}
+                    {branches
+                      .filter(b => {
+                        if (currentRole === "Super Admin" || isSystemUser) {
+                          return companyFilter === "all" || b.company === companyFilter;
+                        }
+                        return b.company === currentUser?.company;
+                      })
+                      .map(b => <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>)
+                    }
                   </SelectContent>
                 </Select>
               </div>

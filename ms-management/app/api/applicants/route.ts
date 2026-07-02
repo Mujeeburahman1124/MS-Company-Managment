@@ -76,6 +76,78 @@ export async function POST(request: Request) {
       }
     }
 
+    // Validate email uniqueness in Staff, Applicant, and User tables
+    if (data.email && data.email.trim() !== "") {
+      const emailLower = data.email.trim().toLowerCase();
+      
+      const existingUser = await prisma.user.findFirst({
+        where: { email: emailLower }
+      });
+      if (existingUser) {
+        return NextResponse.json(
+          { error: "A user account with this email address already exists." },
+          { status: 400 }
+        );
+      }
+
+      const existingStaff = await prisma.staff.findFirst({
+        where: { email: emailLower }
+      });
+      if (existingStaff) {
+        return NextResponse.json(
+          { error: "A staff member with this email address already exists." },
+          { status: 400 }
+        );
+      }
+
+      const existingApplicant = await prisma.applicant.findFirst({
+        where: { email: emailLower }
+      });
+      if (existingApplicant) {
+        return NextResponse.json(
+          { error: "An applicant with this email address already exists." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Check phone/whatsapp uniqueness in Staff and Applicant tables
+    if (data.mobile || data.whatsapp) {
+      const cleanMobile = data.mobile ? data.mobile.trim().replace(/[^0-9+]/g, "") : "";
+      const cleanWhatsapp = data.whatsapp ? data.whatsapp.trim().replace(/[^0-9+]/g, "") : "";
+      
+      if (cleanMobile || cleanWhatsapp) {
+        const numbersToCheck = [cleanMobile, cleanWhatsapp].filter(n => n.length > 5);
+        for (const num of numbersToCheck) {
+          // Check in Staff
+          const dupStaff = await prisma.staff.findFirst({
+            where: {
+              OR: [
+                { mobile: { contains: num } },
+                { whatsapp: { contains: num } }
+              ]
+            }
+          });
+          if (dupStaff) {
+            return NextResponse.json({ error: `Mobile or WhatsApp number (${num}) is already registered for staff member ${dupStaff.name}.` }, { status: 400 });
+          }
+
+          // Check in Applicant
+          const dupApp = await prisma.applicant.findFirst({
+            where: {
+              OR: [
+                { mobile: { contains: num } },
+                { whatsapp: { contains: num } }
+              ]
+            }
+          });
+          if (dupApp) {
+            return NextResponse.json({ error: `Mobile or WhatsApp number (${num}) is already registered for applicant ${dupApp.fullName}.` }, { status: 400 });
+          }
+        }
+      }
+    }
+
     // Generate tracking code if not provided
     let trackingCode = data.trackingCode;
     if (!trackingCode) {
@@ -120,7 +192,42 @@ export async function POST(request: Request) {
         memberActive: data.memberActive || false
       }
     });
+    const targetClientCompany = applicant.clientName || data.clientName;
+    // 1. Notify Agency (Own Company) admins
+    try {
+      await prisma.notification.create({
+        data: {
+          title: "New Online Application Received",
+          message: `Applicant ${applicant.fullName} has registered online. Next step: Click here to review details, documents, and schedule an interview.`,
+          type: "Info",
+          userId: "admin",
+          company: "MS Company Management Solutions",
+          link: `/applicants/${applicant.id}`,
+          createdAt: new Date().toISOString()
+        }
+      });
+    } catch (err) {
+      console.error("Failed to create agency notification:", err);
+    }
 
+    // 2. Also notify the target Client Company admins if selected
+    if (targetClientCompany && targetClientCompany !== "Not Placed" && targetClientCompany !== "System") {
+      try {
+        await prisma.notification.create({
+          data: {
+            title: "New Online Application Received",
+            message: `Applicant ${applicant.fullName} has applied to your company. Next step: Review profile and schedule interview.`,
+            type: "Info",
+            userId: "admin",
+            company: targetClientCompany,
+            link: `/applicants/${applicant.id}`,
+            createdAt: new Date().toISOString()
+          }
+        });
+      } catch (err) {
+        console.error("Failed to create client company notification:", err);
+      }
+    }
     // Trigger real-time notifications asynchronously
     if (applicant.email && applicant.email.trim() !== "") {
       const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Horizon F.Z.E";
@@ -149,7 +256,6 @@ ${companyName} Recruitment Team`;
     }
 
     // Link applicant with Client Company, create Placement + Agreement, and dispatch email alerts
-    const targetClientCompany = applicant.clientName || data.clientName;
     if (targetClientCompany && targetClientCompany !== "Not Placed" && targetClientCompany !== "System") {
       try {
         const clientCompany = await prisma.company.findFirst({

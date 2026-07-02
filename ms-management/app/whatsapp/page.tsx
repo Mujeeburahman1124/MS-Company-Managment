@@ -90,7 +90,16 @@ export default function WhatsAppPage() {
     const a: Recipient[] = applicants
       .filter(a => a.whatsapp || a.mobile)
       .map(a => ({ id: `app-${a.id}`, name: a.fullName, number: a.whatsapp || a.mobile, type: "applicant", company: a.company }));
-    return [...s, ...a];
+    
+    const seen = new Set<string>();
+    const pool: Recipient[] = [];
+    for (const item of [...s, ...a]) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        pool.push(item);
+      }
+    }
+    return pool;
   }, [staff, applicants]);
 
   const suggestions = useMemo(() => {
@@ -156,6 +165,10 @@ export default function WhatsAppPage() {
           const saved = await res.json();
           if (saved) setLocalSent(prev => [saved, ...prev]);
           successCount++;
+          // Auto-redirect to WhatsApp Web/App to transmit the message in real-time for free
+          if (typeof window !== "undefined") {
+            window.open(buildWaLink(r.number, message), "_blank");
+          }
         } else {
           failCount++;
         }

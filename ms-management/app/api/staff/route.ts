@@ -51,9 +51,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Validate email uniqueness in both Staff and User tables
+    // Validate email uniqueness in Staff, Applicant, and User tables
     if (data.email && data.email.trim() !== "") {
       const emailLower = data.email.trim().toLowerCase();
+      
       const existingUser = await prisma.user.findUnique({
         where: { email: emailLower }
       });
@@ -62,6 +63,63 @@ export async function POST(request: Request) {
           { error: "A user account with this email address already exists." },
           { status: 400 }
         );
+      }
+
+      const existingStaff = await prisma.staff.findFirst({
+        where: { email: emailLower }
+      });
+      if (existingStaff) {
+        return NextResponse.json(
+          { error: "A staff member with this email address already exists." },
+          { status: 400 }
+        );
+      }
+
+      const existingApplicant = await prisma.applicant.findFirst({
+        where: { email: emailLower }
+      });
+      if (existingApplicant) {
+        return NextResponse.json(
+          { error: "An applicant with this email address already exists." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Check phone/whatsapp uniqueness in Staff and Applicant tables
+    if (data.mobile || data.whatsapp) {
+      const cleanMobile = data.mobile ? data.mobile.trim().replace(/[^0-9+]/g, "") : "";
+      const cleanWhatsapp = data.whatsapp ? data.whatsapp.trim().replace(/[^0-9+]/g, "") : "";
+      
+      if (cleanMobile || cleanWhatsapp) {
+        const numbersToCheck = [cleanMobile, cleanWhatsapp].filter(n => n.length > 5);
+        for (const num of numbersToCheck) {
+          // Check in Staff
+          const dupStaff = await prisma.staff.findFirst({
+            where: {
+              OR: [
+                { mobile: { contains: num } },
+                { whatsapp: { contains: num } }
+              ]
+            }
+          });
+          if (dupStaff) {
+            return NextResponse.json({ error: `Mobile or WhatsApp number (${num}) is already registered for staff member ${dupStaff.name}.` }, { status: 400 });
+          }
+
+          // Check in Applicant
+          const dupApp = await prisma.applicant.findFirst({
+            where: {
+              OR: [
+                { mobile: { contains: num } },
+                { whatsapp: { contains: num } }
+              ]
+            }
+          });
+          if (dupApp) {
+            return NextResponse.json({ error: `Mobile or WhatsApp number (${num}) is already registered for applicant ${dupApp.fullName}.` }, { status: 400 });
+          }
+        }
       }
     }
 

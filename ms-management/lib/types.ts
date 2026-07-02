@@ -445,6 +445,9 @@ export interface Role {
   name: string;
   userCount: number;
   isSystem?: boolean;
+  isCustom?: boolean;
+  company?: string | null;
+  description?: string;
   permissions: {
     [moduleName: string]: {
       view: boolean;
