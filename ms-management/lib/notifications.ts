@@ -1,41 +1,6 @@
 import nodemailer from "nodemailer";
 import prisma from "./prisma";
-import fs from "fs";
-import path from "path";
 
-// ─── Fallback .env loader for non-standard working directories ────────────────
-function loadEnvFallback() {
-  if (process.env.SMTP_HOST) return;
-  try {
-    const pathsToTry = [
-      path.resolve(process.cwd(), ".env"),
-      path.resolve(process.cwd(), "ms-management", ".env"),
-      path.resolve(__dirname, "../../../.env"),
-      path.resolve(__dirname, "../../../../.env"),
-    ];
-    for (const envPath of pathsToTry) {
-      if (fs.existsSync(envPath)) {
-        const content = fs.readFileSync(envPath, "utf-8");
-        content.split(/\r?\n/).forEach(line => {
-          const trimmed = line.trim();
-          if (!trimmed || trimmed.startsWith("#")) return;
-          const index = trimmed.indexOf("=");
-          if (index === -1) return;
-          const key = trimmed.substring(0, index).trim();
-          let val = trimmed.substring(index + 1).trim();
-          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-            val = val.substring(1, val.length - 1);
-          }
-          process.env[key] = val;
-        });
-        break;
-      }
-    }
-  } catch (e) {
-    console.error("Failed to load .env fallback:", e);
-  }
-}
-loadEnvFallback();
 
 const cleanEnvVar = (val: string | undefined) => {
   if (!val) return val;
