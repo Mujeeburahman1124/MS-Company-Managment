@@ -1,1 +1,5 @@
-{}
+{
+  "buildCommand": "bash build.sh",
+  "outputDirectory": "ms-management/.next",
+  "framework": "nextjs"
+}
