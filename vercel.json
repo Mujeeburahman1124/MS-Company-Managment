@@ -1,6 +1,5 @@
 {
   "buildCommand": "bash build.sh",
   "outputDirectory": "ms-management/.next",
-  "installCommand": "echo 'install handled in build.sh'",
   "framework": "nextjs"
 }
