@@ -178,7 +178,12 @@ export default function NewStaffPage() {
               ].map(f => (
                 <div key={f.id} className="space-y-1">
                   <Label htmlFor={f.id} className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{f.label} {f.req && <span className="text-rose-500">*</span>}</Label>
-                  <Input id={f.id} type={(f as any).type || "text"} placeholder={(f as any).placeholder} className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100" {...register(f.id as any, f.req ? { required: true } : {})} />
+                  <Input id={f.id} type={(f as any).type || "text"} placeholder={(f as any).placeholder} className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100" {...register(f.id as any, f.req ? { required: `${f.label} is required` } : {})} />
+                  {errors[f.id as keyof FormData] && (
+                    <span className="text-[9px] text-rose-500 font-bold block">
+                      {errors[f.id as keyof FormData]?.message}
+                    </span>
+                  )}
                 </div>
               ))}
               <div className="space-y-1">
@@ -339,7 +344,12 @@ export default function NewStaffPage() {
               ].map(f => (
                 <div key={f.id} className="space-y-1">
                   <Label htmlFor={f.id} className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{f.label} {f.req && <span className="text-rose-500">*</span>}</Label>
-                  <Input id={f.id} type={(f as any).type || "text"} placeholder={(f as any).placeholder} className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100" {...register(f.id as any, f.req ? { required: true } : {})} />
+                  <Input id={f.id} type={(f as any).type || "text"} placeholder={(f as any).placeholder} className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100" {...register(f.id as any, f.req ? { required: `${f.label} is required` } : {})} />
+                  {errors[f.id as keyof FormData] && (
+                    <span className="text-[9px] text-rose-500 font-bold block">
+                      {errors[f.id as keyof FormData]?.message}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -408,9 +418,9 @@ export default function NewStaffPage() {
             )}
           </Card>
 
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => router.back()} className="text-xs font-semibold rounded-xl px-4 h-10 border-slate-200">Cancel</Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-10 gap-1.5 shadow-md"><Save className="w-4 h-4" /> Save Staff Member</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-3 select-none w-full">
+            <Button type="button" variant="outline" onClick={() => router.back()} className="w-full sm:w-auto text-xs font-semibold rounded-xl px-4 h-10 border-slate-200">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-10 gap-1.5 shadow-md"><Save className="w-4 h-4" /> Save Staff Member</Button>
           </div>
         </form>
       </div>

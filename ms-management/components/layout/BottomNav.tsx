@@ -11,27 +11,62 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
+import { getPermissionModuleName } from "@/lib/constants";
 
 const MORE_ITEMS = [
-  { label: "Applicants", path: "/applicants",    icon: Users },
-  { label: "Tasks",      path: "/tasks",         icon: CheckSquare },
-  { label: "Staff",      path: "/staff",         icon: Briefcase },
-  { label: "Leave",      path: "/leave",         icon: Clock },
-  { label: "Client Companies",  path: "/companies",     icon: Building2 },
-  { label: "Suppliers",  path: "/suppliers",     icon: Package },
-  { label: "Vehicles",   path: "/vehicles",      icon: Car },
-  { label: "Documents",  path: "/documents",     icon: FileText },
-  { label: "Interviews", path: "/interviews",    icon: Shield },
-  { label: "Reports",    path: "/reports",       icon: BarChart3 },
-  { label: "Settings",   path: "/settings",      icon: Settings },
+  { label: "Applicants", path: "/applicants",    icon: Users,         permissionKey: "applicants" },
+  { label: "Tasks",      path: "/tasks",         icon: CheckSquare,   permissionKey: "tasks" },
+  { label: "Staff",      path: "/staff",         icon: Briefcase,     permissionKey: "staff" },
+  { label: "Leave",      path: "/leave",         icon: Clock,         permissionKey: "leave" },
+  { label: "Client Companies",  path: "/companies",     icon: Building2,     permissionKey: "companies" },
+  { label: "Suppliers",  path: "/suppliers",     icon: Package,       permissionKey: "suppliers" },
+  { label: "Vehicles",   path: "/vehicles",      icon: Car,           permissionKey: "vehicles" },
+  { label: "Documents",  path: "/documents",     icon: FileText,      permissionKey: "documents" },
+  { label: "Interviews", path: "/interviews",    icon: Shield,        permissionKey: "interviews" },
+  { label: "Reports",    path: "/reports",       icon: BarChart3,     permissionKey: "reports", hiddenFor: ["Staff"] },
+  { label: "Settings",   path: "/settings",      icon: Settings,      permissionKey: "settings", hiddenFor: ["Staff", "HR Manager", "Recruiter", "Accountant", "Branch Admin"] },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { notifications } = useAuthStore();
+  const { notifications, currentUser, currentRole, hasPermission } = useAuthStore();
   const unreadCount = notifications.filter((n: any) => !n.read).length;
   const [showMore, setShowMore] = useState(false);
+
+  const isSuperAdmin = currentRole === "Super Admin";
+
+  const canSeeItem = (item: any): boolean => {
+    if (isSuperAdmin) return true;
+
+    // Check custom permissions overrides first before role-based hiding
+    if (item.permissionKey && currentUser?.permissions) {
+      const userPermissions = typeof currentUser.permissions === 'string'
+        ? (() => { try { return JSON.parse(currentUser.permissions); } catch { return null; } })()
+        : currentUser.permissions;
+      if (userPermissions) {
+        const permissionModule = getPermissionModuleName(item.permissionKey);
+        if (permissionModule) {
+          const matrix = userPermissions.matrix || userPermissions;
+          if (matrix[permissionModule] !== undefined && matrix[permissionModule] !== null) {
+            const modulePerms = matrix[permissionModule];
+            if (modulePerms && modulePerms["view"] !== undefined) {
+              return Boolean(modulePerms["view"]);
+            }
+          }
+        }
+      }
+    }
+
+    // Role-based hiding
+    if (item.hiddenFor && item.hiddenFor.includes(currentRole)) return false;
+    // No permission key = always visible
+    if (!item.permissionKey) return true;
+    // Check permission store
+    return hasPermission(item.permissionKey, "view");
+  };
+
+  const visibleItems = MORE_ITEMS.filter(canSeeItem);
 
   if (pathname === "/login" || pathname?.startsWith("/tracking") || pathname === "/forgot-password") return null;
 
@@ -52,7 +87,7 @@ export default function BottomNav() {
               </button>
             </div>
             <div className="grid grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto pb-4">
-              {MORE_ITEMS.map((item) => {
+              {visibleItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname?.startsWith(item.path);
                 return (

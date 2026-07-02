@@ -227,6 +227,7 @@ export default function NewApplicantPage() {
                   className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   {...register("dateOfBirth", { required: true })}
                 />
+                {errors.dateOfBirth && <span className="text-[9px] text-rose-500 font-bold block">Date of birth is required</span>}
               </div>
 
               {/* Email */}
@@ -241,6 +242,7 @@ export default function NewApplicantPage() {
                   className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   {...register("email", { required: true })}
                 />
+                {errors.email && <span className="text-[9px] text-rose-500 font-bold block">Email is required</span>}
               </div>
 
               {/* Nationality */}
@@ -308,6 +310,7 @@ export default function NewApplicantPage() {
                   className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   {...register("mobile", { required: true })}
                 />
+                {errors.mobile && <span className="text-[9px] text-rose-500 font-bold block">Mobile number is required</span>}
               </div>
 
               {/* Whatsapp */}
@@ -397,6 +400,7 @@ export default function NewApplicantPage() {
                   className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   {...register("passportNumber", { required: true })}
                 />
+                {errors.passportNumber && <span className="text-[9px] text-rose-500 font-bold block">Passport number is required</span>}
               </div>
 
               {/* Visa Type */}
@@ -441,6 +445,7 @@ export default function NewApplicantPage() {
                   className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400"
                   {...register("passportExpiry", { required: true })}
                 />
+                {errors.passportExpiry && <span className="text-[9px] text-rose-500 font-bold block">Passport expiry date is required</span>}
               </div>
             </div>
           </Card>
@@ -712,19 +717,19 @@ export default function NewApplicantPage() {
 
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 select-none">
+          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-3 select-none w-full">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.back()}
-              className="text-xs font-semibold text-slate-500 rounded-xl px-4 py-2 border-slate-200 h-10"
+              className="w-full sm:w-auto text-xs font-semibold text-slate-500 rounded-xl px-4 py-2 border-slate-200 h-10"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               onClick={() => setKeepAndNew(true)}
-              className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs px-5 h-10 gap-1.5 border border-slate-200"
+              className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs px-5 h-10 gap-1.5 border border-slate-200"
             >
               <Plus className="w-4 h-4" />
               Save & Add Another
@@ -732,7 +737,7 @@ export default function NewApplicantPage() {
             <Button
               type="submit"
               onClick={() => setKeepAndNew(false)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-10 gap-1.5 shadow-md shadow-blue-500/10"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-10 gap-1.5 shadow-md shadow-blue-500/10 animate-pulse"
             >
               <Save className="w-4 h-4" />
               Save Applicant
