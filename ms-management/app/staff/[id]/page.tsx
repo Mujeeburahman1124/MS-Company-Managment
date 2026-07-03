@@ -153,10 +153,6 @@ export default function StaffDetailPage({ params }: { params: Promise<{ id: stri
       toast.error("Overtime rate required");
       return;
     }
-    if (!formData.shiftId) {
-      toast.error("Shift must be assigned");
-      return;
-    }
 
     const currentCompany = currentRole === "Super Admin" ? formData.company : currentUser.company;
     const companyBranches = branches.filter(b => b.company === currentCompany);
@@ -196,9 +192,8 @@ export default function StaffDetailPage({ params }: { params: Promise<{ id: stri
 
       toast.success("Staff profile updated successfully");
       setEditOpen(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update staff profile");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update staff profile");
     }
   };
 

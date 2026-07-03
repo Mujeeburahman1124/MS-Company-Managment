@@ -120,7 +120,7 @@ export default function NewStaffPage() {
     setCustomDocDetails("");
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     const id = `STF${String(Math.floor(100 + Math.random() * 900))}`;
     const newStaff: Staff = {
       ...data, 
@@ -141,10 +141,14 @@ export default function NewStaffPage() {
       salaryType: data.salaryType || "Monthly",
       permissions: Object.keys(customPermissions).length > 0 ? customPermissions : null
     };
-    addStaff(newStaff);
-    addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Created", module: "Staff", oldValue: null, newValue: `Created staff: ${newStaff.name}`, ipAddress: "192.168.1.102" });
-    toast.success(`Staff member ${newStaff.name} added successfully`);
-    router.push("/staff");
+    try {
+      await addStaff(newStaff);
+      addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Created", module: "Staff", oldValue: null, newValue: `Created staff: ${newStaff.name}`, ipAddress: "192.168.1.102" });
+      toast.success(`Staff member ${newStaff.name} added successfully`);
+      router.push("/staff");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to add staff member");
+    }
   };
 
   return (

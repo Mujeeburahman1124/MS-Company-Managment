@@ -433,9 +433,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const role = state.roles.find((role: Role) => role.name === state.currentRole);
     if (!role) return false;
     const permissionModule = getPermissionModuleName(moduleKey);
-    if (!permissionModule) return true;
+    if (!permissionModule) return true; // unknown module keys (e.g., internal util) — allow
     const permissions = role.permissions[permissionModule];
-    if (!permissions) return true; 
+    if (!permissions) return false; // module not listed in role → deny by default
     return Boolean((permissions as any)[action]);
   },
   
@@ -478,27 +478,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(stf)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => {
-        const newStaff = [saved, ...state.staff];
-        const newSalarySetups = newStaff.map((s: any) => ({
-          staffId: s.id,
-          basic: s.basicSalary ?? 3000,
-          housing: s.housingAllowance ?? 1000,
-          transport: s.transportAllowance ?? 500
-        }));
-        const newShifts = state.shifts.map((s: any) => ({
-          ...s,
-          assignedEmployees: newStaff.filter((st: any) => st.shiftId === s.id).map((st: any) => st.name)
-        }));
-        return {
-          staff: newStaff,
-          salarySetups: newSalarySetups,
-          shifts: newShifts
-        };
-      });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to create staff member");
     }
+    const saved = await res.json();
+    set((state) => {
+      const newStaff = [saved, ...state.staff];
+      const newSalarySetups = newStaff.map((s: any) => ({
+        staffId: s.id,
+        basic: s.basicSalary ?? 3000,
+        housing: s.housingAllowance ?? 1000,
+        transport: s.transportAllowance ?? 500
+      }));
+      const newShifts = state.shifts.map((s: any) => ({
+        ...s,
+        assignedEmployees: newStaff.filter((st: any) => st.shiftId === s.id).map((st: any) => st.name)
+      }));
+      return {
+        staff: newStaff,
+        salarySetups: newSalarySetups,
+        shifts: newShifts
+      };
+    });
   },
   updateStaff: async (stf) => {
     const res = await fetch(`/api/staff/${stf.id}`, {
@@ -506,27 +508,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(stf)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => {
-        const newStaff = state.staff.map((s) => (s.id === saved.id ? saved : s));
-        const newSalarySetups = newStaff.map((s: any) => ({
-          staffId: s.id,
-          basic: s.basicSalary ?? 3000,
-          housing: s.housingAllowance ?? 1000,
-          transport: s.transportAllowance ?? 500
-        }));
-        const newShifts = state.shifts.map((s: any) => ({
-          ...s,
-          assignedEmployees: newStaff.filter((st: any) => st.shiftId === s.id).map((st: any) => st.name)
-        }));
-        return {
-          staff: newStaff,
-          salarySetups: newSalarySetups,
-          shifts: newShifts
-        };
-      });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to update staff member");
     }
+    const saved = await res.json();
+    set((state) => {
+      const newStaff = state.staff.map((s) => (s.id === saved.id ? saved : s));
+      const newSalarySetups = newStaff.map((s: any) => ({
+        staffId: s.id,
+        basic: s.basicSalary ?? 3000,
+        housing: s.housingAllowance ?? 1000,
+        transport: s.transportAllowance ?? 500
+      }));
+      const newShifts = state.shifts.map((s: any) => ({
+        ...s,
+        assignedEmployees: newStaff.filter((st: any) => st.shiftId === s.id).map((st: any) => st.name)
+      }));
+      return {
+        staff: newStaff,
+        salarySetups: newSalarySetups,
+        shifts: newShifts
+      };
+    });
   },
   deleteStaff: async (id) => {
     const res = await fetch(`/api/staff/${id}`, { method: "DELETE" });

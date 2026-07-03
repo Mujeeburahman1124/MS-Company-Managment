@@ -106,7 +106,7 @@ export default function DocumentsPage() {
     const stats: Record<string, { total: number; branches: Record<string, number> }> = {};
     
     allowedApplicants.forEach(app => {
-      app.documents.forEach(() => {
+      (app.documents || []).forEach(() => {
         const comp = app.company || "General";
         const br = app.branch || "General";
         if (!stats[comp]) stats[comp] = { total: 0, branches: {} };
@@ -116,7 +116,7 @@ export default function DocumentsPage() {
     });
 
     allowedStaff.forEach(s => {
-      s.documents.forEach(() => {
+      (s.documents || []).forEach(() => {
         const comp = s.company || "General";
         const br = s.branch || "General";
         if (!stats[comp]) stats[comp] = { total: 0, branches: {} };
@@ -126,7 +126,7 @@ export default function DocumentsPage() {
     });
 
     allowedSuppliers.forEach(sup => {
-      sup.documents.forEach(() => {
+      (sup.documents || []).forEach(() => {
         const comp = currentUser.company || "General Suppliers";
         const br = "Suppliers";
         if (!stats[comp]) stats[comp] = { total: 0, branches: {} };
@@ -163,7 +163,7 @@ export default function DocumentsPage() {
     let docs: any[] = [];
 
     allowedApplicants.forEach((applicant) => {
-      applicant.documents.forEach((doc) => {
+      (applicant.documents || []).forEach((doc) => {
         docs.push({
           ...doc,
           ownerType: "Applicant",
@@ -177,7 +177,7 @@ export default function DocumentsPage() {
     });
 
     allowedStaff.forEach((member) => {
-      member.documents.forEach((doc) => {
+      (member.documents || []).forEach((doc) => {
         docs.push({
           ...doc,
           ownerType: "Staff",
@@ -191,7 +191,7 @@ export default function DocumentsPage() {
     });
 
     allowedSuppliers.forEach((supplier) => {
-      supplier.documents.forEach((doc) => {
+      (supplier.documents || []).forEach((doc) => {
         docs.push({
           ...doc,
           ownerType: "Supplier",
@@ -301,7 +301,7 @@ export default function DocumentsPage() {
     if (ownerType === "Applicant") {
       const owner = applicants.find((item) => item.id === ownerId);
       if (!owner) return;
-      const updatedDocs = owner.documents.map((doc) =>
+      const updatedDocs = (owner.documents || []).map((doc) =>
         doc.id === docId
           ? { ...doc, name: newName, versions: [...(doc.versions || []), versionItem] }
           : doc
@@ -313,7 +313,7 @@ export default function DocumentsPage() {
     if (ownerType === "Staff") {
       const owner = staff.find((item) => item.id === ownerId);
       if (!owner) return;
-      const updatedDocs = owner.documents.map((doc) =>
+      const updatedDocs = (owner.documents || []).map((doc) =>
         doc.id === docId
           ? { ...doc, name: newName, versions: [...(doc.versions || []), versionItem] }
           : doc
@@ -325,7 +325,7 @@ export default function DocumentsPage() {
     if (ownerType === "Supplier") {
       const owner = suppliers.find((item) => item.id === ownerId);
       if (!owner) return;
-      const updatedDocs = owner.documents.map((doc) =>
+      const updatedDocs = (owner.documents || []).map((doc) =>
         doc.id === docId
           ? { ...doc, name: newName, versions: [...(doc.versions || []), versionItem] }
           : doc
@@ -475,19 +475,19 @@ export default function DocumentsPage() {
       if (versionDoc.ownerType === "Applicant") {
         const owner = state.applicants.find((a) => a.id === versionDoc.ownerId);
         if (owner) {
-          const updatedDocs = owner.documents.map((d) => (d.id === versionDoc.id ? updatedDoc : d));
+          const updatedDocs = (owner.documents || []).map((d) => (d.id === versionDoc.id ? updatedDoc : d));
           state.updateApplicant({ ...owner, documents: updatedDocs });
         }
       } else if (versionDoc.ownerType === "Staff") {
         const owner = state.staff.find((s) => s.id === versionDoc.ownerId);
         if (owner) {
-          const updatedDocs = owner.documents.map((d) => (d.id === versionDoc.id ? updatedDoc : d));
+          const updatedDocs = (owner.documents || []).map((d) => (d.id === versionDoc.id ? updatedDoc : d));
           state.updateStaff({ ...owner, documents: updatedDocs });
         }
       } else if (versionDoc.ownerType === "Supplier") {
         const owner = state.suppliers.find((s) => s.id === versionDoc.ownerId);
         if (owner) {
-          const updatedDocs = owner.documents.map((d) => (d.id === versionDoc.id ? updatedDoc : d));
+          const updatedDocs = (owner.documents || []).map((d) => (d.id === versionDoc.id ? updatedDoc : d));
           state.updateSupplier({ ...owner, documents: updatedDocs });
         }
       } else if (versionDoc.ownerType === "Company") {

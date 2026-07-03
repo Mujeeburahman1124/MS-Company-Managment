@@ -7,7 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutGrid, Users, CheckSquare, Bell, Menu,
   Briefcase, Building2, Car, FileText, Shield,
-  X, BarChart3, Settings, Clock, Package, ChevronLeft, User
+  X, BarChart3, Settings, Clock, Package, ChevronLeft, User,
+  ClipboardList
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ import { getPermissionModuleName } from "@/lib/constants";
 
 const MORE_ITEMS = [
   { label: "Applicants", path: "/applicants",    icon: Users,         permissionKey: "applicants" },
+  { label: "Placement",  path: "/placement",     icon: ClipboardList, permissionKey: "placement" },
   { label: "Tasks",      path: "/tasks",         icon: CheckSquare,   permissionKey: "tasks" },
   { label: "Staff",      path: "/staff",         icon: Briefcase,     permissionKey: "staff" },
   { label: "Leave",      path: "/leave",         icon: Clock,         permissionKey: "leave" },

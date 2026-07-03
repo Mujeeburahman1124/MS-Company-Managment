@@ -44,8 +44,11 @@ export default function SuppliersPage() {
   const f = filters.suppliers || { page: 1, pageSize: 10 };
   // Apply company scoping for non-SA roles
   let list = isSuperAdmin ? suppliers : suppliers.filter(s => (s as any).company === currentUser.company || !(s as any).company);
-  if (f.search) { const q = f.search.toLowerCase(); list = list.filter(s => s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q)); }
+  if (f.search) { const q = f.search.toLowerCase(); list = list.filter(s => (s.name ?? "").toLowerCase().includes(q) || (s.email ?? "").toLowerCase().includes(q)); }
   if (f.status && f.status !== "all") list = list.filter(s => s.status === f.status);
+  if (f.company && f.company !== "all") list = list.filter(s => (s as any).company === f.company);
+  if (f.fromDate) list = list.filter(s => s.createdAt >= f.fromDate);
+  if (f.toDate) list = list.filter(s => s.createdAt <= f.toDate);
   
   list = [...list].sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const totalItems = list.length;

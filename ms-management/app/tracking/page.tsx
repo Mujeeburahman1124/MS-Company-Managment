@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import PageHeader from "@/components/shared/PageHeader";
+import { NATIONALITIES } from "@/lib/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ export default function TrackingPage() {
     placements,
     updateApplicant,
     addActivityLog,
+    ownCompanies,
     companies,
     branches,
     staff
@@ -36,6 +38,9 @@ export default function TrackingPage() {
   const [search, setSearch] = useState("");
   const [companyFilter, setCompanyFilter] = useState("all");
   const [branchFilter, setBranchFilter] = useState("all");
+  const [clientCompanyFilter, setClientCompanyFilter] = useState("all");
+  const [nationalityFilter, setNationalityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedApp, setSelectedApp] = useState<Applicant | null>(null);
@@ -64,6 +69,15 @@ export default function TrackingPage() {
   }
   if (branchFilter !== "all") {
     filteredList = filteredList.filter(a => a.branch === branchFilter);
+  }
+  if (clientCompanyFilter !== "all") {
+    filteredList = filteredList.filter(a => a.clientName === clientCompanyFilter);
+  }
+  if (nationalityFilter !== "all") {
+    filteredList = filteredList.filter(a => a.nationality === nationalityFilter);
+  }
+  if (statusFilter !== "all") {
+    filteredList = filteredList.filter(a => a.status === statusFilter);
   }
   if (startDate) {
     filteredList = filteredList.filter(a => a.applicationDate >= startDate);
@@ -132,8 +146,7 @@ export default function TrackingPage() {
     const updated = {
       ...draggedApplicant,
       status: targetStatus,
-      company: targetStatus === "Placed" ? placedCompany : draggedApplicant.company,
-      branch: targetStatus === "Placed" ? "Main Branch" : draggedApplicant.branch,
+      clientName: targetStatus === "Placed" ? placedCompany : draggedApplicant.clientName,
       statusHistory: [
         {
           oldStatus: draggedApplicant.status,
@@ -276,6 +289,9 @@ export default function TrackingPage() {
     setSearch("");
     setCompanyFilter("all");
     setBranchFilter("all");
+    setClientCompanyFilter("all");
+    setNationalityFilter("all");
+    setStatusFilter("all");
     setStartDate("");
     setEndDate("");
     toast.success("Filters cleared");
@@ -344,7 +360,7 @@ export default function TrackingPage() {
       {/* Filter Row with Advanced Controls */}
       <div className="bg-white border-b border-slate-100 p-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 flex-1">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 flex-1">
             {/* Search Input */}
             <div className="relative col-span-2 md:col-span-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -356,7 +372,7 @@ export default function TrackingPage() {
               />
             </div>
 
-            {/* Company Filter */}
+            {/* Our Company Filter */}
             <div className="space-y-0.5">
               <select
                 value={companyFilter}
@@ -367,8 +383,8 @@ export default function TrackingPage() {
                 disabled={!isSuperAdmin}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
               >
-                <option value="all">All Companies</option>
-                {companies.map(c => (
+                <option value="all">Our Company</option>
+                {ownCompanies.map(c => (
                   <option key={c.id} value={c.name}>{c.name}</option>
                 ))}
               </select>
@@ -388,6 +404,48 @@ export default function TrackingPage() {
                     <option key={b.id} value={b.name}>{b.name}</option>
                   ))
                 }
+              </select>
+            </div>
+
+            {/* Client Company Filter */}
+            <div className="space-y-0.5">
+              <select
+                value={clientCompanyFilter}
+                onChange={e => setClientCompanyFilter(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+              >
+                <option value="all">Client Company</option>
+                {companies.map(c => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Nationality Filter */}
+            <div className="space-y-0.5">
+              <select
+                value={nationalityFilter}
+                onChange={e => setNationalityFilter(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+              >
+                <option value="all">Nationality</option>
+                {NATIONALITIES.map(n => (
+                  <option key={n.name} value={n.name}>{n.flag} {n.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status / Stage Filter */}
+            <div className="space-y-0.5">
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+              >
+                <option value="all">Pipeline Stage</option>
+                {STAGES.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
               </select>
             </div>
 
@@ -432,7 +490,7 @@ export default function TrackingPage() {
       {/* Kanban Board Container */}
       <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-50/50">
         <div className="flex gap-4 h-full min-w-max pb-4">
-          {STAGES.map(stage => {
+          {(statusFilter === "all" ? STAGES : STAGES.filter(s => s === statusFilter)).map(stage => {
             const stageApplicants = filteredList.filter(a => a.status === stage);
             return (
               <div key={stage}

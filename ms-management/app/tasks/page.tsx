@@ -30,7 +30,9 @@ const KANBAN_COLS = [
 
 const isOverdue = (task: Task) => {
   if (task.status === "Completed" || !task.deadline) return false;
-  const deadlineStr = task.deadline.replace(" ", "T");
+  // Normalize: replace space separator, add :00 seconds if missing (Safari compatibility)
+  let deadlineStr = task.deadline.replace(" ", "T");
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(deadlineStr)) deadlineStr += ":00";
   const deadlineTime = new Date(deadlineStr).getTime();
   return deadlineTime < Date.now();
 };
@@ -205,12 +207,19 @@ export default function TasksPage() {
     e.preventDefault();
     if (!form.title || !form.assignedTo || !form.deadline || !form.assignedDate) { toast.error("Title, assignee, assign date, and deadline are required"); return; }
     
-    // Client-side validations
-    if (new Date(form.deadline) <= new Date(form.assignedDate)) {
+    // Client-side validations — normalize to full ISO for Safari/mobile compatibility
+    const normalizeDateTime = (dt: string) => {
+      if (!dt) return "";
+      // Replace space with T, pad to full ISO format (add :00 seconds if missing)
+      const clean = dt.replace(" ", "T");
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(clean)) return `${clean}:00`;
+      return clean;
+    };
+    if (new Date(normalizeDateTime(form.deadline)) <= new Date(normalizeDateTime(form.assignedDate))) {
       toast.error("Deadline must be after the Assign Date");
       return;
     }
-    if (!editTask && new Date(form.deadline) < new Date()) {
+    if (!editTask && new Date(normalizeDateTime(form.deadline)) < new Date()) {
       toast.error("Deadline cannot be in the past for new tasks");
       return;
     }

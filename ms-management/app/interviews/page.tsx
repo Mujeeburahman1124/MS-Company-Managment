@@ -29,6 +29,62 @@ export default function InterviewsPage() {
   const [modal, setModal] = useState(false);
   const [editInt, setEditInt] = useState<Interview | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedGreetingCard, setSelectedGreetingCard] = useState<Interview | null>(null);
+  const [isGreetingCardOpen, setIsGreetingCardOpen] = useState(false);
+  const [emailTemplate, setEmailTemplate] = useState<"Formal" | "Modern" | "Technical">("Formal");
+
+  const getEmailTemplateBody = (template: string, f: any) => {
+    const name = f.personName || "[Candidate Name]";
+    const positionName = (f.type === "Interview" ? f.position : f.meetingType) || "[Position]";
+    const dt = f.dateTime ? f.dateTime.replace("T", " ") : "[Date & Time]";
+    const format = f.isOnline ? `Online (${f.mode})` : "Physical Assessment";
+    const links = `${f.meetingLink ? `Meeting Link: ${f.meetingLink}\n` : ""}${f.locationLink ? `Location Link: ${f.locationLink}\n` : ""}`;
+    
+    switch (template) {
+      case "Modern":
+        return `Hi ${name}!
+
+Thank you for your application for the ${positionName} position. We are excited to connect with you!
+
+We have scheduled your interview session:
+- Date & Time: ${dt}
+- Format: ${format}
+${links}
+Looking forward to speaking with you!
+
+Best regards,
+Hiring Team`;
+      case "Technical":
+        return `Dear ${name},
+
+You have been scheduled for a Technical Assessment interview for the position of ${positionName} conducted by ${f.conductPerson}.
+
+Session Details:
+- Date & Time: ${dt}
+- Format: ${format}
+${links}
+Please ensure you are in a quiet room, have a stable internet connection, and have your development/IDE environment ready for screen sharing.
+
+Best regards,
+Technical Recruitment Team`;
+      case "Formal":
+      default:
+        return `Dear ${name},
+
+We are pleased to invite you for an interview regarding your application for the ${positionName} position.
+
+Below are the scheduled details:
+- Conductor: ${f.conductPerson}
+- Date & Time: ${dt}
+- Format: ${format}
+${links}
+Please confirm your availability by replying to this email.
+
+Best regards,
+HR Department`;
+    }
+  };
+
   const [form, setForm] = useState({
     applicantId: "",
     type: "Interview" as Interview["type"],
@@ -73,7 +129,7 @@ export default function InterviewsPage() {
   const f = filters.interviews;
   let list = interviews;
   if (currentRole !== "Super Admin" && currentUser.company !== "System") list = list.filter(i => i.company === currentUser.company);
-  if (f.search) { const q = f.search.toLowerCase(); list = list.filter(i => i.personName.toLowerCase().includes(q) || i.conductPerson.toLowerCase().includes(q)); }
+  if (f.search) { const q = f.search.toLowerCase(); list = list.filter(i => (i.personName ?? "").toLowerCase().includes(q) || (i.conductPerson ?? "").toLowerCase().includes(q)); }
   if (f.status && f.status !== "all") list = list.filter(i => i.status === f.status);
   if (f.company && f.company !== "all") list = list.filter(i => i.company === f.company);
   if (f.fromDate) list = list.filter(i => i.dateTime.slice(0,10) >= f.fromDate);
@@ -130,7 +186,7 @@ export default function InterviewsPage() {
           id: `EML-${Math.floor(100+Math.random()*900)}`,
           to: form.email,
           subject: `Interview Invitation: ${form.type === "Interview" ? form.position : form.meetingType} - ${form.personName}`,
-          body: `Dear ${form.personName},\n\nYou have been scheduled for an ${form.type} conducted by ${form.conductPerson}.\n\nDate & Time: ${form.dateTime.replace("T", " ")}\nFormat: ${form.isOnline ? `Online (${form.mode})` : "Physical Assessment"}\n${form.meetingLink ? `Meeting Link: ${form.meetingLink}\n` : ""}${form.locationLink ? `Location Link: ${form.locationLink}\n` : ""}\nNotes: ${form.notes || "N/A"}\n\nBest regards,\nHR Department`,
+          body: form.notes || getEmailTemplateBody(emailTemplate, form),
           sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
           company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
           branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
@@ -340,7 +396,8 @@ export default function InterviewsPage() {
                     {(["Completed","Cancelled","Rescheduled"] as Interview["status"][]).filter(s => s !== int.status).map(s => (
                       <button key={s} onClick={() => handleStatusChange(int, s)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">→ {s}</button>
                     ))}
-                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:int.dateTime.replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors ml-auto">Edit</button>
+                    <button type="button" onClick={() => { setSelectedGreetingCard(int); setIsGreetingCardOpen(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-indigo-150 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-200 transition-colors flex items-center gap-1 ml-auto">🎴 Card</button>
+                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:int.dateTime.replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors">Edit</button>
                     <button onClick={() => setDeleteId(int.id)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-rose-100 bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
                   </div>
                 </Card>
@@ -532,6 +589,25 @@ export default function InterviewsPage() {
                       <Input value={form.meetingLink} onChange={e => setForm(f => ({...f, meetingLink: e.target.value}))} placeholder="https://zoom.us/j/..." className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
                     </div>
 
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Invitation Template</Label>
+                      <select
+                        value={emailTemplate}
+                        onChange={e => {
+                          const val = e.target.value as any;
+                          setEmailTemplate(val);
+                          const generated = getEmailTemplateBody(val, form);
+                          setForm(f => ({ ...f, notes: generated }));
+                          toast.success(`${val} template text applied to Notes`);
+                        }}
+                        className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                      >
+                        <option value="Formal">Formal Invite Template</option>
+                        <option value="Modern">Modern & Friendly Template</option>
+                        <option value="Technical">Technical Assessment Template</option>
+                      </select>
+                    </div>
+
                     {!form.isOnline && (
                       <div className="space-y-1">
                         <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Google Map Location Link</Label>
@@ -656,6 +732,100 @@ export default function InterviewsPage() {
       </Dialog>
 
       <ConfirmDialog isOpen={!!deleteId} onOpenChange={open => !open && setDeleteId(null)} onConfirm={() => { deleteInterview(deleteId!); toast.success("Deleted"); setDeleteId(null); }} title="Delete Schedule" description="Remove this interview/meeting from the calendar." confirmText="Delete" variant="danger" />
+
+      {/* MODAL: GREETING CARD */}
+      <Dialog open={isGreetingCardOpen} onOpenChange={setIsGreetingCardOpen}>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-lg w-[95vw] overflow-hidden">
+          <div id="print-card-content" className="p-8 space-y-6 flex flex-col items-center bg-gradient-to-b from-blue-900 via-slate-900 to-blue-950 text-white border-b-8 border-amber-500 relative select-none">
+            {/* Elegant Border Decoration */}
+            <div className="absolute inset-4 border border-amber-500/20 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-5 border-2 border-amber-500/45 rounded-xl pointer-events-none" />
+            
+            {/* Invitation Card Content */}
+            <div className="z-10 text-center space-y-4 w-full">
+              <div className="text-amber-500 font-extrabold text-[11px] uppercase tracking-widest">Official Invitation</div>
+              <h2 className="text-2xl font-black tracking-tight text-white uppercase">Interview Invitation</h2>
+              <div className="h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent w-3/4 mx-auto my-2" />
+              
+              <div className="space-y-1.5 py-4">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Candidate Name</p>
+                <h3 className="text-xl font-extrabold text-white">{selectedGreetingCard?.personName}</h3>
+                <p className="text-xs text-amber-400 font-bold italic">{selectedGreetingCard?.position || selectedGreetingCard?.meetingType}</p>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3.5 text-left text-xs font-semibold text-slate-200">
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Interviewer</span>
+                  <span className="font-extrabold text-white">{selectedGreetingCard?.conductPerson}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Date & Time</span>
+                  <span className="font-extrabold text-white">{selectedGreetingCard?.dateTime.replace("T", " ")}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Format</span>
+                  <span className="font-extrabold text-white">
+                    {selectedGreetingCard?.isOnline ? `Online (${selectedGreetingCard?.mode})` : "Physical Assessment"}
+                  </span>
+                </div>
+                {selectedGreetingCard?.meetingLink && (
+                  <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
+                    <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Meeting Link</span>
+                    <span className="text-[10px] text-blue-400 font-medium truncate block select-text">{selectedGreetingCard?.meetingLink}</span>
+                  </div>
+                )}
+                {selectedGreetingCard?.locationLink && (
+                  <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
+                    <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Google Map Location</span>
+                    <span className="text-[10px] text-amber-400 font-medium truncate block select-text">{selectedGreetingCard?.locationLink}</span>
+                  </div>
+                )}
+                {selectedGreetingCard?.notes && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Instructions</span>
+                    <span className="text-[10px] text-slate-300 font-medium leading-relaxed italic">"{selectedGreetingCard?.notes}"</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                {selectedGreetingCard?.company || "MS COMPANY"} HR & RECRUITMENT TEAM
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="p-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
+            <Button variant="ghost" onClick={() => setIsGreetingCardOpen(false)} className="text-xs rounded-xl px-4 h-9">
+              Close
+            </Button>
+            <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9 gap-1.5 shadow-sm">
+              Print Card
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <style jsx global>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #print-card-content, #print-card-content * {
+            visibility: visible !important;
+          }
+          #print-card-content {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(to bottom, #1e3a8a, #0f172a, #172554) !important;
+            color: white !important;
+            border-bottom: 8px solid #f59e0b !important;
+            padding: 3rem !important;
+            box-sizing: border-box !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

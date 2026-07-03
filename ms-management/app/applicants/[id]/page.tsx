@@ -202,8 +202,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
     const updated: typeof applicant = {
       ...applicant,
       status: targetStatus,
-      company: targetStatus === "Placed" ? placedCompany : applicant.company,
-      branch: targetStatus === "Placed" ? "Main Branch" : applicant.branch,
+      clientName: targetStatus === "Placed" ? placedCompany : applicant.clientName,
       statusHistory: [
         {
           oldStatus: applicant.status,

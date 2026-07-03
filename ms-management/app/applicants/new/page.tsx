@@ -37,16 +37,18 @@ interface FormData {
 
 export default function NewApplicantPage() {
   const router = useRouter();
-  const { addApplicant, addActivityLog, currentUser, companies } = useAuthStore();
+  const { addApplicant, addActivityLog, currentUser, ownCompanies, branches } = useAuthStore();
 
   const [positions, setPositions] = useState<string[]>([]);
   const [positionInput, setPositionInput] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
-  const [clientPhoto, setClientPhoto] = useState<string | null>(null);
-  const [clientName, setClientName] = useState<string>("");
-  const [clientMobile, setClientMobile] = useState<string>("");
-  const [clientWhatsapp, setClientWhatsapp] = useState<string>("");
-  const [clientEmail, setClientEmail] = useState<string>("");
+  const [cvFile, setCvFile] = useState<{ name: string; url: string } | null>(null);
+  const [selectedOwnCompany, setSelectedOwnCompany] = useState<string>(
+    currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company
+  );
+  const [selectedOwnBranch, setSelectedOwnBranch] = useState<string>(
+    currentUser.branch === "All" ? "Main Branch" : currentUser.branch
+  );
 
   // Named document slots (field-by-field)
   const [passportCopy, setPassportCopy] = useState<{ name: string; url: string } | null>(null);
@@ -99,8 +101,8 @@ export default function NewApplicantPage() {
       toast.error("Please add at least one applying position.");
       return;
     }
-    if (!clientName) {
-      toast.error("Applying for Client Company is required.");
+    if (!selectedOwnCompany) {
+      toast.error("Our Company assignment is required.");
       return;
     }
 
@@ -111,24 +113,25 @@ export default function NewApplicantPage() {
     if (passportCopy) documents.push({ id: `DOC-passport-${Date.now()}`, name: passportCopy.name, uploadedBy: currentUser.name, uploadedDate: new Date().toISOString().slice(0, 10), type: "application/pdf", url: passportCopy.url });
     if (visaPage) documents.push({ id: `DOC-visa-${Date.now()}`, name: visaPage.name, uploadedBy: currentUser.name, uploadedDate: new Date().toISOString().slice(0, 10), type: "application/pdf", url: visaPage.url });
     if (applicantPhoto) documents.push({ id: `DOC-photo-${Date.now()}`, name: applicantPhoto.name, uploadedBy: currentUser.name, uploadedDate: new Date().toISOString().slice(0, 10), type: "image/jpeg", url: applicantPhoto.url });
+    if (cvFile) documents.push({ id: `DOC-cv-${Date.now()}`, name: "CV - " + cvFile.name, uploadedBy: currentUser.name, uploadedDate: new Date().toISOString().slice(0, 10), type: "application/pdf", url: cvFile.url });
     otherDocs.forEach((d, i) => documents.push({ id: `DOC-other-${Date.now()}-${i}`, name: d.name, uploadedBy: currentUser.name, uploadedDate: new Date().toISOString().slice(0, 10), type: d.type, url: d.url }));
 
     const newApplicant: Applicant = {
       ...data,
       id: applicantId,
       photo: applicantPhoto?.url ?? photo,
-      clientName,
-      clientPhoto,
-      clientMobile,
-      clientWhatsapp,
-      clientEmail,
+      clientName: "",
+      clientPhoto: null,
+      clientMobile: "",
+      clientWhatsapp: "",
+      clientEmail: "",
       applicationDate: new Date().toISOString().slice(0, 10),
       nationalityFlag: NATIONALITIES.find(n => n.name === data.nationality)?.flag || "🏳️",
       applyingPositions: positions,
       status: "Pending",
       trackingCode: `TRK-2026-${Math.floor(100 + Math.random() * 900)}`,
-      company: currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company,
-      branch: currentUser.branch === "All" ? "Main Branch" : currentUser.branch,
+      company: selectedOwnCompany,
+      branch: selectedOwnBranch || "Main Branch",
       createdBy: currentUser.name,
       createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
       documents,
@@ -168,13 +171,9 @@ export default function NewApplicantPage() {
       setPositions([]);
       setPositionInput("");
       setPhoto(null);
-      setClientPhoto(null);
-      setClientName("");
-      setClientMobile("");
-      setClientWhatsapp("");
-      setClientEmail("");
       setPassportCopy(null);
       setVisaPage(null);
+      setCvFile(null);
       setApplicantPhoto(null);
       setOtherDocs([]);
       setKeepAndNew(false);
@@ -518,6 +517,37 @@ export default function NewApplicantPage() {
                 )}
               </div>
 
+              {/* CV / Resume Copy */}
+              <div className={`border-2 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors relative cursor-pointer min-h-24 ${cvFile ? "border-emerald-400 bg-emerald-50/30" : "border-dashed border-slate-200"}`}>
+                <input
+                  type="file"
+                  accept=".pdf,image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = await readAsDataURL(file);
+                      setCvFile({ name: file.name, url });
+                      toast.success(`CV attached`);
+                    }
+                  }}
+                  className="absolute inset-0 opacity-0 cursor-pointer h-full w-full"
+                />
+                <UploadCloud className={`w-7 h-7 ${cvFile ? "text-emerald-500" : "text-slate-400"}`} />
+                <div>
+                  <div className="text-[11px] font-bold text-slate-600">CV / Resume</div>
+                  {cvFile ? (
+                    <span className="text-[8px] text-emerald-600 font-bold truncate block max-w-[120px]">{cvFile.name}</span>
+                  ) : (
+                    <span className="text-[8px] text-slate-400">Click to upload</span>
+                  )}
+                </div>
+                {cvFile && (
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setCvFile(null); }} className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-200">
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+
               {/* Applicant Photo */}
               <div className={`border-2 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-2 hover:bg-slate-50 transition-colors relative cursor-pointer min-h-24 overflow-hidden ${applicantPhoto ? "border-emerald-400 bg-emerald-50/30" : "border-dashed border-slate-200"}`}>
                 <input
@@ -609,108 +639,64 @@ export default function NewApplicantPage() {
 
           <Card className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-slate-800 tracking-wider uppercase border-b border-slate-100 pb-2">
-              4. Client / Hiring Company Contact Details
+              4. Corporate Company & Branch Assignment
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Client Name */}
+              {/* Own Company Assignment */}
               <div className="space-y-1">
-                <Label htmlFor="clientName" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Applying for Client Company *
+                <Label htmlFor="ownCompany" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  Our Company Assignment *
                 </Label>
                 <Select
-                  value={clientName}
+                  value={selectedOwnCompany}
                   onValueChange={(val) => {
-                    const matched = companies.find(c => c.name === val);
-                    setClientName(val || "");
-                    setClientEmail(matched?.email || "");
-                    setClientMobile(matched?.telephone || "");
-                    setClientWhatsapp(matched?.whatsapp || matched?.telephone || "");
+                    setSelectedOwnCompany(val || "");
+                    const matchedBranches = branches.filter((b: any) => b.company === val);
+                    setSelectedOwnBranch(matchedBranches.length > 0 ? matchedBranches[0].name : "");
                   }}
+                  disabled={currentUser.role !== "Super Admin"}
                 >
                   <SelectTrigger className="bg-white border-slate-200 rounded-xl text-xs h-10 text-left font-normal text-slate-700">
-                    <SelectValue placeholder="Select Client Company *" />
+                    <SelectValue placeholder="Select Company *" />
                   </SelectTrigger>
                   <SelectContent className="bg-white rounded-xl text-xs">
-                    {companies.map(c => (
-                      <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
-                    ))}
+                    {currentUser.role === "Super Admin" ? (
+                      ownCompanies.map(c => (
+                        <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value={currentUser.company}>{currentUser.company}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Client Mobile */}
+              {/* Branch Assignment */}
               <div className="space-y-1">
-                <Label htmlFor="clientMobile" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Client Mobile Number
+                <Label htmlFor="ownBranch" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  Branch Assignment *
                 </Label>
-                <Input
-                  id="clientMobile"
-                  placeholder="+971 50 000 0000"
-                  className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400"
-                  value={clientMobile}
-                  onChange={(e) => setClientMobile(e.target.value)}
-                />
-              </div>
-
-              {/* Client WhatsApp */}
-              <div className="space-y-1">
-                <Label htmlFor="clientWhatsapp" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Client WhatsApp Number
-                </Label>
-                <Input
-                  id="clientWhatsapp"
-                  placeholder="+971 50 000 0000"
-                  className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400"
-                  value={clientWhatsapp}
-                  onChange={(e) => setClientWhatsapp(e.target.value)}
-                />
-              </div>
-
-              {/* Client Email */}
-              <div className="space-y-1">
-                <Label htmlFor="clientEmail" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Client Email Address
-                </Label>
-                <Input
-                  id="clientEmail"
-                  type="email"
-                  placeholder="hr@company.com"
-                  className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                />
-              </div>
-
-              {/* Client Photo */}
-              <div className="space-y-1 md:col-span-2">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Client Representative Photo
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <Input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setClientPhoto(reader.result as string);
-                          toast.success("Client photo attached");
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400" 
-                  />
-                  {clientPhoto && (
-                    <Avatar className="w-10 h-10 border border-slate-100 rounded-xl">
-                      <AvatarImage src={clientPhoto} className="object-cover rounded-xl" />
-                      <AvatarFallback className="rounded-xl text-[10px]">Client</AvatarFallback>
-                    </Avatar>
-                  )}
-                </div>
+                <Select
+                  value={selectedOwnBranch}
+                  onValueChange={(val) => setSelectedOwnBranch(val || "")}
+                  disabled={currentUser.role === "Branch Admin"}
+                >
+                  <SelectTrigger className="bg-white border-slate-200 rounded-xl text-xs h-10 text-left font-normal text-slate-700">
+                    <SelectValue placeholder="Select Branch *" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded-xl text-xs">
+                    {branches
+                      .filter((b: any) => b.company === selectedOwnCompany)
+                      .map(b => (
+                        <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
+                      ))
+                    }
+                    {branches.filter((b: any) => b.company === selectedOwnCompany).length === 0 && (
+                      <SelectItem value="Main Branch">Main Branch</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </Card>
