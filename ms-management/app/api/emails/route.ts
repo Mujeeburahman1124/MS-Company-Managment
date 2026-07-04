@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
-import { sendEmail } from "@/lib/notifications";
+import { sendEmail, generateEmailContent } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -33,15 +33,41 @@ export async function POST(request: Request) {
 
     const data = await request.json();
 
-    if (!data.to || !data.subject || !data.body) {
-      return NextResponse.json({ error: "To, subject, and body are required" }, { status: 400 });
+    if (!data.to) {
+      return NextResponse.json({ error: "To is required" }, { status: 400 });
+    }
+
+    let finalSubject = data.subject;
+    let finalBody = data.body;
+
+    // Use the central template generator if a template type is provided
+    if (data.templateType) {
+      if (!data.templateData) {
+        return NextResponse.json({ error: "templateData is required when templateType is provided" }, { status: 400 });
+      }
+      try {
+        const generated = generateEmailContent(data.templateType, {
+          ...data.templateData,
+          company: data.templateData.company || user.company,
+          branch: data.templateData.branch || user.branch
+        });
+        finalSubject = generated.subject;
+        finalBody = generated.body;
+      } catch (err: any) {
+        return NextResponse.json({ error: err.message || "Invalid template configuration" }, { status: 400 });
+      }
+    } else {
+      // Fallback for custom generic emails
+      if (!data.subject || !data.body) {
+        return NextResponse.json({ error: "Subject and body are required if no templateType is specified" }, { status: 400 });
+      }
     }
 
     // sendEmail handles both SMTP sending and Prisma SentEmail DB creation
     await sendEmail({
       to: data.to,
-      subject: data.subject,
-      body: data.body,
+      subject: finalSubject,
+      body: finalBody,
       candidateName: data.candidateName || null,
       company: data.company || user.company,
       branch: data.branch || user.branch

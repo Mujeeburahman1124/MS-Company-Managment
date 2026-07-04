@@ -143,7 +143,25 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // If status has changed, trigger real-time notifications
     if (data.status && data.status !== existing.status && updated.email) {
-      const emailBody = `Dear ${updated.fullName},
+      if (updated.status === "Selected") {
+        sendEmail({
+          to: updated.email,
+          subject: "Will be replaced by template backend",
+          body: "Will be replaced by template backend",
+          candidateName: updated.fullName,
+          company: updated.company,
+          branch: updated.branch,
+          type: "Offer",
+          templateType: "Offer",
+          templateData: {
+            applicantName: updated.fullName,
+            role: Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions,
+            company: updated.company,
+            branch: updated.branch
+          }
+        }).catch(err => console.error("Async offer letter email error:", err));
+      } else {
+        const emailBody = `Dear ${updated.fullName},
 
 Your application status has been updated to: ${updated.status}.
 
@@ -156,14 +174,16 @@ You can track your application details anytime at http://localhost:3000/apply.
 Best regards,
 MS Horizon F.Z.E Recruitment Team`;
 
-      sendEmail({
-        to: updated.email,
-        subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
-        body: emailBody,
-        candidateName: updated.fullName,
-        company: updated.company,
-        branch: updated.branch
-      }).catch(err => console.error("Async status update email error:", err));
+        sendEmail({
+          to: updated.email,
+          subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
+          body: emailBody,
+          candidateName: updated.fullName,
+          company: updated.company,
+          branch: updated.branch,
+          type: "Status Update"
+        }).catch(err => console.error("Async status update email error:", err));
+      }
     } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
       // General profile update
       const emailBody = `Dear ${updated.fullName},

@@ -634,6 +634,8 @@ export interface SentEmail {
   company?: string;
   branch?: string;
   candidateName?: string;
+  templateType?: "Interview" | "Offer" | "Visa";
+  templateData?: any;
 }
  
 export interface SentWhatsApp {

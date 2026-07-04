@@ -101,7 +101,9 @@ export default function ReminderEngine() {
       body: string,
       company: string,
       branch: string,
-      candidateName: string
+      candidateName: string,
+      templateType?: "Interview" | "Offer" | "Visa",
+      templateData?: any
     ) => {
       const exists = sentEmails.some((e) => e.id === id);
       if (!exists) {
@@ -114,6 +116,8 @@ export default function ReminderEngine() {
           company,
           branch,
           candidateName,
+          templateType,
+          templateData
         };
         addSentEmail(email);
 
@@ -199,20 +203,21 @@ export default function ReminderEngine() {
           const branchEmail = `${(app.branch || "main").toLowerCase().replace(/[^a-z0-9]/g, "")}@${(app.company || "company").toLowerCase().replace(/[^a-z0-9]/g, "")}.ae`;
           const toAddress = `${app.email}, ${companyEmail}, ${branchEmail}`;
 
-          const emailBody = `Dear ${app.fullName},\n\n` +
-            `This is an automated alert that your visa is expiring in ${days} days (Date: ${app.visaExpiry}). Please coordinate with the branch (${app.branch}) immediately to initiate the renewal process.\n\n` +
-            `Dear Branch Admin (${app.branch}) & Company HR (${app.company}),\n` +
-            `Kindly note that Applicant ${app.fullName} (ID: ${app.id}) has a visa expiry in 20 days or less. Renewal processing is required.\n\n` +
-            `Best regards,\nMS Manager Notification System`;
-
           triggerAutomatedEmail(
             emailId,
             toAddress,
+            // Subject and Body are now overridden by the template generator in the backend
             `URGENT: Visa Expiration Alert - 20 Days Left (Applicant: ${app.fullName})`,
-            emailBody,
+            "Will be replaced by template backend",
             app.company,
             app.branch,
-            app.fullName
+            app.fullName,
+            "Visa",
+            {
+              applicantName: app.fullName,
+              date: app.visaExpiry,
+              extraDetails: "This applies to the applicant's visa."
+            }
           );
 
           triggerAutomatedWhatsApp(

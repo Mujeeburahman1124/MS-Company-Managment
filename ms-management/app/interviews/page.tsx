@@ -185,12 +185,20 @@ HR Department`;
         addSentEmail({
           id: `EML-${Math.floor(100+Math.random()*900)}`,
           to: form.email,
-          subject: `Interview Invitation: ${form.type === "Interview" ? form.position : form.meetingType} - ${form.personName}`,
-          body: form.notes || getEmailTemplateBody(emailTemplate, form),
+          subject: "Will be replaced by template backend",
+          body: "Will be replaced by template backend",
           sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
           company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
           branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
-          candidateName: form.personName
+          candidateName: form.personName,
+          templateType: "Interview",
+          templateData: {
+            applicantName: form.personName,
+            role: form.type === "Interview" ? form.position : form.meetingType,
+            date: form.dateTime.replace("T", " "),
+            link: form.meetingLink || form.locationLink,
+            notes: form.notes || getEmailTemplateBody(emailTemplate, form)
+          }
         });
         toast.success("Auto invite email sent successfully");
       }

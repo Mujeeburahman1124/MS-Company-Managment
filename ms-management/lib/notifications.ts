@@ -284,5 +284,46 @@ export async function sendWhatsApp({
     console.error(`[WHATSAPP-SERVICE] Failed to save SentWhatsApp log:`, dbErr);
   }
 
-  return realWaSent;
+}
+
+/**
+ * Generates the email subject and body strictly based on the template type.
+ * Prevents multiple templates from being concatenated or triggered at the same time.
+ */
+export function generateEmailContent(
+  templateType: "Interview" | "Offer" | "Visa",
+  data: {
+    applicantName?: string;
+    company?: string;
+    branch?: string;
+    date?: string;
+    role?: string;
+    link?: string;
+    notes?: string;
+    extraDetails?: string;
+  }
+): { subject: string; body: string } {
+  const name = data.applicantName || "Candidate";
+  const company = data.company || "Company";
+  const branch = data.branch || "Branch";
+
+  switch (templateType) {
+    case "Interview":
+      return {
+        subject: `Interview Invitation: ${data.role || "Discussion"} - ${name}`,
+        body: `Dear ${name},\n\nWe are pleased to invite you for an interview for the position of ${data.role || "the open role"} at ${company}.\n\nDate & Time: ${data.date || "TBD"}\nLocation/Link: ${data.link || "N/A"}\n\nNotes: ${data.notes || "Please be available at the scheduled time."}\n\nWe look forward to speaking with you.\n\nBest regards,\n${company} HR Team`,
+      };
+    case "Offer":
+      return {
+        subject: `Job Offer: ${data.role || "Position"} at ${company}`,
+        body: `Dear ${name},\n\nWe are thrilled to offer you the position of ${data.role || "the open role"} at ${company}.\n\nExpected Joining Date: ${data.date || "To be discussed"}\nBranch: ${branch}\n\nPlease review the attached terms and reply to this email to accept the offer.\n\nCongratulations and welcome to the team!\n\nBest regards,\n${company} HR Team`,
+      };
+    case "Visa":
+      return {
+        subject: `URGENT: Visa Expiration Alert - ${name}`,
+        body: `Dear ${name},\n\nThis is an automated alert regarding your visa status. Your visa is expiring soon on ${data.date || "the upcoming date"}.\n\nPlease coordinate with the HR department at ${branch} branch immediately to initiate the renewal process and avoid any penalties.\n\n${data.extraDetails || ""}\n\nBest regards,\n${company} Notification System`,
+      };
+    default:
+      throw new Error("Invalid templateType");
+  }
 }
