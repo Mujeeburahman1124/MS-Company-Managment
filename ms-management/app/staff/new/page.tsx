@@ -152,7 +152,7 @@ export default function NewStaffPage() {
   };
 
   return (
-    <div className="flex flex-col h-full pb-12">
+    <div className="flex flex-col h-full pb-24 md:pb-12">
       <PageHeader title="Add New Staff Member" subtitle="Register employee details and upload verification documents" showBack />
       <div className="p-4 md:p-6 max-w-4xl mx-auto w-full">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

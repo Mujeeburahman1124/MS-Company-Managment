@@ -201,7 +201,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   };
 
   return (
-    <div className="flex flex-col h-full select-none pb-12">
+    <div className="flex flex-col h-full select-none pb-24 md:pb-12">
       <PageHeader 
         title={company.name} 
         subtitle={`ID: ${company.id} · Created By: ${company.createdBy}`}

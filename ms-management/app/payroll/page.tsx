@@ -33,7 +33,7 @@ export default function PayrollPage() {
   }, [isStaff, activeTab]);
 
   return (
-    <div className="flex flex-col h-full pb-12">
+    <div className="flex flex-col h-full pb-24 md:pb-12">
       <PageHeader
         title="Payroll Management"
         subtitle="Manage salaries, deductions, and issue payslips"

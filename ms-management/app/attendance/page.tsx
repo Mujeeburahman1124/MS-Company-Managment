@@ -55,7 +55,7 @@ function AttendanceContent() {
   }, [tabParam, visibleTabs]);
 
   return (
-    <div className="flex flex-col h-full pb-12">
+    <div className="flex flex-col h-full pb-24 md:pb-12">
       <PageHeader
         title="Attendance Management"
         subtitle="Comprehensive tracking for time, shifts, and overtime"

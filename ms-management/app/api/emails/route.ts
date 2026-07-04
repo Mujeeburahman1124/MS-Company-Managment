@@ -70,7 +70,9 @@ export async function POST(request: Request) {
       body: finalBody,
       candidateName: data.candidateName || null,
       company: data.company || user.company,
-      branch: data.branch || user.branch
+      branch: data.branch || user.branch,
+      templateType: data.templateType || null,
+      templateData: data.templateData || null
     });
 
     const logged = await prisma.sentEmail.findFirst({

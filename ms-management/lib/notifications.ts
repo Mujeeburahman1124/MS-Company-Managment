@@ -8,7 +8,12 @@ const cleanEnvVar = (val: string | undefined) => {
 };
 
 // ─── HTML Email Template ──────────────────────────────────────────────────────
-function buildHtmlEmail(subject: string, body: string, company = "MS Horizon F.Z.E"): string {
+function buildHtmlEmail(
+  subject: string, 
+  body: string, 
+  company = "MS Horizon F.Z.E",
+  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Offer" | "Visa"
+): string {
   const htmlBody = body
     .split("\n\n")
     .map(para => {
@@ -32,6 +37,32 @@ function buildHtmlEmail(subject: string, body: string, company = "MS Horizon F.Z
 
   const year = new Date().getFullYear();
 
+  // Dynamically set header colors and design highlights based on email type
+  let headerBg = "linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)"; // default professional blue
+  let subtitle = "HR Management System";
+  let footerExtra = "Please do not reply directly to this email.";
+
+  if (templateType === "Interview_Initial") {
+    headerBg = "linear-gradient(135deg,#1e293b 0%,#3b82f6 100%)"; // Slate Blue
+    subtitle = "Initial Screening Interview Invitation";
+  } else if (templateType === "Interview_Online") {
+    headerBg = "linear-gradient(135deg,#0f766e 0%,#0d9488 100%)"; // Cyan/Teal
+    subtitle = "Online Virtual Interview Invitation";
+    footerExtra = "Please make sure to test your video and audio before joining the meeting.";
+  } else if (templateType === "Interview_Physical") {
+    headerBg = "linear-gradient(135deg,#78350f 0%,#b45309 100%)"; // Warm Gold/Amber
+    subtitle = "In-Person Office Interview Invitation";
+    footerExtra = "Please report to the reception desk 10 minutes prior to your interview.";
+  } else if (templateType === "Offer") {
+    headerBg = "linear-gradient(135deg,#065f46 0%,#10b981 100%)"; // Emerald Green
+    subtitle = "Official Job Offer Letter";
+    footerExtra = "Please sign and return the copy to finalize your onboarding.";
+  } else if (templateType === "Visa") {
+    headerBg = "linear-gradient(135deg,#991b1b 0%,#ef4444 100%)"; // Warning Red
+    subtitle = "Urgent Visa Expiration Warning";
+    footerExtra = "This is a high priority notification requiring immediate compliance.";
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,9 +77,9 @@ function buildHtmlEmail(subject: string, body: string, company = "MS Horizon F.Z
         <table width="100%" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);padding:32px 40px;text-align:center;">
+            <td style="background:${headerBg};padding:32px 40px;text-align:center;">
               <div style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">${company}</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;font-weight:500;">HR Management System</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;font-weight:500;">${subtitle}</div>
             </td>
           </tr>
           <!-- Subject Banner -->
@@ -91,7 +122,7 @@ function buildHtmlEmail(subject: string, body: string, company = "MS Horizon F.Z
             <td style="padding:24px 40px;text-align:center;background:#f9fafb;">
               <div style="font-size:12px;color:#9ca3af;line-height:1.6;">
                 This is an automated notification from <strong>${company}</strong> HR System.<br/>
-                Please do not reply directly to this email.<br/>
+                ${footerExtra}<br/>
                 &copy; ${year} ${company}. All Rights Reserved.
               </div>
             </td>
@@ -118,6 +149,8 @@ export async function sendEmail({
   deliveryStatus,
   sentBy,
   type,
+  templateType,
+  templateData,
 }: {
   to: string;
   subject: string;
@@ -128,6 +161,8 @@ export async function sendEmail({
   deliveryStatus?: string;
   sentBy?: string;
   type?: string;
+  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Offer" | "Visa";
+  templateData?: any;
 }) {
   const host = cleanEnvVar(process.env.SMTP_HOST);
   const port = Number(cleanEnvVar(process.env.SMTP_PORT)) || 587;
@@ -150,7 +185,7 @@ export async function sendEmail({
         tls: { rejectUnauthorized: false },
       });
 
-      const htmlContent = buildHtmlEmail(subject, body, company);
+      const htmlContent = buildHtmlEmail(subject, body, company, templateType);
 
       await transporter.sendMail({
         from,
@@ -291,7 +326,7 @@ export async function sendWhatsApp({
  * Prevents multiple templates from being concatenated or triggered at the same time.
  */
 export function generateEmailContent(
-  templateType: "Interview" | "Offer" | "Visa",
+  templateType: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Offer" | "Visa",
   data: {
     applicantName?: string;
     company?: string;
@@ -309,19 +344,99 @@ export function generateEmailContent(
 
   switch (templateType) {
     case "Interview":
+    case "Interview_Initial":
       return {
-        subject: `Interview Invitation: ${data.role || "Discussion"} - ${name}`,
-        body: `Dear ${name},\n\nWe are pleased to invite you for an interview for the position of ${data.role || "the open role"} at ${company}.\n\nDate & Time: ${data.date || "TBD"}\nLocation/Link: ${data.link || "N/A"}\n\nNotes: ${data.notes || "Please be available at the scheduled time."}\n\nWe look forward to speaking with you.\n\nBest regards,\n${company} HR Team`,
+        subject: `Initial Interview Invitation: ${data.role || "Discussion"} - ${name}`,
+        body: `Dear ${name},
+
+We are pleased to invite you for an Initial screening interview for the position of ${data.role || "the open role"} at ${company}.
+
+Details:
+- Position: ${data.role || "discussion"}
+- Company: ${company}
+- Branch: ${branch}
+- Date & Time: ${data.date || "TBD"}
+
+Notes: ${data.notes || "Please prepare to discuss your experience, qualifications, and expectations."}
+
+We look forward to speaking with you.
+
+Best regards,
+${company} HR Team`,
+      };
+    case "Interview_Online":
+      return {
+        subject: `Online Interview Invitation: ${data.role || "Discussion"} - ${name}`,
+        body: `Dear ${name},
+
+We are pleased to invite you for an Online Virtual Interview for the position of ${data.role || "the open role"} at ${company}.
+
+Online Interview Details:
+- Meeting Platform & Link: ${data.link || "Will be shared shortly"}
+- Date & Time: ${data.date || "TBD"}
+
+Notes: ${data.notes || ""}
+
+Virtual Meeting Tips:
+- Ensure a stable internet connection and quiet space.
+- Keep your camera enabled.
+- Join the link 5 minutes prior to the schedule.
+
+Best regards,
+${company} HR Team`,
+      };
+    case "Interview_Physical":
+      return {
+        subject: `Office Interview Invitation: ${data.role || "Discussion"} - ${name}`,
+        body: `Dear ${name},
+
+We are pleased to invite you for an In-person/Physical Interview for the position of ${data.role || "the open role"} at ${company}.
+
+Physical Office Details:
+- Location / Address: ${data.link || "Our Main Office Address"}
+- Branch Office: ${branch}
+- Date & Time: ${data.date || "TBD"}
+
+Notes: ${data.notes || ""}
+
+Candidate Guidelines:
+- Please carry a copy of your CV and valid ID.
+- Register at the front desk upon arrival.
+- Dress code is professional business attire.
+
+Best regards,
+${company} HR Team`,
       };
     case "Offer":
       return {
         subject: `Job Offer: ${data.role || "Position"} at ${company}`,
-        body: `Dear ${name},\n\nWe are thrilled to offer you the position of ${data.role || "the open role"} at ${company}.\n\nExpected Joining Date: ${data.date || "To be discussed"}\nBranch: ${branch}\n\nPlease review the attached terms and reply to this email to accept the offer.\n\nCongratulations and welcome to the team!\n\nBest regards,\n${company} HR Team`,
+        body: `Dear ${name},
+
+We are thrilled to offer you the position of ${data.role || "the open role"} at ${company}.
+
+Expected Joining Date: ${data.date || "To be discussed"}
+Branch: ${branch}
+
+Please review the attached terms and reply to this email to accept the offer.
+
+Congratulations and welcome to the team!
+
+Best regards,
+${company} HR Team`,
       };
     case "Visa":
       return {
         subject: `URGENT: Visa Expiration Alert - ${name}`,
-        body: `Dear ${name},\n\nThis is an automated alert regarding your visa status. Your visa is expiring soon on ${data.date || "the upcoming date"}.\n\nPlease coordinate with the HR department at ${branch} branch immediately to initiate the renewal process and avoid any penalties.\n\n${data.extraDetails || ""}\n\nBest regards,\n${company} Notification System`,
+        body: `Dear ${name},
+
+This is an automated alert regarding your visa status. Your visa is expiring soon on ${data.date || "the upcoming date"}.
+
+Please coordinate with the HR department at ${branch} branch immediately to initiate the renewal process and avoid any penalties.
+
+${data.extraDetails || ""}
+
+Best regards,
+${company} Notification System`,
       };
     default:
       throw new Error("Invalid templateType");

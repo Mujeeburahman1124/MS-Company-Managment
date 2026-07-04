@@ -5,7 +5,7 @@ import PageHeader from "@/components/shared/PageHeader";
  
 export default function ShiftsPage() {
   return (
-    <div className="flex flex-col h-full pb-12">
+    <div className="flex flex-col h-full pb-24 md:pb-12">
       <PageHeader
         title="Shift Management"
         subtitle="Manage employee shifts, working hours, and grace periods"

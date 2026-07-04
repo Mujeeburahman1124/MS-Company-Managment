@@ -186,7 +186,7 @@ export default function NewApplicantPage() {
   };
 
   return (
-    <div className="flex flex-col h-full select-none pb-12">
+    <div className="flex flex-col h-full select-none pb-24 md:pb-24 md:pb-12">
       <PageHeader
         title="Add New Applicant"
         subtitle="Register a new applicant form and upload documents"

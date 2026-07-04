@@ -218,6 +218,10 @@ We have automatically generated a user login account for you:
 - Temporary Password: ${temporaryPassword}
 
 Please log in and update your password immediately by clicking on your profile avatar in the sidebar.`;
+      } else {
+        emailBody += `
+
+Please note: A system login account was not requested for your profile. If you require access to the employee portal in the future, please contact your HR or System Administrator.`;
       }
 
       emailBody += `

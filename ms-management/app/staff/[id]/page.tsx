@@ -338,7 +338,7 @@ export default function StaffDetailPage({ params }: { params: Promise<{ id: stri
   ];
 
   return (
-    <div className="flex flex-col h-full select-none pb-12">
+    <div className="flex flex-col h-full select-none pb-24 md:pb-12">
       <PageHeader 
         title={`Staff Profile: ${member.name}`} 
         subtitle={`ID: ${member.id} · ${member.position}`}
