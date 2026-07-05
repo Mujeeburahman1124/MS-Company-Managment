@@ -51,99 +51,98 @@
 }
 
 :root {
-  /* Premium Corporate Color Palette */
-  --background: oklch(0.99 0.005 255);
-  --foreground: oklch(0.12 0.02 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0.02 260);
+  /* High-Contrast Black & White Branding Theme with Royal Blue Logo Accent */
+  --background: oklch(0.98 0.005 255); /* Crisp light background */
+  --foreground: oklch(0.15 0.01 260); /* Near-black text readability */
+  --card: oklch(1 0 0); /* Pure white cards */
+  --card-foreground: oklch(0.15 0.01 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0.02 260);
-  --primary: oklch(0.55 0.22 260);
-  /* Vibrant Pro Blue */
+  --popover-foreground: oklch(0.15 0.01 260);
+  --primary: oklch(0.48 0.22 260); /* Premium royal blue from logo */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.965 0.005 260);
+  --secondary: oklch(0.95 0.005 260); /* Clean slate/gray border background */
   --secondary-foreground: oklch(0.2 0.02 260);
-  --muted: oklch(0.965 0.005 260);
-  --muted-foreground: oklch(0.55 0.015 260);
-  --accent: oklch(0.94 0.03 260);
+  --muted: oklch(0.95 0.005 260);
+  --muted-foreground: oklch(0.45 0.01 260);
+  --accent: oklch(0.93 0.02 260);
   --accent-foreground: oklch(0.2 0.02 260);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0.01 260);
-  --input: oklch(0.91 0.01 260);
-  --ring: oklch(0.55 0.22 260);
-  --chart-1: oklch(0.55 0.2 260);
-  --chart-2: oklch(0.6 0.18 160);
-  /* Emerald */
-  --chart-3: oklch(0.65 0.15 30);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.88 0.01 260); /* Crisp grey borders */
+  --input: oklch(0.88 0.01 260);
+  --ring: oklch(0.48 0.22 260);
+  --chart-1: oklch(0.48 0.22 260);
+  --chart-2: oklch(0.15 0.01 260); /* Monochrome charcoal/black accent */
+  --chart-3: oklch(0.6 0.16 140);
   --chart-4: oklch(0.55 0.2 300);
   --chart-5: oklch(0.55 0.15 180);
   --radius: 0.75rem;
-  /* Softer corners for modern feel */
-  --sidebar: oklch(0.15 0.025 260);
-  --sidebar-foreground: oklch(0.92 0 0);
-  --sidebar-primary: oklch(0.55 0.2 260);
+
+  /* Deep Black Sidebar (matches left diamond logo) */
+  --sidebar: oklch(0.08 0.005 260); /* Deep charcoal/black */
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.48 0.22 260);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.22 0.025 260);
-  --sidebar-accent-foreground: oklch(0.92 0 0);
-  --sidebar-border: oklch(0.25 0.02 260);
-  --sidebar-ring: oklch(0.55 0.18 260);
+  --sidebar-accent: oklch(0.14 0.01 260);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.18 0.01 260);
+  --sidebar-ring: oklch(0.48 0.22 260);
 
   /* Custom premium tokens */
-  --ms-gradient-start: #0f172a;
-  --ms-gradient-mid: #1e40af;
-  --ms-gradient-end: #3b82f6;
-  --ms-glow: 0 0 35px rgba(37, 99, 235, 0.18);
-  --ms-card-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 12px 24px -4px rgba(0, 0, 0, 0.02);
-  --ms-card-shadow-hover: 0 20px 40px -12px rgba(37, 99, 235, 0.12), 0 0 0 1px oklch(0.55 0.22 260 / 10%);
+  --ms-gradient-start: #080a0f; /* High contrast black */
+  --ms-gradient-mid: #1d4ed8; /* Logo blue */
+  --ms-gradient-end: #2563eb;
+  --ms-glow: 0 0 35px rgba(29, 78, 216, 0.15);
+  --ms-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 20px -8px rgba(0, 0, 0, 0.02);
+  --ms-card-shadow-hover: 0 16px 32px -8px rgba(29, 78, 216, 0.1), 0 0 0 1px oklch(0.48 0.22 260 / 8%);
 
-  /* Extended Status Palette for Req 4, 15, 16 */
-  --ms-status-processing: #3b82f6;
+  /* Status Colors */
+  --ms-status-processing: #2563eb;
   --ms-status-placed: #10b981;
   --ms-status-returned: #f59e0b;
   --ms-status-rejected: #ef4444;
 
   /* Brand Gradient Palette */
-  --ms-brand-grad: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --ms-brand-grad: linear-gradient(135deg, #1d4ed8 0%, #0f172a 100%);
   --ms-success-grad: linear-gradient(135deg, #059669 0%, #10b981 100%);
 }
 
-
 .dark {
-  --background: oklch(0.13 0.015 260);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.18 0.015 260);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0.015 260);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.65 0.2 260);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.22 0.015 260);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.22 0.015 260);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.22 0.015 260);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.65 0.2 260);
-  --chart-2: oklch(0.65 0.2 150);
-  --chart-3: oklch(0.65 0.15 30);
+  /* Crisp Pitch-Black Theme matching Logo's dark attributes */
+  --background: oklch(0.06 0.005 260); /* True pitch black/charcoal */
+  --foreground: oklch(0.98 0 0); /* Pure white text */
+  --card: oklch(0.1 0.005 260); /* Dark carbon cards */
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.1 0.005 260);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.6 0.18 260); /* Royal Blue Logo Accent */
+  --primary-foreground: oklch(0.08 0 0);
+  --secondary: oklch(0.14 0.005 260);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.14 0.005 260);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.14 0.005 260);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.65 0.18 25);
+  --border: oklch(1 0 0 / 8%); /* Clean subtle border */
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.6 0.18 260);
+  --chart-1: oklch(0.6 0.18 260);
+  --chart-2: oklch(0.98 0 0);
+  --chart-3: oklch(0.65 0.15 140);
   --chart-4: oklch(0.65 0.2 300);
   --chart-5: oklch(0.65 0.15 180);
-  --sidebar: oklch(0.15 0.02 260);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.65 0.2 260);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.22 0.02 260);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.08 0.005 260);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.6 0.18 260);
+  --sidebar-primary-foreground: oklch(0.08 0 0);
+  --sidebar-accent: oklch(0.14 0.01 260);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.6 0.18 260);
 }
 
 .dark body {
-  background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%) !important;
+  background: linear-gradient(135deg, #06080c 0%, #0d0f14 100%) !important;
 }
 
 /* ─── Base Layer ─── */
