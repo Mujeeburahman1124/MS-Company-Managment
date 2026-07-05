@@ -1138,7 +1138,7 @@ export default function TrackingPage() {
 
       {/* Validation Dialog for Kanban Drag & Drop Status Transition */}
       <Dialog open={isStatusDialogOpen} onOpenChange={open => !open && setIsStatusDialogOpen(false)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleStatusSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">

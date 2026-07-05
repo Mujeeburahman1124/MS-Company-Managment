@@ -14,26 +14,29 @@ function buildHtmlEmail(
   company = "MS Horizon F.Z.E",
   templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed" | "Offer" | "Visa"
 ): string {
-  const htmlBody = body
-    .split("\n\n")
-    .map(para => {
-      const lines = para
-        .split("\n")
-        .map(line => {
-          if (line.startsWith("- ") || line.startsWith("• ")) {
-            return `<li style="margin:4px 0;color:#374151;">${line.replace(/^[-•]\s*/, "")}</li>`;
+  const isHtml = body.trim().startsWith("<") && (body.includes("</") || body.includes("/>"));
+  const htmlBody = isHtml
+    ? body
+    : body
+        .split("\n\n")
+        .map(para => {
+          const lines = para
+            .split("\n")
+            .map(line => {
+              if (line.startsWith("- ") || line.startsWith("• ")) {
+                return `<li style="margin:4px 0;color:#374151;">${line.replace(/^[-•]\s*/, "")}</li>`;
+              }
+              if (line.trim() === "") return "";
+              return `<span style="display:block;color:#374151;line-height:1.7;">${line}</span>`;
+            })
+            .join("");
+
+          if (lines.includes("<li")) {
+            return `<ul style="margin:8px 0 8px 20px;padding:0;">${lines}</ul>`;
           }
-          if (line.trim() === "") return "";
-          return `<span style="display:block;color:#374151;line-height:1.7;">${line}</span>`;
+          return `<p style="margin:0 0 14px 0;">${lines}</p>`;
         })
         .join("");
-
-      if (lines.includes("<li")) {
-        return `<ul style="margin:8px 0 8px 20px;padding:0;">${lines}</ul>`;
-      }
-      return `<p style="margin:0 0 14px 0;">${lines}</p>`;
-    })
-    .join("");
 
   const year = new Date().getFullYear();
 

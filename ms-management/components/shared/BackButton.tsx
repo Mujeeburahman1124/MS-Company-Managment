@@ -15,7 +15,7 @@ export default function BackButton() {
       className="text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100/50 rounded-xl px-2 md:px-3 py-1.5 h-8 gap-1 select-none flex-shrink-0"
     >
       <ChevronLeft className="w-4 h-4" />
-      <span className="hidden sm:inline">Back</span>
+      <span className="inline">Back</span>
     </Button>
   );
 }

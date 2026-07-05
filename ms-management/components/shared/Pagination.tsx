@@ -63,7 +63,8 @@ export default function Pagination({ moduleKey, totalItems }: PaginationProps) {
       {/* Controls: Page selectors & Next/Prev */}
       <div className="flex items-center gap-4">
         {/* Page size selector */}
-        <div className="hidden sm:flex items-center gap-1.5">
+        {/* Page size selector (Always visible) */}
+        <div className="flex items-center gap-1.5">
           <span>Show:</span>
           <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
             <SelectTrigger className="w-18 bg-white border-slate-200 rounded-lg text-xs h-8">
@@ -85,19 +86,19 @@ export default function Pagination({ moduleKey, totalItems }: PaginationProps) {
             size="icon"
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
-            className="w-8 h-8 rounded-lg border-slate-200 disabled:opacity-50"
+            className="w-8 h-8 rounded-lg border-slate-200 disabled:opacity-50 flex-shrink-0"
           >
             <ChevronLeft className="w-4 h-4 text-slate-500" />
           </Button>
 
-          {/* Numbers list (hidden on mobile) */}
-          <div className="hidden sm:flex items-center gap-1">
+          {/* Numbers list (Scrollable on mobile) */}
+          <div className="flex items-center gap-1 max-w-[100px] xs:max-w-[150px] sm:max-w-none overflow-x-auto scrollbar-none select-none py-0.5">
             {getPageNumbers().map((p) => (
               <Button
                 key={p}
                 variant={page === p ? "default" : "outline"}
                 onClick={() => handlePageChange(p)}
-                className={`w-8 h-8 rounded-lg text-xs font-bold ${
+                className={`w-8 h-8 rounded-lg text-xs font-bold flex-shrink-0 ${
                   page === p
                     ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -113,7 +114,7 @@ export default function Pagination({ moduleKey, totalItems }: PaginationProps) {
             size="icon"
             onClick={() => handlePageChange(page + 1)}
             disabled={page === totalPages}
-            className="w-8 h-8 rounded-lg border-slate-200 disabled:opacity-50"
+            className="w-8 h-8 rounded-lg border-slate-200 disabled:opacity-50 flex-shrink-0"
           >
             <ChevronRight className="w-4 h-4 text-slate-500" />
           </Button>

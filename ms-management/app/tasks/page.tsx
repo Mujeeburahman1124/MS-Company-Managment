@@ -573,7 +573,7 @@ export default function TasksPage() {
       {view === "table" && <Pagination moduleKey="tasks" totalItems={totalItems} />}
 
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">{editTask ? "Edit Task" : "Create New Task"}</DialogTitle>

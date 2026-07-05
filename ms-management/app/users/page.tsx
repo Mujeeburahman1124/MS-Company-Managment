@@ -786,7 +786,7 @@ export default function UsersPage() {
 
       {/* Audited Email Change Modal */}
       <Dialog open={!!emailChangeModal} onOpenChange={open => !open && setEmailChangeModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleEmailChangeSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">

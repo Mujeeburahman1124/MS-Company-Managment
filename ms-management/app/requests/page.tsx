@@ -308,7 +308,7 @@ export default function StaffRequestsPage() {
       </Dialog>
 
       <Dialog open={!!actionModal} onOpenChange={open => !open && setActionModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">{actionModal?.action} Request?</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Request from {actionModal?.req.staffName} for {actionModal?.req.requestType}</DialogDescription>
