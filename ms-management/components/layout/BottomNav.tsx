@@ -8,7 +8,8 @@ import {
   LayoutGrid, Users, CheckSquare, Bell, Menu,
   Briefcase, Building2, Car, FileText, Shield,
   X, BarChart3, Settings, Clock, Package, ChevronLeft, User,
-  ClipboardList
+  ClipboardList, Target, UserCheck, Cake, FileSpreadsheet,
+  Activity, DollarSign, GitBranch, MessageCircle, UserPlus, ShieldCheck
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
@@ -16,16 +17,29 @@ import { getPermissionModuleName } from "@/lib/constants";
 
 const MORE_ITEMS = [
   { label: "Applicants", path: "/applicants",    icon: Users,         permissionKey: "applicants" },
+  { label: "Interviews", path: "/interviews",    icon: Shield,        permissionKey: "interviews" },
   { label: "Placement",  path: "/placement",     icon: ClipboardList, permissionKey: "placement" },
-  { label: "Tasks",      path: "/tasks",         icon: CheckSquare,   permissionKey: "tasks" },
+  { label: "Tracking",   path: "/tracking",      icon: Target,        permissionKey: "tracking" },
+  { label: "Members",    path: "/members",       icon: UserCheck,     permissionKey: "members" },
   { label: "Staff",      path: "/staff",         icon: Briefcase,     permissionKey: "staff" },
+  { label: "Birthdays",  path: "/birthday",      icon: Cake,          permissionKey: "birthday" },
   { label: "Leave",      path: "/leave",         icon: Clock,         permissionKey: "leave" },
-  { label: "Client Companies",  path: "/companies",     icon: Building2,     permissionKey: "companies" },
+  { label: "Requests",   path: "/requests",      icon: FileSpreadsheet, permissionKey: "requests" },
+  { label: "Attendance", path: "/attendance",    icon: Activity,      permissionKey: "attendance" },
+  { label: "Payroll",    path: "/payroll",       icon: DollarSign,    permissionKey: "payroll" },
+  { label: "Clients",    path: "/companies",     icon: Building2,     permissionKey: "companies" },
+  { label: "Branches",   path: "/branches",      icon: GitBranch,     permissionKey: "branches" },
   { label: "Suppliers",  path: "/suppliers",     icon: Package,       permissionKey: "suppliers" },
   { label: "Vehicles",   path: "/vehicles",      icon: Car,           permissionKey: "vehicles" },
+  { label: "Tasks",      path: "/tasks",         icon: CheckSquare,   permissionKey: "tasks" },
   { label: "Documents",  path: "/documents",     icon: FileText,      permissionKey: "documents" },
-  { label: "Interviews", path: "/interviews",    icon: Shield,        permissionKey: "interviews" },
+  { label: "Visa Expiry",path: "/visa-expiry",   icon: Shield,        permissionKey: "visaExpiry" },
+  { label: "WhatsApp",   path: "/whatsapp",      icon: MessageCircle },
+  { label: "Users",      path: "/users",         icon: UserPlus,      permissionKey: "users", hiddenFor: ["Staff", "Recruiter", "Accountant"] },
+  { label: "Roles",      path: "/roles",         icon: ShieldCheck,   permissionKey: "roles", hiddenFor: ["Staff", "HR Manager", "Recruiter", "Accountant", "Branch Admin"] },
+  { label: "Own Cos",    path: "/own-companies", icon: Building2,     superAdminOnly: true },
   { label: "Reports",    path: "/reports",       icon: BarChart3,     permissionKey: "reports", hiddenFor: ["Staff"] },
+  { label: "Activity",   path: "/activity-log",  icon: Activity,      permissionKey: "activityLog", hiddenFor: ["Staff", "Recruiter"] },
   { label: "Settings",   path: "/settings",      icon: Settings,      permissionKey: "settings", hiddenFor: ["Staff", "HR Manager", "Recruiter", "Accountant", "Branch Admin"] },
 ];
 
