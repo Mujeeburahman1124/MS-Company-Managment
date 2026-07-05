@@ -11,85 +11,193 @@ const cleanEnvVar = (val: string | undefined) => {
 function buildHtmlEmail(
   subject: string, 
   body: string, 
-  company = "MS Horizon F.Z.E",
+  company = "MS Human Resource Consultancies",
   templateType?: 
     | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
     | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday"
 ): string {
-  const htmlBody = body
+  // Parse body key-value pairs
+  let detailsTableHtml = "";
+  const cleanedBodyRows: string[] = [];
+  const lines = body.split("\n");
+  const detailRows: Array<{ key: string; val: string; icon: string }> = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if ((trimmed.startsWith("- ") || trimmed.startsWith("• ")) && trimmed.includes(":")) {
+      const parts = trimmed.substring(2).split(":");
+      const key = parts[0].trim();
+      const val = parts.slice(1).join(":").trim();
+      
+      // Determine the icon for the key
+      let icon = "📋";
+      const kLower = key.toLowerCase();
+      if (kLower.includes("position") || kLower.includes("role") || kLower.includes("job")) icon = "💼";
+      else if (kLower.includes("company") || kLower.includes("client")) icon = "🏢";
+      else if (kLower.includes("date") || kLower.includes("expiry")) icon = "📅";
+      else if (kLower.includes("time")) icon = "🕒";
+      else if (kLower.includes("location") || kLower.includes("address") || kLower.includes("venue")) icon = "📍";
+      else if (kLower.includes("type") || kLower.includes("mode")) icon = "👥";
+      else if (kLower.includes("person") || kLower.includes("contact person")) icon = "👤";
+      else if (kLower.includes("number") || kLower.includes("phone") || kLower.includes("contact")) icon = "📞";
+      else if (kLower.includes("passport")) icon = "🪪";
+      else if (kLower.includes("visa")) icon = "🛂";
+      else if (kLower.includes("days") || kLower.includes("remaining")) icon = "⚠️";
+      else if (kLower.includes("instruction") || kLower.includes("remark") || kLower.includes("note")) icon = "ℹ️";
+
+      detailRows.push({ key, val, icon });
+    } else {
+      cleanedBodyRows.push(line);
+    }
+  }
+
+  if (detailRows.length > 0) {
+    detailsTableHtml = `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin:20px 0;background:#ffffff;border-collapse:collapse;box-shadow:0 1px 3px rgba(0,0,0,0.02);">`;
+    detailRows.forEach((row, i) => {
+      detailsTableHtml += `
+        <tr style="border-bottom:1px solid #f3f4f6;${i === detailRows.length - 1 ? 'border-bottom:none;' : ''}">
+          <td style="padding:12px 16px;width:24px;text-align:center;font-size:16px;vertical-align:middle;">${row.icon}</td>
+          <td style="padding:12px 8px;font-family:sans-serif;font-size:13px;font-weight:700;color:#4b5563;width:160px;vertical-align:middle;">${row.key}</td>
+          <td style="padding:12px 4px;font-family:sans-serif;font-size:13px;color:#9ca3af;width:10px;text-align:center;vertical-align:middle;">:</td>
+          <td style="padding:12px 16px;font-family:sans-serif;font-size:13px;font-weight:700;color:#1f2937;vertical-align:middle;">${row.val}</td>
+        </tr>`;
+    });
+    detailsTableHtml += `</table>`;
+  }
+
+  const htmlBody = cleanedBodyRows
+    .join("\n")
     .split("\n\n")
     .map(para => {
-      const lines = para
-        .split("\n")
-        .map(line => {
-          if (line.startsWith("- ") || line.startsWith("• ")) {
-            return `<li style="margin:4px 0;color:#374151;">${line.replace(/^[-•]\s*/, "")}</li>`;
-          }
-          if (line.trim() === "") return "";
-          return `<span style="display:block;color:#374151;line-height:1.7;">${line}</span>`;
-        })
-        .join("");
-
-      if (lines.includes("<li")) {
-        return `<ul style="margin:8px 0 8px 20px;padding:0;">${lines}</ul>`;
+      const pTrim = para.trim();
+      if (pTrim === "") return "";
+      
+      // If it contains "Dear", make it bold or prominent
+      if (pTrim.startsWith("Dear")) {
+        return `<p style="margin:0 0 16px 0;font-family:sans-serif;font-size:15px;font-weight:700;color:#1f2937;">${pTrim}</p>`;
       }
-      return `<p style="margin:0 0 14px 0;">${lines}</p>`;
+      return `<p style="margin:0 0 14px 0;line-height:1.7;color:#374151;font-family:sans-serif;font-size:14px;">${pTrim.replace(/\n/g, "<br/>")}</p>`;
     })
     .join("");
 
-  const year = new Date().getFullYear();
+  const dividerColor = templateType === "Visa" ? "#ef4444" : "#2563eb";
 
-  // Dynamically set header colors and design highlights based on email type
-  let headerBg = "linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)"; // default professional blue
-  let subtitle = "HR Management System";
-  let footerExtra = "Please do not reply directly to this email.";
-
-  if (templateType === "Interview_Initial") {
-    headerBg = "linear-gradient(135deg,#1e293b 0%,#3b82f6 100%)"; // Slate Blue
-    subtitle = "Initial Screening Interview Invitation";
-  } else if (templateType === "Interview_Online") {
-    headerBg = "linear-gradient(135deg,#0f766e 0%,#0d9488 100%)"; // Cyan/Teal
-    subtitle = "Online Virtual Interview Invitation";
-    footerExtra = "Please make sure to test your video and audio before joining the meeting.";
-  } else if (templateType === "Interview_Physical") {
-    headerBg = "linear-gradient(135deg,#78350f 0%,#b45309 100%)"; // Warm Gold/Amber
-    subtitle = "In-Person Office Interview Invitation";
-    footerExtra = "Please report to the reception desk 10 minutes prior to your interview.";
-  } else if (templateType === "Interview_Cancelled") {
-    headerBg = "linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%)"; // Rose Red
-    subtitle = "Interview Cancellation Notice";
-    footerExtra = "We apologize for any inconvenience. Please contact HR for further information.";
-  } else if (templateType === "Interview_Completed") {
-    headerBg = "linear-gradient(135deg,#064e3b 0%,#059669 100%)"; // Emerald Green
-    subtitle = "Interview Completed - Thank You";
-    footerExtra = "We will reach out to you regarding the next steps in the process.";
-  } else if (templateType === "Offer") {
-    headerBg = "linear-gradient(135deg,#065f46 0%,#10b981 100%)"; // Emerald Green
-    subtitle = "Official Job Offer Letter";
-    footerExtra = "Please sign and return the copy to finalize your onboarding.";
+  // Template Type Headers
+  let templateHeader = "";
+  if (templateType?.startsWith("Interview")) {
+    templateHeader = `
+      <div style="text-align:center;margin:24px 0 16px 0;">
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-bottom:10px;">
+          <tr>
+            <td style="background:#eff6ff;width:40px;height:40px;border-radius:10px;text-align:center;vertical-align:middle;color:#2563eb;font-size:20px;border:1px solid #dbeafe;">📅</td>
+          </tr>
+        </table>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:1px;text-transform:uppercase;">INTERVIEW INVITATION</div>
+      </div>
+    `;
   } else if (templateType === "Visa") {
-    headerBg = "linear-gradient(135deg,#991b1b 0%,#ef4444 100%)"; // Warning Red
-    subtitle = "Urgent Visa Expiration Warning";
-    footerExtra = "This is a high priority notification requiring immediate compliance.";
+    templateHeader = `
+      <div style="text-align:center;margin:24px 0 16px 0;">
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-bottom:10px;">
+          <tr>
+            <td style="background:#fef2f2;width:40px;height:40px;border-radius:10px;text-align:center;vertical-align:middle;color:#ef4444;font-size:20px;border:1px solid #fee2e2;">🔔</td>
+          </tr>
+        </table>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#991b1b;letter-spacing:1px;text-transform:uppercase;">VISA EXPIRY ALERT</div>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;color:#374151;margin-top:4px;">Action Required</div>
+      </div>
+    `;
   } else if (templateType === "Registration") {
-    headerBg = "linear-gradient(135deg,#4f46e5 0%,#6366f1 100%)"; // Indigo
-    subtitle = "User Account Registration Success";
-    footerExtra = "Please update your password immediately upon your first login.";
-  } else if (templateType === "Placement") {
-    headerBg = "linear-gradient(135deg,#059669 0%,#10b981 100%)"; // Placed Success Green
-    subtitle = "Applicant Placement Agreement Cleared";
-    footerExtra = "Your employment agreement has been saved inside the document center.";
-  } else if (templateType === "Leave") {
-    headerBg = "linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%)"; // Cobalt Blue
-    subtitle = "Leave Request Status Notification";
-  } else if (templateType === "Payroll") {
-    headerBg = "linear-gradient(135deg,#0d9488 0%,#14b8a6 100%)"; // Teal
-    subtitle = "Official Monthly Payslip Released";
-    footerExtra = "You can download your detailed payslip PDF inside the Payroll history panel.";
-  } else if (templateType === "Birthday") {
-    headerBg = "linear-gradient(135deg,#ea580c 0%,#f97316 100%)"; // Warm Birthday Orange
-    subtitle = "Warm Birthday Wishes from the Team! 🎂";
-    footerExtra = "We hope you have an amazing day celebrating!";
+    templateHeader = `
+      <div style="text-align:center;margin:24px 0 16px 0;">
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-bottom:10px;">
+          <tr>
+            <td style="background:#eff6ff;width:40px;height:40px;border-radius:10px;text-align:center;vertical-align:middle;color:#2563eb;font-size:20px;border:1px solid #dbeafe;">✓</td>
+          </tr>
+        </table>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:1px;">Registration Completed Successfully!</div>
+      </div>
+    `;
+  } else {
+    templateHeader = `
+      <div style="text-align:center;margin:24px 0 16px 0;">
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:1px;text-transform:uppercase;">${subject}</div>
+      </div>
+    `;
+  }
+
+  // Notice Banners
+  let noticeBanner = "";
+  if (templateType === "Visa") {
+    noticeBanner = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef2f2;border:1px solid #fee2e2;border-radius:12px;margin:20px 0;">
+        <tr>
+          <td style="padding:14px 20px;color:#991b1b;font-family:sans-serif;font-size:12px;font-weight:700;line-height:1.4;">
+            <span style="font-size:16px;margin-right:8px;vertical-align:middle;">⚠️</span>
+            <span style="vertical-align:middle;">Kindly ensure the visa is renewed before the expiry date to avoid overstay fines and legal issues.</span>
+          </td>
+        </tr>
+      </table>
+    `;
+  } else if (templateType?.startsWith("Interview")) {
+    noticeBanner = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;margin:20px 0;">
+        <tr>
+          <td style="padding:14px 20px;color:#1e40af;font-family:sans-serif;font-size:12px;font-weight:700;line-height:1.4;">
+            <span style="font-size:16px;margin-right:8px;vertical-align:middle;">🔔</span>
+            <span style="vertical-align:middle;">If you are unable to attend the interview on the above date and time, please inform us as soon as possible.</span>
+          </td>
+        </tr>
+      </table>
+    `;
+  } else if (templateType === "Registration") {
+    noticeBanner = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;margin:20px 0;">
+        <tr>
+          <td style="padding:14px 20px;color:#1e40af;font-family:sans-serif;font-size:12px;font-weight:700;line-height:1.4;">
+            <span style="font-size:16px;margin-right:8px;vertical-align:middle;">🔔</span>
+            <span style="vertical-align:middle;">Please keep your mobile number and email active for further updates. You can also log in to your account to check status.</span>
+          </td>
+        </tr>
+      </table>
+    `;
+  }
+
+  // Attachments HTML
+  let attachmentsHtml = "";
+  if (templateType?.startsWith("Interview")) {
+    attachmentsHtml = `
+      <div style="margin-top:24px;border-top:1px dashed #e5e7eb;padding-top:16px;">
+        <div style="font-family:sans-serif;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:10px;">Attachments:</div>
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-right:10px;margin-bottom:10px;">
+          <tr>
+            <td style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;background:#f9fafb;font-family:sans-serif;font-size:11px;">
+              <span style="color:#ef4444;font-size:14px;margin-right:4px;">📄</span>
+              <strong style="color:#374151;">Location Map.pdf</strong>
+              <span style="color:#9ca3af;font-size:8px;margin-left:4px;">(245 KB)</span>
+            </td>
+          </tr>
+        </table>
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-right:10px;margin-bottom:10px;">
+          <tr>
+            <td style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;background:#f9fafb;font-family:sans-serif;font-size:11px;">
+              <span style="color:#ef4444;font-size:14px;margin-right:4px;">📄</span>
+              <strong style="color:#374151;">Company Profile.pdf</strong>
+              <span style="color:#9ca3af;font-size:8px;margin-left:4px;">(512 KB)</span>
+            </td>
+          </tr>
+        </table>
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-right:10px;margin-bottom:10px;">
+          <tr>
+            <td style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;background:#f9fafb;font-family:sans-serif;font-size:11px;">
+              <span style="color:#ef4444;font-size:14px;margin-right:4px;">📄</span>
+              <strong style="color:#374151;">Job Description.pdf</strong>
+              <span style="color:#9ca3af;font-size:8px;margin-left:4px;">(189 KB)</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
   }
 
   return `<!DOCTYPE html>
@@ -103,59 +211,157 @@ function buildHtmlEmail(
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-          <!-- Header -->
+        <table width="100%" style="max-width:650px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);border:1px solid #e5e7eb;">
+          
+          <!-- BRAND HEADER -->
           <tr>
-            <td style="background:${headerBg};padding:32px 40px;text-align:center;">
-              <div style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">${company}</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;font-weight:500;">${subtitle}</div>
+            <td style="padding:24px 32px;background:#ffffff;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <!-- Left side: logo -->
+                  <td style="vertical-align:middle;text-align:left;">
+                    <table cellpadding="0" cellspacing="0" style="display:inline-table;vertical-align:middle;margin-right:12px;">
+                      <tr>
+                        <td style="background:#111827;width:40px;height:40px;border-radius:8px;transform:rotate(45deg);text-align:center;vertical-align:middle;">
+                          <div style="transform:rotate(-45deg);color:#ffffff;font-family:sans-serif;font-size:16px;font-weight:950;line-height:40px;text-align:center;width:40px;height:40px;margin:0 auto;">MS</div>
+                        </td>
+                      </tr>
+                    </table>
+                    <div style="display:inline-block;vertical-align:middle;text-align:left;">
+                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:900;color:#111827;line-height:1.1;letter-spacing:-0.5px;">MS HUMAN RESOURCE</div>
+                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:900;color:#2563eb;line-height:1.1;">CONSULTANCIES</div>
+                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:9px;font-weight:600;color:#6b7280;margin-top:2px;">Right People. Right Opportunity.</div>
+                    </div>
+                  </td>
+                  <!-- Right side: contact details -->
+                  <td style="width:1px;background:#e5e7eb;height:50px;padding:0;vertical-align:middle;"></td>
+                  <td style="padding-left:20px;vertical-align:middle;text-align:left;font-family:sans-serif;font-size:10px;color:#4b5563;line-height:1.4;width:190px;">
+                    ✉ <a href="mailto:hr@safayar-msjobs.com" style="color:#4b5563;text-decoration:none;font-weight:600;">hr@safayar-msjobs.com</a><br/>
+                    📞 <span style="font-weight:600;">+971 58 532 2913</span><br/>
+                    🌐 <a href="https://www.msjobs.net" target="_blank" style="color:#2563eb;text-decoration:none;font-weight:600;">www.msjobs.net</a><br/>
+                    📍 <span style="font-weight:600;">Ajman, UAE</span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
-          <!-- Subject Banner -->
+
+          <!-- DIVIDER LINE -->
           <tr>
-            <td style="background:#eff6ff;padding:16px 40px;border-bottom:1px solid #dbeafe;">
-              <div style="font-size:15px;font-weight:700;color:#1d4ed8;">${subject}</div>
+            <td style="background:${dividerColor};height:3px;padding:0;font-size:0;line-height:0;"></td>
+          </tr>
+
+          <!-- TEMPLATE HEADER (Dynamic invitation/expiry text) -->
+          <tr>
+            <td style="padding:10px 32px 0 32px;">
+              ${templateHeader}
             </td>
           </tr>
-          <!-- Body -->
+
+          <!-- BODY SECTION -->
           <tr>
-            <td style="padding:32px 40px;font-size:14px;color:#374151;line-height:1.7;">
+            <td style="padding:20px 32px 32px 32px;">
+              
+              <!-- Greeting and Intro -->
               ${htmlBody}
+
+              <!-- Details Table (Key-Value Grid) -->
+              ${detailsTableHtml}
+
+              <!-- Action Notification Banner -->
+              ${noticeBanner}
+
+              <!-- Signature block + Handdrawn Thank You -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+                <tr>
+                  <td style="font-family:sans-serif;font-size:14px;color:#374151;line-height:1.7;vertical-align:middle;">
+                    We look forward to working with you.<br/>
+                    Best Regards,<br/>
+                    <strong style="color:#1e3a8a;">MS Human Resource Consultancies Team</strong>
+                  </td>
+                  <td align="right" style="vertical-align:bottom;width:120px;">
+                    <span style="font-family:'Georgia',serif;font-style:italic;font-size:24px;color:#2563eb;font-weight:bold;white-space:nowrap;letter-spacing:-0.5px;">Thank You!</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Document attachments indicator -->
+              ${attachmentsHtml}
+
             </td>
           </tr>
-          <!-- Sharing Section -->
+
+          <!-- FOOTER DIVIDER -->
           <tr>
-            <td style="padding:20px 40px;background:#f8fafc;border-top:1px solid #e5e7eb;text-align:center;">
-              <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
-                Share or Forward this Update
-              </div>
-              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(subject + '\n\n' + body)}" 
-                 target="_blank" 
-                 style="display:inline-block;background:#25d366;color:#ffffff;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                Share via WhatsApp
-              </a>
-              <a href="mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}" 
-                 style="display:inline-block;background:#3b82f6;color:#ffffff;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;margin:0 4px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                Forward Email
-              </a>
-            </td>
-          </tr>
-          <!-- Divider -->
-          <tr>
-            <td style="padding:0 40px;">
+            <td style="padding:0 32px;">
               <hr style="border:none;border-top:1px solid #e5e7eb;margin:0;" />
             </td>
           </tr>
-          <!-- Footer -->
+
+          <!-- FOOTER INFO BLOCK -->
           <tr>
-            <td style="padding:24px 40px;text-align:center;background:#f9fafb;">
-              <div style="font-size:12px;color:#9ca3af;line-height:1.6;">
-                This is an automated notification from <strong>${company}</strong> HR System.<br/>
-                ${footerExtra}<br/>
-                &copy; ${year} ${company}. All Rights Reserved.
-              </div>
+            <td style="padding:24px 32px;background:#ffffff;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <!-- Left side: logo replica -->
+                  <td style="vertical-align:middle;text-align:left;width:45%;">
+                    <table cellpadding="0" cellspacing="0" style="display:inline-table;vertical-align:middle;margin-right:8px;">
+                      <tr>
+                        <td style="background:#111827;width:30px;height:30px;border-radius:6px;transform:rotate(45deg);text-align:center;vertical-align:middle;">
+                          <div style="transform:rotate(-45deg);color:#ffffff;font-family:sans-serif;font-size:12px;font-weight:900;line-height:30px;text-align:center;width:30px;height:30px;margin:0 auto;">MS</div>
+                        </td>
+                      </tr>
+                    </table>
+                    <div style="display:inline-block;vertical-align:middle;text-align:left;">
+                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:800;color:#111827;line-height:1.1;">MS HUMAN RESOURCE</div>
+                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:9px;font-weight:800;color:#2563eb;line-height:1.1;">CONSULTANCIES</div>
+                    </div>
+                  </td>
+                  <!-- Middle: Stay Connected -->
+                  <td style="vertical-align:middle;text-align:center;width:25%;">
+                    <div style="font-family:sans-serif;font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;">Stay Connected</div>
+                    <table cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 2px;">
+                      <tr>
+                        <td style="background:#3b5998;width:20px;height:20px;border-radius:10px;text-align:center;vertical-align:middle;color:#ffffff;font-family:sans-serif;font-size:10px;font-weight:bold;">f</td>
+                      </tr>
+                    </table>
+                    <table cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 2px;">
+                      <tr>
+                        <td style="background:#0077b5;width:20px;height:20px;border-radius:10px;text-align:center;vertical-align:middle;color:#ffffff;font-family:sans-serif;font-size:10px;font-weight:bold;">in</td>
+                      </tr>
+                    </table>
+                    <table cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 2px;">
+                      <tr>
+                        <td style="background:#25d366;width:20px;height:20px;border-radius:10px;text-align:center;vertical-align:middle;color:#ffffff;font-family:sans-serif;font-size:10px;font-weight:bold;">w</td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Right: address and contacts -->
+                  <td style="vertical-align:middle;text-align:right;font-family:sans-serif;font-size:9px;color:#4b5563;line-height:1.4;width:30%;">
+                    ✉ <a href="mailto:hr@safayar-msjobs.com" style="color:#4b5563;text-decoration:none;">hr@safayar-msjobs.com</a><br/>
+                    📞 +971 58 532 2913<br/>
+                    🌐 www.msjobs.net<br/>
+                    📍 Real Group Building, Ajman
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
+
+          <!-- BOTTOM DISCLAIMER -->
+          <tr>
+            <td style="padding:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:12px;border-radius:0 0 16px 16px;text-align:center;">
+                <tr>
+                  <td style="font-family:sans-serif;font-size:9px;color:#9ca3af;line-height:1.4;">
+                    This email is confidential and intended solely for the use of the individual to whom it is addressed.<br/>
+                    If you have received this email in error, please notify us and delete it from your system.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
         </table>
       </td>
     </tr>
@@ -163,6 +369,7 @@ function buildHtmlEmail(
 </body>
 </html>`;
 }
+
 
 /**
  * Sends a real-time email with beautiful HTML formatting.
