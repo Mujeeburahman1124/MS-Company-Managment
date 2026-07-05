@@ -170,7 +170,7 @@ export default function SettingsPage() {
             <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
               <Paintbrush className="w-4 h-4 text-blue-600"/> Appearance & Branding
             </h3>
-            <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               {[
                 { label: "Primary Color", key: "primaryColor" },
                 { label: "Sidebar Color", key: "sidebarColor" },

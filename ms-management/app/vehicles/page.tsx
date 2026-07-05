@@ -226,7 +226,7 @@ export default function VehiclesPage() {
               <DialogTitle className="text-base font-bold text-slate-800">{editVehicle ? "Edit Vehicle" : "Add New Vehicle"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Enter vehicle details and document expiry dates.</DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vehicle Type</Label>
                 <Select value={form.vehicleType} onValueChange={v => setForm(f => ({...f, vehicleType: v || "Sedan"}))}>
