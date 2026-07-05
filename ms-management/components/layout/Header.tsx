@@ -2,7 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft, Home, Bell, User, LogOut, Settings } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+import { ChevronLeft, Home, Bell, User, LogOut, Settings, Sun, Moon, Laptop } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import GlobalSearch from './GlobalSearch';
@@ -21,9 +23,43 @@ export function Header() {
   const router = useRouter();
   const { currentUser, currentRole, notifications, logout } = useAuthStore();
   const unreadCount = notifications.filter(n => !n.read).length;
+  
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Set the theme locally if database has a preference on login
+  useEffect(() => {
+    if (mounted && currentUser?.theme) {
+      setTheme(currentUser.theme);
+    }
+  }, [mounted, currentUser?.theme, setTheme]);
+
+  const handleThemeChange = async (newTheme: string) => {
+    setTheme(newTheme);
+    if (currentUser?.id && currentUser.id !== "") {
+      try {
+        await fetch(`/api/users/${currentUser.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ theme: newTheme })
+        });
+        
+        // Sync local store state
+        useAuthStore.setState((state) => ({
+          currentUser: state.currentUser ? { ...state.currentUser, theme: newTheme } : state.currentUser
+        }));
+      } catch (err) {
+        console.error("Failed to sync theme to DB:", err);
+      }
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center h-14 px-3 md:px-5 bg-white/90 backdrop-blur-md border-b border-slate-200/60 shrink-0 gap-2 shadow-sm">
+    <header className="sticky top-0 z-40 flex items-center h-14 px-3 md:px-5 bg-card/90 backdrop-blur-md border-b border-border/60 shrink-0 gap-2 shadow-sm">
 
       {/* Back button */}
       <button
@@ -64,6 +100,33 @@ export function Header() {
             </span>
           )}
         </Link>
+
+        {/* Theme Toggle */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 outline-none focus:ring-0 cursor-pointer">
+            {mounted ? (
+              theme === "dark" ? <Moon className="w-4 h-4 text-blue-400" /> :
+              theme === "light" ? <Sun className="w-4 h-4 text-amber-500" /> :
+              <Laptop className="w-4 h-4 text-slate-400" />
+            ) : (
+              <Sun className="w-4 h-4" />
+            )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36 bg-white border border-slate-100 rounded-xl shadow-xl">
+            <DropdownMenuItem onClick={() => handleThemeChange("light")} className="cursor-pointer hover:bg-slate-50">
+              <Sun className="w-3.5 h-3.5 mr-2 text-amber-500" />
+              <span className="text-xs font-semibold text-slate-700">Light</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleThemeChange("dark")} className="cursor-pointer hover:bg-slate-50">
+              <Moon className="w-3.5 h-3.5 mr-2 text-blue-500" />
+              <span className="text-xs font-semibold text-slate-700">Dark</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleThemeChange("system")} className="cursor-pointer hover:bg-slate-50">
+              <Laptop className="w-3.5 h-3.5 mr-2 text-slate-500" />
+              <span className="text-xs font-semibold text-slate-700">System</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* User menu — BaseUI DropdownMenu does not support asChild, so we pass the trigger content directly */}
         <DropdownMenu>

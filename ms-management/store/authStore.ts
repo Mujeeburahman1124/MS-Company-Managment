@@ -150,7 +150,8 @@ const DEFAULT_USER: User = {
   status: "Pending",
   lastLogin: "",
   photo: null,
-  createdAt: ""
+  createdAt: "",
+  theme: "system"
 };
 
 const DEFAULT_SITE_SETTINGS: SiteSettings = {

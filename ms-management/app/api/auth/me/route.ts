@@ -46,7 +46,8 @@ export async function GET() {
         company: user.company,
         branch: user.branch,
         status: user.status,
-        photo: user.photo
+        photo: user.photo,
+        theme: user.theme
       }
     });
   } catch (error) {

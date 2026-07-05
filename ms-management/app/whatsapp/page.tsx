@@ -9,7 +9,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import {
   MessageCircle, Send, Search, Users, Clock, CheckCheck,
   X, Plus, ExternalLink, Copy, Zap,
-  User, Phone, AlertCircle,
+  User, Phone, AlertCircle, Paperclip
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -80,6 +80,7 @@ export default function WhatsAppPage() {
   const [customNumber, setCustomNumber] = useState("");
   const [tab, setTab] = useState<"compose" | "history">("compose");
   const [historySearch, setHistorySearch] = useState("");
+  const [attachment, setAttachment] = useState<File | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   // Build contact pool from staff + applicants
@@ -148,6 +149,10 @@ export default function WhatsAppPage() {
     let successCount = 0;
     let failCount = 0;
 
+    const finalMessage = attachment
+      ? `${message}\n\n[Attachment: ${attachment.name}]`
+      : message;
+
     for (const r of recipients) {
       try {
         const res = await fetch("/api/whatsapp", {
@@ -155,7 +160,7 @@ export default function WhatsAppPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             to: r.number,
-            message,
+            message: finalMessage,
             candidateName: r.name,
             company: currentUser.company,
             branch: currentUser.branch,
@@ -165,25 +170,34 @@ export default function WhatsAppPage() {
           const saved = await res.json();
           if (saved) setLocalSent(prev => [saved, ...prev]);
           successCount++;
-          // Auto-redirect to WhatsApp Web/App to transmit the message in real-time for free
           if (typeof window !== "undefined") {
-            window.open(buildWaLink(r.number, message), "_blank");
+            window.open(buildWaLink(r.number, finalMessage), "_blank");
           }
         } else {
           failCount++;
+          // Fallback if API response is not ok
+          if (typeof window !== "undefined") {
+            window.open(buildWaLink(r.number, finalMessage), "_blank");
+          }
         }
-      } catch {
+      } catch (err) {
         failCount++;
+        // Fallback on network/API exception
+        if (typeof window !== "undefined") {
+          window.open(buildWaLink(r.number, finalMessage), "_blank");
+        }
       }
     }
 
     setSending(false);
-    if (successCount > 0) toast.success(`Message sent to ${successCount} recipient${successCount > 1 ? "s" : ""}.`);
-    if (failCount > 0) toast.error(`Failed to send to ${failCount} recipient${failCount > 1 ? "s" : ""}.`);
-    if (successCount > 0) {
+    if (successCount > 0) toast.success(`Message sent/forwarded to ${successCount} recipient${successCount > 1 ? "s" : ""}.`);
+    if (failCount > 0) toast.warning(`Twilio API not configured/failed. Direct WhatsApp fallback links opened.`);
+    
+    if (successCount > 0 || failCount > 0) {
       setMessage("");
       setRecipients([]);
       setActiveTemplate(null);
+      setAttachment(null);
       setTab("history");
     }
   };
@@ -392,6 +406,26 @@ export default function WhatsAppPage() {
                   rows={10}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-800 resize-none focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 placeholder:text-slate-400 leading-relaxed transition-all"
                 />
+
+                {/* Attachment Selector */}
+                <div className="flex items-center gap-2 mt-3 p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                  <Paperclip className="w-4 h-4 text-slate-400" />
+                  <span className="text-xs text-slate-600 font-semibold truncate flex-1">
+                    {attachment ? `${attachment.name} (${(attachment.size / 1024).toFixed(1)} KB)` : "Attach PDF or Document"}
+                  </span>
+                  {attachment ? (
+                    <button type="button" onClick={() => setAttachment(null)} className="text-xs text-rose-500 font-bold hover:text-rose-700">
+                      Remove
+                    </button>
+                  ) : (
+                    <label className="text-xs text-blue-600 font-bold hover:text-blue-700 cursor-pointer">
+                      Browse
+                      <input type="file" className="hidden" accept=".pdf,.doc,.docx,.jpg,.png" onChange={e => {
+                        if (e.target.files?.[0]) setAttachment(e.target.files[0]);
+                      }} />
+                    </label>
+                  )}
+                </div>
 
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold">

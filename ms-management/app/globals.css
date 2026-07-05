@@ -142,6 +142,10 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.dark body {
+  background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%) !important;
+}
+
 /* ─── Base Layer ─── */
 @layer base {
   * {

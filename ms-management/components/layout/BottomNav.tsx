@@ -92,12 +92,12 @@ export default function BottomNav() {
       {showMore && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowMore(false)} />
-          <div className="relative bg-white rounded-t-3xl shadow-2xl z-10 p-4 pb-24 safe-area-bottom">
+          <div className="relative bg-card rounded-t-3xl shadow-2xl z-10 p-4 pb-24 safe-area-bottom border-t border-border/40">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-800">Quick Navigation</h3>
+              <h3 className="text-sm font-bold text-card-foreground">Quick Navigation</h3>
               <button
                 onClick={() => setShowMore(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -113,7 +113,7 @@ export default function BottomNav() {
                     onClick={() => setShowMore(false)}
                     className={cn(
                       "flex flex-col items-center justify-center py-3 px-2 rounded-2xl transition-all gap-1.5",
-                      isActive ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                      isActive ? "bg-blue-600 text-white" : "bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -127,11 +127,11 @@ export default function BottomNav() {
       )}
 
       {/* Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around z-40 px-1 shadow-lg safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-40 px-1 shadow-lg safe-area-bottom">
         {/* Back Button */}
         <button
           onClick={() => { setShowMore(false); router.back(); }}
-          className="flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 hover:text-blue-600"
+          className="flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600"
         >
           <ChevronLeft className="w-5 h-5" />
           <span className="text-[9px] font-semibold mt-1 tracking-wide">Back</span>
@@ -142,7 +142,7 @@ export default function BottomNav() {
           href="/dashboard"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600",
             pathname === "/dashboard" && "text-blue-600"
           )}
         >
@@ -155,7 +155,7 @@ export default function BottomNav() {
           href="/notifications"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all relative text-slate-500 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all relative text-slate-500 dark:text-slate-400 hover:text-blue-600",
             pathname?.startsWith("/notifications") && "text-blue-600"
           )}
         >
@@ -175,7 +175,7 @@ export default function BottomNav() {
           href="/profile"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600",
             pathname?.startsWith("/profile") && "text-blue-600"
           )}
         >
@@ -187,7 +187,7 @@ export default function BottomNav() {
         <button
           onClick={() => setShowMore(!showMore)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600",
             showMore && "text-blue-600"
           )}
         >

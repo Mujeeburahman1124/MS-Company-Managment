@@ -157,7 +157,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={cn("font-sans", "min-h-screen bg-slate-50 flex text-slate-800 antialiased overflow-hidden w-full")}>
+    <div className={cn("font-sans", "min-h-screen bg-background flex text-foreground antialiased overflow-hidden w-full")}>
       {/* Sidebar - Desktop / Tablet */}
       <Sidebar />
 
@@ -170,7 +170,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <Breadcrumb />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto pb-20 md:pb-6 bg-slate-50">
+        <main className="flex-1 overflow-y-auto pb-20 md:pb-6 bg-transparent">
           {pageContent}
         </main>
 

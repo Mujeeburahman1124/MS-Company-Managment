@@ -352,7 +352,7 @@ export default function DocumentUploader({
           STAGING DIALOG — name every file before uploading
       ════════════════════════════════════════════════════════════════════ */}
       <Dialog open={stagingOpen} onOpenChange={(o) => { if (!uploadingAll && !o) cancelAll(); }}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-lg w-[95vw] overflow-hidden">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
 
           {/* header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-600 to-violet-600">
@@ -497,7 +497,7 @@ export default function DocumentUploader({
           PREVIEW DIALOG
       ════════════════════════════════════════════════════════════════════ */}
       <Dialog open={!!previewDoc} onOpenChange={(o) => { if (!o) setPreviewDoc(null); }}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl w-[95vw] overflow-hidden">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
 
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
             <div className="min-w-0">

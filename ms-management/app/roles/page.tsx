@@ -277,7 +277,7 @@ export default function RolesPage() {
         </div>
       </div>
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md w-[95vw]">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Create New Role</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Add a custom role and initialize it with default permissions.</DialogDescription>

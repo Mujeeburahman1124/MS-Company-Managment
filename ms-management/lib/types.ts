@@ -210,6 +210,7 @@ export interface User {
   loginHistory?: LoginHistoryEntry[];
   emailHistory?: EmailChangeRecord[];
   permissions?: any;
+  theme?: string;
 }
 
 export interface EmailChangeRecord {

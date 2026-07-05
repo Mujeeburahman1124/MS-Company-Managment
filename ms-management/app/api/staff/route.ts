@@ -123,6 +123,31 @@ export async function POST(request: Request) {
       }
     }
 
+    // Validate passport uniqueness in Staff and Applicant tables (case-insensitive)
+    if (data.passportNumber && data.passportNumber.trim() !== "") {
+      const passportTrimmed = data.passportNumber.trim();
+      
+      const existingStaffPassport = await prisma.staff.findFirst({
+        where: { passportNumber: { equals: passportTrimmed, mode: 'insensitive' } }
+      });
+      if (existingStaffPassport) {
+        return NextResponse.json(
+          { error: `Passport number (${passportTrimmed}) is already registered for staff member ${existingStaffPassport.name}.` },
+          { status: 400 }
+        );
+      }
+
+      const existingAppPassport = await prisma.applicant.findFirst({
+        where: { passportNumber: { equals: passportTrimmed, mode: 'insensitive' } }
+      });
+      if (existingAppPassport) {
+        return NextResponse.json(
+          { error: `Passport number (${passportTrimmed}) is already registered for applicant ${existingAppPassport.fullName}.` },
+          { status: 400 }
+        );
+      }
+    }
+
     // Auto-generate temporary password if email is provided and they have system access
     let temporaryPassword = "";
     let hashedPassword = "";

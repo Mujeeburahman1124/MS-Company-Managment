@@ -107,6 +107,32 @@ export async function PUT(request: Request, { params }: RouteParams) {
         }
       }
     }
+
+    // Validate passport uniqueness in Staff and Applicant tables (case-insensitive, excluding current staff ID)
+    if (data.passportNumber && data.passportNumber.trim() !== "") {
+      const passportTrimmed = data.passportNumber.trim();
+      
+      const existingStaffPassport = await prisma.staff.findFirst({
+        where: { passportNumber: { equals: passportTrimmed, mode: 'insensitive' }, id: { not: id } }
+      });
+      if (existingStaffPassport) {
+        return NextResponse.json(
+          { error: `Passport number (${passportTrimmed}) is already registered for staff member ${existingStaffPassport.name}.` },
+          { status: 400 }
+        );
+      }
+
+      const existingAppPassport = await prisma.applicant.findFirst({
+        where: { passportNumber: { equals: passportTrimmed, mode: 'insensitive' } }
+      });
+      if (existingAppPassport) {
+        return NextResponse.json(
+          { error: `Passport number (${passportTrimmed}) is already registered for applicant ${existingAppPassport.fullName}.` },
+          { status: 400 }
+        );
+      }
+    }
+
     const updated = await prisma.staff.update({
       where: { id },
       data: {

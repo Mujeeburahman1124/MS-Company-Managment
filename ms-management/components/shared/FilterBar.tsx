@@ -86,7 +86,7 @@ export default function FilterBar({
             )}
           >
             <SlidersHorizontal className="w-4 h-4" />
-            <span className="inline">Filters</span>
+            <span>Filters</span>
           </Button>
 
           {/* Clear button */}
@@ -97,7 +97,7 @@ export default function FilterBar({
               className="text-xs h-10 rounded-xl px-3 border-slate-200 text-rose-500 hover:text-rose-600 hover:bg-rose-50 gap-1.5"
             >
               <RotateCcw className="w-4 h-4" />
-              <span className="inline">Reset</span>
+              <span>Reset</span>
             </Button>
           )}
 
@@ -125,7 +125,7 @@ export default function FilterBar({
               className="text-xs h-10 rounded-xl px-3 border-slate-200 text-slate-600 hover:bg-slate-50 gap-1.5"
             >
               <Download className="w-4 h-4" />
-              <span className="inline">Export</span>
+              <span>Export</span>
             </Button>
           )}
 
@@ -137,7 +137,7 @@ export default function FilterBar({
               className="text-xs h-10 rounded-xl px-3 border-slate-200 text-slate-600 hover:bg-slate-50 gap-1.5"
             >
               <Printer className="w-4 h-4" />
-              <span className="inline">Print</span>
+              <span>Print</span>
             </Button>
           )}
 

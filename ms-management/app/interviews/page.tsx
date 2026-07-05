@@ -33,74 +33,6 @@ export default function InterviewsPage() {
   const [selectedGreetingCard, setSelectedGreetingCard] = useState<Interview | null>(null);
   const [isGreetingCardOpen, setIsGreetingCardOpen] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState<"Formal" | "Modern" | "Technical">("Formal");
-  const [emailModalData, setEmailModalData] = useState<{ int: Interview; to: string; subject: string; body: string } | null>(null);
-  const [whatsappModalData, setWhatsappModalData] = useState<{ int: Interview; to: string; message: string } | null>(null);
-
-  const buildPremiumInterviewEmailTemplate = (int: Interview) => {
-    const compName = int.company || "MS Group";
-    const dateStr = int.dateTime.split("T")[0] || int.dateTime.split(" ")[0];
-    const timeStr = int.dateTime.split("T")[1] || int.dateTime.split(" ")[1];
-    
-    return `<div style="font-family:'Segoe UI',Arial,sans-serif;color:#374151;">
-<p style="font-size:15px;font-weight:600;margin-bottom:12px;color:#1e3a8a;">Dear Mr/Ms. ${int.personName},</p>
-<p style="margin-bottom:16px;line-height:1.6;color:#374151;">We are pleased to invite you for an interview regarding your application with our client. Please find the details below:</p>
-
-<table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-  <tbody>
-    <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;width:35%;">Position</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${int.type === "Interview" ? int.position : int.meetingType}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Client Company</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${int.company || "N/A"}</td>
-    </tr>
-    <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Interview Date</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${dateStr}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Interview Time</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${timeStr}</td>
-    </tr>
-    <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Interview Location</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${int.isOnline ? "Online Link" : (int.locationLink || "Office premises")}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Interview Type</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${int.isOnline ? `Online (${int.mode})` : "Physical Assessment"}</td>
-    </tr>
-    <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Contact Person</td>
-      <td style="padding:10px 16px;color:#111827;font-weight:600;">${int.conductPerson}</td>
-    </tr>
-    ${int.meetingLink ? `
-    <tr style="border-bottom:1px solid #e5e7eb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Meeting Link</td>
-      <td style="padding:10px 16px;"><a href="${int.meetingLink}" style="color:#2563eb;text-decoration:none;font-weight:600;">Join Meeting</a></td>
-    </tr>
-    ` : ""}
-    <tr style="background:#f9fafb;">
-      <td style="padding:10px 16px;font-weight:bold;color:#6b7280;">Additional Instructions</td>
-      <td style="padding:10px 16px;color:#4b5563;font-style:italic;">${int.notes || "Please bring your original passport and CV."}</td>
-    </tr>
-  </tbody>
-</table>
-
-<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin:16px 0;font-size:12px;color:#1e3a8a;">
-  🔔 <strong>Notice:</strong> If you are unable to attend the interview on the above date and time, please inform us as soon as possible.
-</div>
-
-<p style="margin-top:20px;line-height:1.6;color:#374151;">We look forward to meeting you.</p>
-<p style="margin-top:16px;font-weight:bold;color:#1e3a5f;">Best Regards,<br/>${compName} Team</p>
-</div>`;
-  };
-
-  const buildPremiumWhatsAppTemplate = (int: Interview) => {
-    const dt = int.dateTime.replace("T", " ");
-    return `Dear ${int.personName},\n\nWe are pleased to invite you for an interview for the position of ${int.type === "Interview" ? int.position : int.meetingType}.\n\n📅 Date & Time: ${dt}\n💻 Format: ${int.isOnline ? `Online (${int.mode})` : "Physical Assessment"}\n👤 Conductor: ${int.conductPerson}\n${int.meetingLink ? `🔗 Meeting Link: ${int.meetingLink}\n` : ""}${int.locationLink ? `📍 Location: ${int.locationLink}\n` : ""}\nInstructions: ${int.notes || "Please bring your CV."}\n\nBest Regards,\nHR Team`;
-  };
 
   const getEmailTemplateBody = (template: string, f: any) => {
     const name = f.personName || "[Candidate Name]";
@@ -439,12 +371,17 @@ HR Department`;
                     {int.email && (
                       <button 
                         onClick={() => {
-                          setEmailModalData({
-                            int,
+                          addSentEmail({
+                            id: `EML-${Math.floor(100+Math.random()*900)}`,
                             to: int.email!,
-                            subject: `Interview Invitation - ${int.type === "Interview" ? int.position : int.meetingType}`,
-                            body: buildPremiumInterviewEmailTemplate(int)
+                            subject: `Interview Invitation Notice: ${int.type === "Interview" ? int.position : int.meetingType} - ${int.personName}`,
+                            body: `Dear ${int.personName},\n\nThis is a manual reminder for your ${int.type} scheduled with ${int.conductPerson} on ${int.dateTime}.\n\nMeeting link: ${int.meetingLink || "N/A"}\nLocation: ${int.locationLink || "N/A"}\nNotes: ${int.notes || "N/A"}`,
+                            sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+                            company: int.company || currentUser.company,
+                            branch: int.branch || currentUser.branch,
+                            candidateName: int.personName
                           });
+                          toast.success(`Invitation Email manually sent to ${int.personName}`);
                         }}
                         className="text-[9px] font-bold px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 hover:border-blue-200 transition-colors flex items-center gap-1 flex-1 justify-center"
                       >
@@ -454,11 +391,16 @@ HR Department`;
                     {int.whatsapp && (
                       <button 
                         onClick={() => {
-                          setWhatsappModalData({
-                            int,
+                          addSentWhatsApp({
+                            id: `WHA-${Math.floor(100+Math.random()*900)}`,
                             to: int.whatsapp!,
-                            message: buildPremiumWhatsAppTemplate(int)
+                            message: `Manual Reminder: Hello ${int.personName}, your ${int.type} is scheduled on ${int.dateTime}. Join link: ${int.meetingLink || "N/A"}`,
+                            sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+                            company: int.company || currentUser.company,
+                            branch: int.branch || currentUser.branch,
+                            candidateName: int.personName
                           });
+                          toast.success(`WhatsApp message manually sent to ${int.personName}`);
                         }}
                         className="text-[9px] font-bold px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 border border-slate-200 hover:border-emerald-200 transition-colors flex items-center gap-1 flex-1 justify-center"
                       >
@@ -922,8 +864,8 @@ HR Department`;
 
       {/* MODAL: GREETING CARD */}
       <Dialog open={isGreetingCardOpen} onOpenChange={setIsGreetingCardOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-lg w-[95vw] max-h-[90vh] flex flex-col overflow-hidden">
-          <div id="print-card-content" className="p-8 space-y-6 flex flex-col items-center bg-gradient-to-b from-blue-900 via-slate-900 to-blue-950 text-white border-b-8 border-amber-500 relative select-none overflow-y-auto flex-1 scrollbar-none">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-lg w-[95vw] max-h-[95vh] overflow-y-auto">
+          <div id="print-card-content" className="p-8 space-y-6 flex flex-col items-center bg-gradient-to-b from-blue-900 via-slate-900 to-blue-950 text-white border-b-8 border-amber-500 relative select-none">
             {/* Elegant Border Decoration */}
             <div className="absolute inset-4 border border-amber-500/20 rounded-2xl pointer-events-none" />
             <div className="absolute inset-5 border-2 border-amber-500/45 rounded-xl pointer-events-none" />
@@ -936,7 +878,7 @@ HR Department`;
               
               <div className="space-y-1.5 py-4">
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Candidate Name</p>
-                <p className="text-xl font-extrabold text-white">{selectedGreetingCard?.personName}</p>
+                <h3 className="text-xl font-extrabold text-white">{selectedGreetingCard?.personName}</h3>
                 <p className="text-xs text-amber-400 font-bold italic">{selectedGreetingCard?.position || selectedGreetingCard?.meetingType}</p>
               </div>
 
@@ -980,7 +922,7 @@ HR Department`;
               </div>
             </div>
           </div>
-          <DialogFooter className="p-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end shrink-0">
+          <DialogFooter className="p-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
             <Button variant="ghost" onClick={() => setIsGreetingCardOpen(false)} className="text-xs rounded-xl px-4 h-9">
               Close
             </Button>
@@ -1054,118 +996,6 @@ HR Department`;
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9 gap-1.5 shadow-sm"
             >
               🖨️ Print Card
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      {/* MODAL: MANUAL EDIT & SEND EMAIL */}
-      <Dialog open={!!emailModalData} onOpenChange={open => !open && setEmailModalData(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-xl w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <Mail className="w-5 h-5 text-blue-600"/> Edit & Send Invitation Email
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-400">
-              Customize the email subject and template content before manually sending it to the candidate.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-4 text-xs">
-            <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Recipient Email</Label>
-              <Input disabled value={emailModalData?.to || ""} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Subject</Label>
-              <Input 
-                value={emailModalData?.subject || ""} 
-                onChange={e => setEmailModalData(prev => prev ? { ...prev, subject: e.target.value } : null)}
-                className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email Body (HTML/Text)</Label>
-              <textarea 
-                rows={12} 
-                value={emailModalData?.body || ""} 
-                onChange={e => setEmailModalData(prev => prev ? { ...prev, body: e.target.value } : null)}
-                className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 font-mono outline-none focus:border-blue-400 resize-y" 
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex gap-2 justify-end pt-4">
-            <Button variant="ghost" onClick={() => setEmailModalData(null)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
-            <Button 
-              onClick={() => {
-                if (emailModalData) {
-                  addSentEmail({
-                    id: `EML-${Math.floor(100+Math.random()*900)}`,
-                    to: emailModalData.to,
-                    subject: emailModalData.subject,
-                    body: emailModalData.body,
-                    sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
-                    company: emailModalData.int.company || currentUser.company,
-                    branch: emailModalData.int.branch || currentUser.branch,
-                    candidateName: emailModalData.int.personName
-                  });
-                  toast.success(`Invitation Email successfully sent to ${emailModalData.int.personName}`);
-                  setEmailModalData(null);
-                }
-              }} 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9"
-            >
-              Send Email
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* MODAL: MANUAL EDIT & SEND WHATSAPP */}
-      <Dialog open={!!whatsappModalData} onOpenChange={open => !open && setWhatsappModalData(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <Phone className="w-5 h-5 text-emerald-600"/> Edit & Send WhatsApp Message
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-400">
-              Customize the message text before sending to the candidate's WhatsApp number.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-4 text-xs">
-            <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp Number</Label>
-              <Input disabled value={whatsappModalData?.to || ""} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Message Text</Label>
-              <textarea 
-                rows={8} 
-                value={whatsappModalData?.message || ""} 
-                onChange={e => setWhatsappModalData(prev => prev ? { ...prev, message: e.target.value } : null)}
-                className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-y" 
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex gap-2 justify-end pt-4">
-            <Button variant="ghost" onClick={() => setWhatsappModalData(null)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
-            <Button 
-              onClick={() => {
-                if (whatsappModalData) {
-                  addSentWhatsApp({
-                    id: `WHA-${Math.floor(100+Math.random()*900)}`,
-                    to: whatsappModalData.to,
-                    message: whatsappModalData.message,
-                    sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
-                    company: whatsappModalData.int.company || currentUser.company,
-                    branch: whatsappModalData.int.branch || currentUser.branch,
-                    candidateName: whatsappModalData.int.personName
-                  });
-                  toast.success(`WhatsApp message successfully sent to ${whatsappModalData.int.personName}`);
-                  setWhatsappModalData(null);
-                }
-              }} 
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs px-5 h-9"
-            >
-              Send WhatsApp Message
             </Button>
           </DialogFooter>
         </DialogContent>

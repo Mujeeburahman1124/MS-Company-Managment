@@ -12,31 +12,30 @@ function buildHtmlEmail(
   subject: string, 
   body: string, 
   company = "MS Horizon F.Z.E",
-  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed" | "Offer" | "Visa"
+  templateType?: 
+    | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
+    | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday"
 ): string {
-  const isHtml = body.trim().startsWith("<") && (body.includes("</") || body.includes("/>"));
-  const htmlBody = isHtml
-    ? body
-    : body
-        .split("\n\n")
-        .map(para => {
-          const lines = para
-            .split("\n")
-            .map(line => {
-              if (line.startsWith("- ") || line.startsWith("• ")) {
-                return `<li style="margin:4px 0;color:#374151;">${line.replace(/^[-•]\s*/, "")}</li>`;
-              }
-              if (line.trim() === "") return "";
-              return `<span style="display:block;color:#374151;line-height:1.7;">${line}</span>`;
-            })
-            .join("");
-
-          if (lines.includes("<li")) {
-            return `<ul style="margin:8px 0 8px 20px;padding:0;">${lines}</ul>`;
+  const htmlBody = body
+    .split("\n\n")
+    .map(para => {
+      const lines = para
+        .split("\n")
+        .map(line => {
+          if (line.startsWith("- ") || line.startsWith("• ")) {
+            return `<li style="margin:4px 0;color:#374151;">${line.replace(/^[-•]\s*/, "")}</li>`;
           }
-          return `<p style="margin:0 0 14px 0;">${lines}</p>`;
+          if (line.trim() === "") return "";
+          return `<span style="display:block;color:#374151;line-height:1.7;">${line}</span>`;
         })
         .join("");
+
+      if (lines.includes("<li")) {
+        return `<ul style="margin:8px 0 8px 20px;padding:0;">${lines}</ul>`;
+      }
+      return `<p style="margin:0 0 14px 0;">${lines}</p>`;
+    })
+    .join("");
 
   const year = new Date().getFullYear();
 
@@ -72,6 +71,25 @@ function buildHtmlEmail(
     headerBg = "linear-gradient(135deg,#991b1b 0%,#ef4444 100%)"; // Warning Red
     subtitle = "Urgent Visa Expiration Warning";
     footerExtra = "This is a high priority notification requiring immediate compliance.";
+  } else if (templateType === "Registration") {
+    headerBg = "linear-gradient(135deg,#4f46e5 0%,#6366f1 100%)"; // Indigo
+    subtitle = "User Account Registration Success";
+    footerExtra = "Please update your password immediately upon your first login.";
+  } else if (templateType === "Placement") {
+    headerBg = "linear-gradient(135deg,#059669 0%,#10b981 100%)"; // Placed Success Green
+    subtitle = "Applicant Placement Agreement Cleared";
+    footerExtra = "Your employment agreement has been saved inside the document center.";
+  } else if (templateType === "Leave") {
+    headerBg = "linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%)"; // Cobalt Blue
+    subtitle = "Leave Request Status Notification";
+  } else if (templateType === "Payroll") {
+    headerBg = "linear-gradient(135deg,#0d9488 0%,#14b8a6 100%)"; // Teal
+    subtitle = "Official Monthly Payslip Released";
+    footerExtra = "You can download your detailed payslip PDF inside the Payroll history panel.";
+  } else if (templateType === "Birthday") {
+    headerBg = "linear-gradient(135deg,#ea580c 0%,#f97316 100%)"; // Warm Birthday Orange
+    subtitle = "Warm Birthday Wishes from the Team! 🎂";
+    footerExtra = "We hope you have an amazing day celebrating!";
   }
 
   return `<!DOCTYPE html>
@@ -172,7 +190,9 @@ export async function sendEmail({
   deliveryStatus?: string;
   sentBy?: string;
   type?: string;
-  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed" | "Offer" | "Visa";
+  templateType?: 
+    | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
+    | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday";
   templateData?: any;
 }) {
   const host = cleanEnvVar(process.env.SMTP_HOST);
