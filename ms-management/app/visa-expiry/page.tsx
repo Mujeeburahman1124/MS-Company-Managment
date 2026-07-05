@@ -31,7 +31,7 @@ type VisaRecord = {
 };
 
 export default function VisaExpiryPage() {
-  const { currentRole, currentUser, staff, applicants, addActivityLog, companies, addSentEmail } = useAuthStore();
+  const { currentRole, currentUser, staff, applicants, addActivityLog, companies, addSentEmail, addNotification } = useAuthStore();
   const [reminders, setReminders] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("All");
@@ -90,10 +90,28 @@ export default function VisaExpiryPage() {
     setReminders(prev => [...prev, item.id]);
     
     if (item.type === "Applicant") {
+      const applicantObj = applicants.find(a => a.id === item.id);
+      const isPlaced = applicantObj ? (applicantObj.status === "Placed") : false;
       const clientCompany = companies.find(c => c.name === item.company);
+      
       const recipientEmails = [item.email];
-      if (clientCompany && clientCompany.email) {
+      if (isPlaced && clientCompany && clientCompany.email) {
         recipientEmails.push(clientCompany.email);
+      }
+      
+      // If not placed, add internal notification to the notification bell
+      if (!isPlaced) {
+        addNotification({
+          id: `NOTIF-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          type: "visa_expiry",
+          title: "Visa Expiry Notice (Not Placed)",
+          message: `Applicant ${item.name} (${item.id}) visa is expiring on ${formatDate(item.expDate)} (${item.daysLeft} days remaining) and is not currently placed.`,
+          time: new Date().toISOString(),
+          read: false,
+          link: `/applicants/${item.id}`,
+          company: item.company,
+          branch: item.branch
+        });
       }
       
       recipientEmails.forEach(email => {
@@ -109,8 +127,8 @@ export default function VisaExpiryPage() {
         });
       });
 
-      if (clientCompany && clientCompany.email) {
-        toast.success(`Visa expiry reminder sent to Applicant (${item.email}) and Client HR (${clientCompany.email})`);
+      if (isPlaced && clientCompany && clientCompany.email) {
+        toast.success(`Visa expiry reminder sent to Placed Applicant (${item.email}) and Client HR (${clientCompany.email})`);
         addActivityLog({
           id: `LOG-${item.id}-visa-reminder`,
           dateTime: new Date().toISOString(),
@@ -121,7 +139,22 @@ export default function VisaExpiryPage() {
           action: "Email Sent",
           module: "Visa Expiry",
           oldValue: null,
-          newValue: `Reminder sent to Applicant (${item.email}) and Client HR (${clientCompany.email}) for ${item.name}`,
+          newValue: `Reminder sent to Placed Applicant (${item.email}) and Client HR (${clientCompany.email}) for ${item.name}`,
+          ipAddress: "127.0.0.1",
+        });
+      } else if (!isPlaced) {
+        toast.success(`Visa expiry reminder sent to Unplaced Applicant (${item.email}) & added to Notification Bell`);
+        addActivityLog({
+          id: `LOG-${item.id}-visa-reminder`,
+          dateTime: new Date().toISOString(),
+          userName: currentUser.name,
+          role: currentRole,
+          company: currentUser.company,
+          branch: currentUser.branch,
+          action: "Email Sent",
+          module: "Visa Expiry",
+          oldValue: null,
+          newValue: `Reminder sent to Unplaced Applicant (${item.email}) & registered in System Notifications for ${item.name}`,
           ipAddress: "127.0.0.1",
         });
       } else {
@@ -136,7 +169,7 @@ export default function VisaExpiryPage() {
           action: "Email Sent",
           module: "Visa Expiry",
           oldValue: null,
-          newValue: `Reminder sent to ${item.name} (${item.email})`,
+          newValue: `Reminder sent to Applicant ${item.name} (${item.email})`,
           ipAddress: "127.0.0.1",
         });
       }
