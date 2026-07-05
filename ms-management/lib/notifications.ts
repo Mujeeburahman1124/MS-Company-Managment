@@ -16,188 +16,121 @@ function buildHtmlEmail(
     | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
     | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday"
 ): string {
-  // Parse body key-value pairs
-  let detailsTableHtml = "";
-  const cleanedBodyRows: string[] = [];
+  // Parse paragraphs and table items
   const lines = body.split("\n");
-  const detailRows: Array<{ key: string; val: string; icon: string }> = [];
-
+  const tableRows: { key: string; val: string }[] = [];
+  const normalParas: string[] = [];
+  
   for (const line of lines) {
     const trimmed = line.trim();
-    if ((trimmed.startsWith("- ") || trimmed.startsWith("• ")) && trimmed.includes(":")) {
-      const parts = trimmed.substring(2).split(":");
+    if (trimmed === "") continue;
+    
+    // Check if line is a key-value pair (contains ":" and fits profile)
+    if (trimmed.includes(":") && (
+      trimmed.startsWith("-") || 
+      trimmed.startsWith("•") || 
+      /^(Position|Client|Interview|Contact|Additional|Candidate|Passport|Visa|Days|Remarks|Leave|Period|Total)/i.test(trimmed)
+    )) {
+      const parts = trimmed.replace(/^[-•]\s*/, "").split(":");
       const key = parts[0].trim();
       const val = parts.slice(1).join(":").trim();
-      
-      // Determine the icon for the key
-      let icon = "📋";
-      const kLower = key.toLowerCase();
-      if (kLower.includes("position") || kLower.includes("role") || kLower.includes("job")) icon = "💼";
-      else if (kLower.includes("company") || kLower.includes("client")) icon = "🏢";
-      else if (kLower.includes("date") || kLower.includes("expiry")) icon = "📅";
-      else if (kLower.includes("time")) icon = "🕒";
-      else if (kLower.includes("location") || kLower.includes("address") || kLower.includes("venue")) icon = "📍";
-      else if (kLower.includes("type") || kLower.includes("mode")) icon = "👥";
-      else if (kLower.includes("person") || kLower.includes("contact person")) icon = "👤";
-      else if (kLower.includes("number") || kLower.includes("phone") || kLower.includes("contact")) icon = "📞";
-      else if (kLower.includes("passport")) icon = "🪪";
-      else if (kLower.includes("visa")) icon = "🛂";
-      else if (kLower.includes("days") || kLower.includes("remaining")) icon = "⚠️";
-      else if (kLower.includes("instruction") || kLower.includes("remark") || kLower.includes("note")) icon = "ℹ️";
-
-      detailRows.push({ key, val, icon });
+      tableRows.push({ key, val });
     } else {
-      cleanedBodyRows.push(line);
+      normalParas.push(trimmed);
     }
   }
 
-  if (detailRows.length > 0) {
-    detailsTableHtml = `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin:20px 0;background:#ffffff;border-collapse:collapse;box-shadow:0 1px 3px rgba(0,0,0,0.02);">`;
-    detailRows.forEach((row, i) => {
-      detailsTableHtml += `
-        <tr style="border-bottom:1px solid #f3f4f6;${i === detailRows.length - 1 ? 'border-bottom:none;' : ''}">
-          <td style="padding:12px 16px;width:24px;text-align:center;font-size:16px;vertical-align:middle;">${row.icon}</td>
-          <td style="padding:12px 8px;font-family:sans-serif;font-size:13px;font-weight:700;color:#4b5563;width:160px;vertical-align:middle;">${row.key}</td>
-          <td style="padding:12px 4px;font-family:sans-serif;font-size:13px;color:#9ca3af;width:10px;text-align:center;vertical-align:middle;">:</td>
-          <td style="padding:12px 16px;font-family:sans-serif;font-size:13px;font-weight:700;color:#1f2937;vertical-align:middle;">${row.val}</td>
+  // Generate body introduction and footer greetings
+  let introHtml = "";
+  let closingHtml = "";
+  let alertHtml = "";
+  
+  // Clean up candidate/user salutations & identify notice text
+  for (const p of normalParas) {
+    if (p.startsWith("Dear") || p.startsWith("Hello")) {
+      introHtml += `<p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #1e293b;">${p}</p>`;
+    } else if (p.toLowerCase().includes("pleased to invite") || p.toLowerCase().includes("welcome") || p.toLowerCase().includes("inform you")) {
+      introHtml += `<p style="margin: 0 0 16px 0; font-size: 13px; color: #475569; line-height: 1.6;">${p}</p>`;
+    } else if (p.toLowerCase().includes("unable to attend") || p.toLowerCase().includes("renew before the expiry") || p.toLowerCase().includes("keep your mobile number")) {
+      const isWarning = p.toLowerCase().includes("renew") || p.toLowerCase().includes("expiry");
+      const alertBg = isWarning ? "#fef2f2" : "#eff6ff";
+      const alertBorder = isWarning ? "#fecaca" : "#bfdbfe";
+      const alertColor = isWarning ? "#991b1b" : "#1e40af";
+      const alertIcon = isWarning ? "⚠" : "🔔";
+      
+      alertHtml += `
+        <table width="100%" cellpadding="0" cellspacing="0" style="background: ${alertBg}; border: 1px solid ${alertBorder}; border-radius: 12px; padding: 14px 16px; margin: 16px 0 20px 0;">
+          <tr>
+            <td width="6%" style="vertical-align: top; font-size: 18px; line-height: 1;">${alertIcon}</td>
+            <td width="94%" style="font-size: 12px; font-weight: 600; color: ${alertColor}; line-height: 1.5;">${p}</td>
+          </tr>
+        </table>`;
+    } else if (p.startsWith("Best Regards") || p.startsWith("Regards") || p.toLowerCase().includes("look forward") || p.toLowerCase().includes("thank you")) {
+      closingHtml += `<p style="margin: 8px 0; font-size: 13px; color: #475569; line-height: 1.5;">${p}</p>`;
+    } else {
+      // General body text
+      introHtml += `<p style="margin: 0 0 14px 0; font-size: 13px; color: #475569; line-height: 1.6;">${p}</p>`;
+    }
+  }
+
+  // Build the details table
+  let tableHtml = "";
+  if (tableRows.length > 0) {
+    tableHtml += `
+      <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin: 16px 0 24px 0; border-collapse: separate; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">`;
+    tableRows.forEach((row, index) => {
+      const bg = index % 2 === 0 ? "#ffffff" : "#f8fafc";
+      const isLast = index === tableRows.length - 1;
+      const borderStyle = isLast ? "" : "border-bottom: 1px solid #f1f5f9;";
+      tableHtml += `
+        <tr style="background: ${bg};">
+          <td width="35%" style="padding: 10px 16px; font-size: 12px; font-weight: 750; color: #475569; ${borderStyle}">${row.key}</td>
+          <td width="5%" style="padding: 10px 0; font-size: 12px; font-weight: 750; color: #94a3b8; ${borderStyle} text-align: center;">:</td>
+          <td width="60%" style="padding: 10px 16px; font-size: 12px; font-weight: 750; color: #1e293b; ${borderStyle}">${row.val}</td>
         </tr>`;
     });
-    detailsTableHtml += `</table>`;
+    tableHtml += `</table>`;
   }
 
-  const htmlBody = cleanedBodyRows
-    .join("\n")
-    .split("\n\n")
-    .map(para => {
-      const pTrim = para.trim();
-      if (pTrim === "") return "";
-      
-      // If it contains "Dear", make it bold or prominent
-      if (pTrim.startsWith("Dear")) {
-        return `<p style="margin:0 0 16px 0;font-family:sans-serif;font-size:15px;font-weight:700;color:#1f2937;">${pTrim}</p>`;
-      }
-      return `<p style="margin:0 0 14px 0;line-height:1.7;color:#374151;font-family:sans-serif;font-size:14px;">${pTrim.replace(/\n/g, "<br/>")}</p>`;
-    })
-    .join("");
+  // Set titles and custom banners
+  let bannerIcon = "📅";
+  let bannerText = "NOTIFICATION";
+  let bannerBg = "#eff6ff";
+  let bannerBorder = "#bfdbfe";
+  let bannerColor = "#1e40af";
+  let showCallout = false;
 
-  const dividerColor = templateType === "Visa" ? "#ef4444" : "#2563eb";
-
-  // Template Type Headers
-  let templateHeader = "";
   if (templateType?.startsWith("Interview")) {
-    templateHeader = `
-      <div style="text-align:center;margin:24px 0 16px 0;">
-        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-bottom:10px;">
-          <tr>
-            <td style="background:#eff6ff;width:40px;height:40px;border-radius:10px;text-align:center;vertical-align:middle;color:#2563eb;font-size:20px;border:1px solid #dbeafe;">📅</td>
-          </tr>
-        </table>
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:1px;text-transform:uppercase;">INTERVIEW INVITATION</div>
-      </div>
-    `;
+    bannerIcon = "📅";
+    bannerText = "INTERVIEW INVITATION";
+    bannerBg = "#eff6ff";
+    bannerBorder = "#bfdbfe";
+    bannerColor = "#1e40af";
+  } else if (templateType === "Offer") {
+    bannerIcon = "🎉";
+    bannerText = "JOB OFFER LETTER";
+    bannerBg = "#f0fdf4";
+    bannerBorder = "#bbf7d0";
+    bannerColor = "#166534";
   } else if (templateType === "Visa") {
-    templateHeader = `
-      <div style="text-align:center;margin:24px 0 16px 0;">
-        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-bottom:10px;">
-          <tr>
-            <td style="background:#fef2f2;width:40px;height:40px;border-radius:10px;text-align:center;vertical-align:middle;color:#ef4444;font-size:20px;border:1px solid #fee2e2;">🔔</td>
-          </tr>
-        </table>
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#991b1b;letter-spacing:1px;text-transform:uppercase;">VISA EXPIRY ALERT</div>
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;color:#374151;margin-top:4px;">Action Required</div>
-      </div>
-    `;
+    bannerIcon = "🔔";
+    bannerText = "VISA EXPIRY ALERT";
+    bannerBg = "#fef2f2";
+    bannerBorder = "#fecaca";
+    bannerColor = "#991b1b";
+    showCallout = true;
   } else if (templateType === "Registration") {
-    templateHeader = `
-      <div style="text-align:center;margin:24px 0 16px 0;">
-        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-bottom:10px;">
-          <tr>
-            <td style="background:#eff6ff;width:40px;height:40px;border-radius:10px;text-align:center;vertical-align:middle;color:#2563eb;font-size:20px;border:1px solid #dbeafe;">✓</td>
-          </tr>
-        </table>
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:1px;">Registration Completed Successfully!</div>
-      </div>
-    `;
-  } else {
-    templateHeader = `
-      <div style="text-align:center;margin:24px 0 16px 0;">
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:1px;text-transform:uppercase;">${subject}</div>
-      </div>
-    `;
-  }
-
-  // Notice Banners
-  let noticeBanner = "";
-  if (templateType === "Visa") {
-    noticeBanner = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="background:#fef2f2;border:1px solid #fee2e2;border-radius:12px;margin:20px 0;">
-        <tr>
-          <td style="padding:14px 20px;color:#991b1b;font-family:sans-serif;font-size:12px;font-weight:700;line-height:1.4;">
-            <span style="font-size:16px;margin-right:8px;vertical-align:middle;">⚠️</span>
-            <span style="vertical-align:middle;">Kindly ensure the visa is renewed before the expiry date to avoid overstay fines and legal issues.</span>
-          </td>
-        </tr>
-      </table>
-    `;
-  } else if (templateType?.startsWith("Interview")) {
-    noticeBanner = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;margin:20px 0;">
-        <tr>
-          <td style="padding:14px 20px;color:#1e40af;font-family:sans-serif;font-size:12px;font-weight:700;line-height:1.4;">
-            <span style="font-size:16px;margin-right:8px;vertical-align:middle;">🔔</span>
-            <span style="vertical-align:middle;">If you are unable to attend the interview on the above date and time, please inform us as soon as possible.</span>
-          </td>
-        </tr>
-      </table>
-    `;
-  } else if (templateType === "Registration") {
-    noticeBanner = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;margin:20px 0;">
-        <tr>
-          <td style="padding:14px 20px;color:#1e40af;font-family:sans-serif;font-size:12px;font-weight:700;line-height:1.4;">
-            <span style="font-size:16px;margin-right:8px;vertical-align:middle;">🔔</span>
-            <span style="vertical-align:middle;">Please keep your mobile number and email active for further updates. You can also log in to your account to check status.</span>
-          </td>
-        </tr>
-      </table>
-    `;
-  }
-
-  // Attachments HTML
-  let attachmentsHtml = "";
-  if (templateType?.startsWith("Interview")) {
-    attachmentsHtml = `
-      <div style="margin-top:24px;border-top:1px dashed #e5e7eb;padding-top:16px;">
-        <div style="font-family:sans-serif;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:10px;">Attachments:</div>
-        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-right:10px;margin-bottom:10px;">
-          <tr>
-            <td style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;background:#f9fafb;font-family:sans-serif;font-size:11px;">
-              <span style="color:#ef4444;font-size:14px;margin-right:4px;">📄</span>
-              <strong style="color:#374151;">Location Map.pdf</strong>
-              <span style="color:#9ca3af;font-size:8px;margin-left:4px;">(245 KB)</span>
-            </td>
-          </tr>
-        </table>
-        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-right:10px;margin-bottom:10px;">
-          <tr>
-            <td style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;background:#f9fafb;font-family:sans-serif;font-size:11px;">
-              <span style="color:#ef4444;font-size:14px;margin-right:4px;">📄</span>
-              <strong style="color:#374151;">Company Profile.pdf</strong>
-              <span style="color:#9ca3af;font-size:8px;margin-left:4px;">(512 KB)</span>
-            </td>
-          </tr>
-        </table>
-        <table cellpadding="0" cellspacing="0" style="display:inline-table;margin-right:10px;margin-bottom:10px;">
-          <tr>
-            <td style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;background:#f9fafb;font-family:sans-serif;font-size:11px;">
-              <span style="color:#ef4444;font-size:14px;margin-right:4px;">📄</span>
-              <strong style="color:#374151;">Job Description.pdf</strong>
-              <span style="color:#9ca3af;font-size:8px;margin-left:4px;">(189 KB)</span>
-            </td>
-          </tr>
-        </table>
-      </div>
-    `;
+    bannerIcon = "✔";
+    bannerText = "REGISTRATION COMPLETED";
+    bannerBg = "#f0fdf4";
+    bannerBorder = "#bbf7d0";
+    bannerColor = "#166534";
+  } else if (templateType === "Birthday") {
+    bannerIcon = "🎂";
+    bannerText = "HAPPY BIRTHDAY WISHES";
+    bannerBg = "#fff7ed";
+    bannerBorder = "#fed7aa";
+    bannerColor = "#c2410c";
   }
 
   return `<!DOCTYPE html>
@@ -207,158 +140,125 @@ function buildHtmlEmail(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:'Segoe UI',Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" style="max-width:650px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);border:1px solid #e5e7eb;">
+        <table width="100%" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06); padding: 32px;">
           
-          <!-- BRAND HEADER -->
+          <!-- Premium Header -->
           <tr>
-            <td style="padding:24px 32px;background:#ffffff;">
-              <table width="100%" cellpadding="0" cellspacing="0">
+            <td>
+              <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px;">
                 <tr>
-                  <!-- Left side: logo -->
-                  <td style="vertical-align:middle;text-align:left;">
-                    <table cellpadding="0" cellspacing="0" style="display:inline-table;vertical-align:middle;margin-right:12px;">
+                  <td width="55%" align="left" style="vertical-align: middle;">
+                    <table cellpadding="0" cellspacing="0">
                       <tr>
-                        <td style="background:#111827;width:40px;height:40px;border-radius:8px;transform:rotate(45deg);text-align:center;vertical-align:middle;">
-                          <div style="transform:rotate(-45deg);color:#ffffff;font-family:sans-serif;font-size:16px;font-weight:950;line-height:40px;text-align:center;width:40px;height:40px;margin:0 auto;">MS</div>
+                        <td>
+                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:24px; padding:8px 12px; border-radius:6px; display:inline-block; margin-right:12px; font-family:'Segoe UI',sans-serif; letter-spacing:1px;">MS</div>
+                        </td>
+                        <td>
+                          <div style="font-size:15px; font-weight:800; color:#1e293b; text-transform:uppercase; letter-spacing:-0.2px; line-height:1.2;">MS HUMAN RESOURCE</div>
+                          <div style="font-size:13px; font-weight:700; color:#2563eb; text-transform:uppercase; line-height:1.2;">CONSULTANCIES</div>
+                          <div style="font-size:9px; color:#64748b; font-style:italic; margin-top:2px;">Right People. Right Opportunity.</div>
                         </td>
                       </tr>
                     </table>
-                    <div style="display:inline-block;vertical-align:middle;text-align:left;">
-                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;font-weight:900;color:#111827;line-height:1.1;letter-spacing:-0.5px;">MS HUMAN RESOURCE</div>
-                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;font-weight:900;color:#2563eb;line-height:1.1;">CONSULTANCIES</div>
-                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:9px;font-weight:600;color:#6b7280;margin-top:2px;">Right People. Right Opportunity.</div>
-                    </div>
                   </td>
-                  <!-- Right side: contact details -->
-                  <td style="width:1px;background:#e5e7eb;height:50px;padding:0;vertical-align:middle;"></td>
-                  <td style="padding-left:20px;vertical-align:middle;text-align:left;font-family:sans-serif;font-size:10px;color:#4b5563;line-height:1.4;width:190px;">
-                    ✉ <a href="mailto:hr@safayar-msjobs.com" style="color:#4b5563;text-decoration:none;font-weight:600;">hr@safayar-msjobs.com</a><br/>
-                    📞 <span style="font-weight:600;">+971 58 532 2913</span><br/>
-                    🌐 <a href="https://www.msjobs.net" target="_blank" style="color:#2563eb;text-decoration:none;font-weight:600;">www.msjobs.net</a><br/>
-                    📍 <span style="font-weight:600;">Ajman, UAE</span>
+                  <td width="45%" align="right" style="font-size:11px; color:#475569; line-height:1.5; border-left:1px solid #e2e8f0; padding-left:16px; vertical-align: middle; font-family:'Segoe UI',sans-serif;">
+                    <div style="margin-bottom:2px;">✉ hr@safayar-msjobs.com</div>
+                    <div style="margin-bottom:2px;">📞 +971 58 532 2913</div>
+                    <div style="margin-bottom:2px;">🌐 www.msjobs.net</div>
+                    <div>📍 Industrial Area 2, Ajman, UAE</div>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- DIVIDER LINE -->
+          <!-- Dynamic Banner Title -->
           <tr>
-            <td style="background:${dividerColor};height:3px;padding:0;font-size:0;line-height:0;"></td>
-          </tr>
-
-          <!-- TEMPLATE HEADER (Dynamic invitation/expiry text) -->
-          <tr>
-            <td style="padding:10px 32px 0 32px;">
-              ${templateHeader}
+            <td align="center" style="padding-bottom: 16px;">
+              <div style="display:inline-block; background:${bannerBg}; border: 1px solid ${bannerBorder}; border-radius: 50px; padding: 6px 18px;">
+                <span style="font-size: 14px; vertical-align: middle; margin-right: 6px;">${bannerIcon}</span>
+                <span style="font-size: 12px; font-weight: 800; color: ${bannerColor}; text-transform: uppercase; letter-spacing: 0.5px;">${bannerText}</span>
+              </div>
             </td>
           </tr>
 
-          <!-- BODY SECTION -->
+          <!-- Body Content Area -->
           <tr>
-            <td style="padding:20px 32px 32px 32px;">
+            <td style="font-family:'Segoe UI',sans-serif; text-align: left;">
+              ${introHtml}
+              ${tableHtml}
+              ${alertHtml}
               
-              <!-- Greeting and Intro -->
-              ${htmlBody}
-
-              <!-- Details Table (Key-Value Grid) -->
-              ${detailsTableHtml}
-
-              <!-- Action Notification Banner -->
-              ${noticeBanner}
-
-              <!-- Signature block + Handdrawn Thank You -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+              <!-- Optional Callout Support Widget -->
+              ${showCallout ? `
+              <table width="100%" cellpadding="0" cellspacing="0" style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 14px 16px; margin: 16px 0;">
                 <tr>
-                  <td style="font-family:sans-serif;font-size:14px;color:#374151;line-height:1.7;vertical-align:middle;">
-                    We look forward to working with you.<br/>
-                    Best Regards,<br/>
-                    <strong style="color:#1e3a8a;">MS Human Resource Consultancies Team</strong>
+                  <td width="10%" style="vertical-align: middle; font-size: 24px;">🎧</td>
+                  <td width="90%" style="font-family:'Segoe UI',sans-serif; font-size: 11px; color: #991b1b; line-height: 1.4; padding-left: 10px;">
+                    <div style="font-weight: 800;">Need Help?</div>
+                    <div style="font-weight: 500; margin-top: 2px;">Contact our support team for assistance.</div>
+                    <div style="font-weight: 800; font-size: 12px; margin-top: 2px;">+971 58 532 2913</div>
                   </td>
-                  <td align="right" style="vertical-align:bottom;width:120px;">
-                    <span style="font-family:'Georgia',serif;font-style:italic;font-size:24px;color:#2563eb;font-weight:bold;white-space:nowrap;letter-spacing:-0.5px;">Thank You!</span>
+                </tr>
+              </table>` : ""}
+
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="60%" style="vertical-align: bottom;">
+                    ${closingHtml}
+                  </td>
+                  <td width="40%" align="right" style="vertical-align: bottom;">
+                    <div style="font-family:'Brush Script MT', cursive, sans-serif; font-size: 26px; color:#2563eb; font-style:italic;">Thank You!</div>
                   </td>
                 </tr>
               </table>
-
-              <!-- Document attachments indicator -->
-              ${attachmentsHtml}
-
             </td>
           </tr>
 
-          <!-- FOOTER DIVIDER -->
+          <!-- Premium Stay Connected Footer -->
           <tr>
-            <td style="padding:0 32px;">
-              <hr style="border:none;border-top:1px solid #e5e7eb;margin:0;" />
-            </td>
-          </tr>
-
-          <!-- FOOTER INFO BLOCK -->
-          <tr>
-            <td style="padding:24px 32px;background:#ffffff;">
-              <table width="100%" cellpadding="0" cellspacing="0">
+            <td>
+              <div style="border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;"></div>
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
                 <tr>
-                  <!-- Left side: logo replica -->
-                  <td style="vertical-align:middle;text-align:left;width:45%;">
-                    <table cellpadding="0" cellspacing="0" style="display:inline-table;vertical-align:middle;margin-right:8px;">
+                  <td width="40%" align="left" style="vertical-align: middle;">
+                    <table cellpadding="0" cellspacing="0">
                       <tr>
-                        <td style="background:#111827;width:30px;height:30px;border-radius:6px;transform:rotate(45deg);text-align:center;vertical-align:middle;">
-                          <div style="transform:rotate(-45deg);color:#ffffff;font-family:sans-serif;font-size:12px;font-weight:900;line-height:30px;text-align:center;width:30px;height:30px;margin:0 auto;">MS</div>
+                        <td>
+                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:18px; padding:5px 8px; border-radius:4px; display:inline-block; margin-right:8px;">MS</div>
+                        </td>
+                        <td>
+                          <div style="font-size:10px; font-weight:800; color:#1e293b; text-transform:uppercase;">MS HUMAN RESOURCE</div>
+                          <div style="font-size:8px; font-weight:700; color:#2563eb; text-transform:uppercase;">CONSULTANCIES</div>
                         </td>
                       </tr>
                     </table>
-                    <div style="display:inline-block;vertical-align:middle;text-align:left;">
-                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:800;color:#111827;line-height:1.1;">MS HUMAN RESOURCE</div>
-                      <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:9px;font-weight:800;color:#2563eb;line-height:1.1;">CONSULTANCIES</div>
+                  </td>
+                  <td width="30%" align="center" style="font-size: 10px; font-weight: 700; color: #64748b; vertical-align: middle;">
+                    <div>Stay Connected</div>
+                    <div style="margin-top: 6px;">
+                      <a href="https://facebook.com" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#1e3a8a; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">FB</a>
+                      <a href="https://linkedin.com" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#2563eb; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">LN</a>
+                      <a href="https://wa.me/971585322913" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#166534; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">WA</a>
                     </div>
                   </td>
-                  <!-- Middle: Stay Connected -->
-                  <td style="vertical-align:middle;text-align:center;width:25%;">
-                    <div style="font-family:sans-serif;font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;">Stay Connected</div>
-                    <table cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 2px;">
-                      <tr>
-                        <td style="background:#3b5998;width:20px;height:20px;border-radius:10px;text-align:center;vertical-align:middle;color:#ffffff;font-family:sans-serif;font-size:10px;font-weight:bold;">f</td>
-                      </tr>
-                    </table>
-                    <table cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 2px;">
-                      <tr>
-                        <td style="background:#0077b5;width:20px;height:20px;border-radius:10px;text-align:center;vertical-align:middle;color:#ffffff;font-family:sans-serif;font-size:10px;font-weight:bold;">in</td>
-                      </tr>
-                    </table>
-                    <table cellpadding="0" cellspacing="0" style="display:inline-table;margin:0 2px;">
-                      <tr>
-                        <td style="background:#25d366;width:20px;height:20px;border-radius:10px;text-align:center;vertical-align:middle;color:#ffffff;font-family:sans-serif;font-size:10px;font-weight:bold;">w</td>
-                      </tr>
-                    </table>
-                  </td>
-                  <!-- Right: address and contacts -->
-                  <td style="vertical-align:middle;text-align:right;font-family:sans-serif;font-size:9px;color:#4b5563;line-height:1.4;width:30%;">
-                    ✉ <a href="mailto:hr@safayar-msjobs.com" style="color:#4b5563;text-decoration:none;">hr@safayar-msjobs.com</a><br/>
-                    📞 +971 58 532 2913<br/>
-                    🌐 www.msjobs.net<br/>
-                    📍 Real Group Building, Ajman
+                  <td width="30%" align="right" style="font-size:10px; color:#64748b; line-height:1.4; border-left:1px solid #e2e8f0; padding-left:12px; vertical-align: middle;">
+                    <div>hr@safayar-msjobs.com</div>
+                    <div>+971 58 532 2913</div>
+                    <div>www.msjobs.net</div>
                   </td>
                 </tr>
               </table>
-            </td>
-          </tr>
-
-          <!-- BOTTOM DISCLAIMER -->
-          <tr>
-            <td style="padding:0;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:12px;border-radius:0 0 16px 16px;text-align:center;">
-                <tr>
-                  <td style="font-family:sans-serif;font-size:9px;color:#9ca3af;line-height:1.4;">
-                    This email is confidential and intended solely for the use of the individual to whom it is addressed.<br/>
-                    If you have received this email in error, please notify us and delete it from your system.
-                  </td>
-                </tr>
-              </table>
+              
+              <!-- Light Gray Confidentiality Disclaimer -->
+              <div style="background:#f8fafc; padding:12px; border-radius:8px; font-size:9px; color:#94a3b8; text-align:center; line-height:1.4; border: 1px solid #f1f5f9;">
+                This email is confidential and intended solely for the use of the individual to whom it is addressed.<br/>
+                If you have received this email in error, please notify us and delete it from your system.
+              </div>
             </td>
           </tr>
 
@@ -369,7 +269,6 @@ function buildHtmlEmail(
 </body>
 </html>`;
 }
-
 
 /**
  * Sends a real-time email with beautiful HTML formatting.
