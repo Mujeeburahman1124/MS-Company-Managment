@@ -51,9 +51,17 @@ export async function POST(request: Request) {
         contactName: data.contactName || "",
         email: data.email || "",
         phone: data.phone || "",
+        mobile: data.mobile || "",
+        whatsapp: data.whatsapp || "",
+        nationality: data.nationality || "",
+        nationalityFlag: data.nationalityFlag || "",
+        notes: data.notes || null,
         status: data.status || "Active",
         company: data.company,
-        createdAt: data.createdAt || new Date().toISOString().slice(0, 10)
+        branch: data.branch || "",
+        createdAt: data.createdAt || new Date().toISOString().slice(0, 10),
+        createdBy: data.createdBy || "",
+        documents: data.documents ?? []
       }
     });
 

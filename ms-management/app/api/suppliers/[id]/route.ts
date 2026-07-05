@@ -36,8 +36,16 @@ export async function PUT(request: Request, { params }: RouteParams) {
         contactName: data.contactName ?? undefined,
         email: data.email ?? undefined,
         phone: data.phone ?? undefined,
+        mobile: data.mobile ?? undefined,
+        whatsapp: data.whatsapp ?? undefined,
+        nationality: data.nationality ?? undefined,
+        nationalityFlag: data.nationalityFlag ?? undefined,
+        notes: data.notes ?? undefined,
         status: data.status ?? undefined,
-        company: data.company ?? undefined
+        company: data.company ?? undefined,
+        branch: data.branch ?? undefined,
+        createdBy: data.createdBy ?? undefined,
+        documents: data.documents ?? undefined
       }
     });
 

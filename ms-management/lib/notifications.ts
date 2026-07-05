@@ -12,7 +12,7 @@ function buildHtmlEmail(
   subject: string, 
   body: string, 
   company = "MS Horizon F.Z.E",
-  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Offer" | "Visa"
+  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed" | "Offer" | "Visa"
 ): string {
   const htmlBody = body
     .split("\n\n")
@@ -53,6 +53,14 @@ function buildHtmlEmail(
     headerBg = "linear-gradient(135deg,#78350f 0%,#b45309 100%)"; // Warm Gold/Amber
     subtitle = "In-Person Office Interview Invitation";
     footerExtra = "Please report to the reception desk 10 minutes prior to your interview.";
+  } else if (templateType === "Interview_Cancelled") {
+    headerBg = "linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%)"; // Rose Red
+    subtitle = "Interview Cancellation Notice";
+    footerExtra = "We apologize for any inconvenience. Please contact HR for further information.";
+  } else if (templateType === "Interview_Completed") {
+    headerBg = "linear-gradient(135deg,#064e3b 0%,#059669 100%)"; // Emerald Green
+    subtitle = "Interview Completed - Thank You";
+    footerExtra = "We will reach out to you regarding the next steps in the process.";
   } else if (templateType === "Offer") {
     headerBg = "linear-gradient(135deg,#065f46 0%,#10b981 100%)"; // Emerald Green
     subtitle = "Official Job Offer Letter";
@@ -161,7 +169,7 @@ export async function sendEmail({
   deliveryStatus?: string;
   sentBy?: string;
   type?: string;
-  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Offer" | "Visa";
+  templateType?: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed" | "Offer" | "Visa";
   templateData?: any;
 }) {
   const host = cleanEnvVar(process.env.SMTP_HOST);
@@ -326,7 +334,7 @@ export async function sendWhatsApp({
  * Prevents multiple templates from being concatenated or triggered at the same time.
  */
 export function generateEmailContent(
-  templateType: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Offer" | "Visa",
+  templateType: "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed" | "Offer" | "Visa",
   data: {
     applicantName?: string;
     company?: string;
@@ -403,6 +411,34 @@ Candidate Guidelines:
 - Please carry a copy of your CV and valid ID.
 - Register at the front desk upon arrival.
 - Dress code is professional business attire.
+
+Best regards,
+${company} HR Team`,
+      };
+    case "Interview_Cancelled":
+      return {
+        subject: `Interview Cancelled: ${data.role || "Scheduled Interview"} - ${name}`,
+        body: `Dear ${name},
+
+We regret to inform you that your ${data.role || "scheduled interview"} at ${company} on ${data.date || "the scheduled date"} has been cancelled.
+
+${data.notes ? `Reason: ${data.notes}` : "Please contact our HR department for further information."}
+
+We apologize for any inconvenience caused. We may reach out to you to reschedule.
+
+Best regards,
+${company} HR Team`,
+      };
+    case "Interview_Completed":
+      return {
+        subject: `Interview Completed - Thank You: ${name}`,
+        body: `Dear ${name},
+
+Thank you for attending your interview${data.role ? ` for the position of ${data.role}` : ""} at ${company} on ${data.date || "the scheduled date"}.
+
+We appreciate the time you invested and your interest in joining our team. Our HR team will review your profile and get back to you regarding the next steps.
+
+${data.notes ? `Feedback Notes: ${data.notes}` : ""}
 
 Best regards,
 ${company} HR Team`,

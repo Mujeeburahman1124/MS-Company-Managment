@@ -287,14 +287,22 @@ model Vehicle {
 }
 
 model Supplier {
-  id          String   @id @default(cuid())
-  name        String
-  contactName String
-  email       String
-  phone       String
-  status      String   // "Active" | "Inactive"
-  company     String
-  createdAt   String
+  id              String   @id @default(cuid())
+  name            String
+  contactName     String   @default("")
+  email           String   @default("")
+  phone           String   @default("")
+  mobile          String   @default("")
+  whatsapp        String   @default("")
+  nationality     String   @default("")
+  nationalityFlag String   @default("")
+  notes           String?
+  status          String   @default("Active") // "Active" | "Inactive"
+  company         String   @default("")
+  branch          String   @default("")
+  createdAt       String   @default("")
+  createdBy       String   @default("")
+  documents       Json?    // Document[]
 }
 
 model Placement {

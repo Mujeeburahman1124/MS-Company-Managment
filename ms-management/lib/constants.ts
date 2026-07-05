@@ -81,10 +81,12 @@ export const MODULE_PERMISSION_MAP: Record<string, string> = {
   attendance: "Attendance",
   payroll: "Payroll",
   notifications: "Notifications",
+  activitylog: "Activity Log",
   activityLog: "Activity Log",
   placement: "Placement",
   members: "Members",
   suppliers: "Suppliers",
+  visaexpiry: "Visa Expiry",
   visaExpiry: "Visa Expiry",
   birthday: "Staff Birthdays",
   leave: "Leave Requests",
@@ -92,10 +94,12 @@ export const MODULE_PERMISSION_MAP: Record<string, string> = {
   interviews: "Interviews",
   reports: "Reports",
   settings: "Site Settings",
-  tracking: "Applicant Tracking"
+  tracking: "Applicant Tracking",
+  vehicles: "Vehicles"
 };
 
-export const getPermissionModuleName = (moduleKey: string): string | undefined => MODULE_PERMISSION_MAP[moduleKey];
+export const getPermissionModuleName = (moduleKey: string): string | undefined =>
+  MODULE_PERMISSION_MAP[moduleKey] ?? MODULE_PERMISSION_MAP[moduleKey.toLowerCase()];
 
 export const SYSTEM_ROLES = [
   "Super Admin",

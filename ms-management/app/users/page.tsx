@@ -176,7 +176,7 @@ export default function UsersPage() {
   const pageSize = f.pageSize || 10;
   const paginated = list.slice((page-1)*pageSize, page*pageSize);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.role) { toast.error("Name, email, and role are required"); return; }
     if (!form.company) { toast.error("Every user must belong to a company"); return; }
@@ -210,18 +210,22 @@ export default function UsersPage() {
       permissions: permissionsPayload
     };
 
-    if (editUser) {
-      updateUser({ ...editUser, ...submitPayload } as any);
-      addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Edited", module: "Users", oldValue: editUser.name, newValue: form.name, ipAddress: "192.168.1.102" });
-      toast.success("User updated");
-    } else {
-      const id = `USR${String(Math.floor(100 + Math.random() * 900))}`;
-      addUser({ ...submitPayload, id, lastLogin: "Never", createdAt: new Date().toISOString().slice(0,10) } as any);
-      addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Created", module: "Users", oldValue: null, newValue: `Created user: ${form.name} (${form.role})`, ipAddress: "192.168.1.102" });
-      toast.success(`User "${form.name}" created`);
+    try {
+      if (editUser) {
+        await updateUser({ ...editUser, ...submitPayload } as any);
+        addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Edited", module: "Users", oldValue: editUser.name, newValue: form.name, ipAddress: "192.168.1.102" });
+        toast.success("User updated");
+      } else {
+        const id = `USR${String(Math.floor(100 + Math.random() * 900))}`;
+        await addUser({ ...submitPayload, id, lastLogin: "Never", createdAt: new Date().toISOString().slice(0,10) } as any);
+        addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Created", module: "Users", oldValue: null, newValue: `Created user: ${form.name} (${form.role})`, ipAddress: "192.168.1.102" });
+        toast.success(`User "${form.name}" created`);
+      }
+      setModal(false); setEditUser(null);
+      setForm({ name:"", email:"", mobile:"", whatsapp:"", role:"Recruiter", company:currentUser.company, branch: currentRole === "Branch Admin" ? currentUser.branch : "", photo: null, status: "Active", department: "", designation: "", shiftId: "", basicSalary: 0, allowances: 0, deductions: 0, permissions: null });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save user");
     }
-    setModal(false); setEditUser(null);
-    setForm({ name:"", email:"", mobile:"", whatsapp:"", role:"Recruiter", company:currentUser.company, branch: currentRole === "Branch Admin" ? currentUser.branch : "", photo: null, status: "Active", department: "", designation: "", shiftId: "", basicSalary: 0, allowances: 0, deductions: 0, permissions: null });
   };
 
   const handleStatusToggle = (u: User) => {

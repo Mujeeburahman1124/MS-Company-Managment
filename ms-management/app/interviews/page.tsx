@@ -926,35 +926,80 @@ HR Department`;
             <Button variant="ghost" onClick={() => setIsGreetingCardOpen(false)} className="text-xs rounded-xl px-4 h-9">
               Close
             </Button>
-            <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9 gap-1.5 shadow-sm">
-              Print Card
+            <Button
+              onClick={() => {
+                const card = selectedGreetingCard;
+                if (!card) return;
+                const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Interview Invitation - ${card.personName}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom, #1e3a8a, #0f172a, #172554);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 2rem; color: white;
+    }
+    .card { 
+      max-width: 500px; width: 100%; border-bottom: 8px solid #f59e0b;
+      padding: 3rem 2.5rem; position: relative; border-radius: 1.5rem;
+      background: linear-gradient(to bottom, #1e3a8a, #0f172a);
+    }
+    .card::before { content: ""; position: absolute; inset: 1rem; border: 1px solid rgba(245,158,11,0.2); border-radius: 1rem; pointer-events: none; }
+    .card::after  { content: ""; position: absolute; inset: 1.25rem; border: 2px solid rgba(245,158,11,0.45); border-radius: 0.75rem; pointer-events: none; }
+    .label { color: #f59e0b; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; text-align: center; }
+    h1 { font-size: 1.75rem; font-weight: 900; text-transform: uppercase; text-align: center; letter-spacing: 0.05em; margin-top: 0.5rem; }
+    .divider { height: 2px; background: linear-gradient(to right, transparent, #f59e0b, transparent); width: 75%; margin: 1rem auto; }
+    .candidate-label { font-size: 9px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
+    .candidate-name { font-size: 1.4rem; font-weight: 800; text-align: center; margin-top: 0.25rem; }
+    .candidate-role { font-size: 0.75rem; color: #fbbf24; font-weight: 700; font-style: italic; text-align: center; margin-top: 0.25rem; }
+    .info-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.25rem; margin-top: 1.5rem; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.7rem; }
+    .info-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .info-key { color: #94a3b8; text-transform: uppercase; font-size: 9px; letter-spacing: 0.08em; font-weight: 700; }
+    .info-val { color: white; font-weight: 700; text-align: right; max-width: 60%; }
+    .footer { margin-top: 1.5rem; font-size: 9px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; text-align: center; }
+    @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="label">Official Invitation</div>
+    <h1>Interview Invitation</h1>
+    <div class="divider"></div>
+    <div class="candidate-label">Candidate Name</div>
+    <div class="candidate-name">${card.personName}</div>
+    <div class="candidate-role">${card.position || card.meetingType || ""}</div>
+    <div class="info-box">
+      <div class="info-row"><span class="info-key">Interviewer</span><span class="info-val">${card.conductPerson}</span></div>
+      <div class="info-row"><span class="info-key">Date &amp; Time</span><span class="info-val">${card.dateTime.replace("T", " ")}</span></div>
+      <div class="info-row"><span class="info-key">Format</span><span class="info-val">${card.isOnline ? `Online (${card.mode})` : "Physical Assessment"}</span></div>
+      ${card.meetingLink ? `<div class="info-row"><span class="info-key">Meeting Link</span><span class="info-val" style="color:#93c5fd;font-size:9px;">${card.meetingLink}</span></div>` : ""}
+      ${card.locationLink ? `<div class="info-row"><span class="info-key">Location</span><span class="info-val" style="color:#fbbf24;font-size:9px;">${card.locationLink}</span></div>` : ""}
+      ${card.notes ? `<div class="info-row"><span class="info-key">Instructions</span><span class="info-val" style="font-style:italic;color:#cbd5e1;">"${card.notes}"</span></div>` : ""}
+    </div>
+    <div class="footer">${card.company || "MS COMPANY"} HR &amp; Recruitment Team</div>
+  </div>
+  <script>window.onload = function(){ window.print(); }<\/script>
+</body>
+</html>`;
+                const popup = window.open("", "PrintCard", "width=600,height=750,toolbar=no,menubar=no,scrollbars=yes,resizable=yes");
+                if (popup) {
+                  popup.document.write(html);
+                  popup.document.close();
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9 gap-1.5 shadow-sm"
+            >
+              🖨️ Print Card
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <style jsx global>{`
-        @media print {
-          body * {
-            visibility: hidden !important;
-          }
-          #print-card-content, #print-card-content * {
-            visibility: visible !important;
-          }
-          #print-card-content {
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: linear-gradient(to bottom, #1e3a8a, #0f172a, #172554) !important;
-            color: white !important;
-            border-bottom: 8px solid #f59e0b !important;
-            padding: 3rem !important;
-            box-sizing: border-box !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

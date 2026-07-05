@@ -663,10 +663,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(usr)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => ({ users: [saved, ...state.users] }));
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to create user");
     }
+    const saved = await res.json();
+    set((state) => ({ users: [saved, ...state.users] }));
   },
   updateUser: async (usr) => {
     const res = await fetch(`/api/users/${usr.id}`, {
@@ -674,12 +676,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(usr)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => ({
-        users: state.users.map((u) => (u.id === saved.id ? saved : u))
-      }));
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to update user");
     }
+    const saved = await res.json();
+    set((state) => ({
+      users: state.users.map((u) => (u.id === saved.id ? saved : u))
+    }));
   },
   deleteUser: async (id) => {
     const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
@@ -1286,16 +1290,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(shift)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      const mapped = {
-        ...saved,
-        startTime: saved.clockIn || "",
-        endTime: saved.clockOut || "",
-        assignedEmployees: (get().staff || []).filter((st: any) => st.shiftId === saved.id).map((st: any) => st.name)
-      };
-      set((state) => ({ shifts: [mapped, ...state.shifts] }));
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to create shift");
     }
+    const saved = await res.json();
+    const mapped = {
+      ...saved,
+      startTime: saved.clockIn || "",
+      endTime: saved.clockOut || "",
+      assignedEmployees: (get().staff || []).filter((st: any) => st.shiftId === saved.id).map((st: any) => st.name)
+    };
+    set((state) => ({ shifts: [mapped, ...state.shifts] }));
   },
   updateShift: async (shift) => {
     const res = await fetch(`/api/shifts/${shift.id}`, {
@@ -1303,16 +1309,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(shift)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      const mapped = {
-        ...saved,
-        startTime: saved.clockIn || "",
-        endTime: saved.clockOut || "",
-        assignedEmployees: (get().staff || []).filter((st: any) => st.shiftId === saved.id).map((st: any) => st.name)
-      };
-      set((state) => ({ shifts: state.shifts.map(s => s.id === saved.id ? mapped : s) }));
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to update shift");
     }
+    const saved = await res.json();
+    const mapped = {
+      ...saved,
+      startTime: saved.clockIn || "",
+      endTime: saved.clockOut || "",
+      assignedEmployees: (get().staff || []).filter((st: any) => st.shiftId === saved.id).map((st: any) => st.name)
+    };
+    set((state) => ({ shifts: state.shifts.map(s => s.id === saved.id ? mapped : s) }));
   },
   deleteShift: async (id) => {
     const res = await fetch(`/api/shifts/${id}`, { method: "DELETE" });

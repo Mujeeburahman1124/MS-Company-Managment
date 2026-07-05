@@ -231,9 +231,9 @@ ${mappedResponse.company} Recruitment Team`;
 
       let templateType: any = "Interview";
       if (data.status === "Cancelled") {
-        templateType = "Visa"; // Red banner
+        templateType = "Interview_Cancelled"; // Red banner — cancellation notice
       } else if (data.status === "Completed") {
-        templateType = "Offer"; // Green banner
+        templateType = "Interview_Completed"; // Emerald banner — thank-you / completion
       } else if (mappedResponse.isOnline) {
         templateType = "Interview_Online"; // Teal banner
       } else {
