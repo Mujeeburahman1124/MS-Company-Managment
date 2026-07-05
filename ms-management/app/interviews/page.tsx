@@ -193,10 +193,15 @@ HR Department`;
       
       // Send auto invites if configured
       if (form.autoWhatsapp && form.whatsapp) {
+        const cleanNumber = form.whatsapp.replace(/[^0-9]/g, "");
+        const waMsg = `Hello ${form.personName}, your ${form.type} (${form.type === "Interview" ? form.position : form.meetingType}) is scheduled with ${form.conductPerson} on ${form.dateTime.replace("T", " ")}. Join here: ${form.meetingLink || "N/A"}`;
+        if (typeof window !== "undefined") {
+          window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(waMsg)}`, "_blank");
+        }
         addSentWhatsApp({
           id: `WHA-${Math.floor(100+Math.random()*900)}`,
           to: form.whatsapp,
-          message: `Hello ${form.personName}, your ${form.type} (${form.type === "Interview" ? form.position : form.meetingType}) is scheduled with ${form.conductPerson} on ${form.dateTime.replace("T", " ")}. Join here: ${form.meetingLink || "N/A"}`,
+          message: waMsg,
           sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
           company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
           branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
@@ -391,10 +396,15 @@ HR Department`;
                     {int.whatsapp && (
                       <button 
                         onClick={() => {
+                          const waMsg = `Manual Reminder: Hello ${int.personName}, your ${int.type} is scheduled on ${int.dateTime}. Join link: ${int.meetingLink || "N/A"}`;
+                          const cleanNumber = int.whatsapp!.replace(/[^0-9]/g, "");
+                          if (typeof window !== "undefined") {
+                            window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(waMsg)}`, "_blank");
+                          }
                           addSentWhatsApp({
                             id: `WHA-${Math.floor(100+Math.random()*900)}`,
                             to: int.whatsapp!,
-                            message: `Manual Reminder: Hello ${int.personName}, your ${int.type} is scheduled on ${int.dateTime}. Join link: ${int.meetingLink || "N/A"}`,
+                            message: waMsg,
                             sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
                             company: int.company || currentUser.company,
                             branch: int.branch || currentUser.branch,
