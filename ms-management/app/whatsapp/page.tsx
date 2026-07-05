@@ -153,6 +153,13 @@ export default function WhatsAppPage() {
       ? `${message}\n\n[Attachment: ${attachment.name}]`
       : message;
 
+    // Open direct WhatsApp links synchronously BEFORE async await calls to prevent browser popup blocking
+    if (typeof window !== "undefined") {
+      for (const r of recipients) {
+        window.open(buildWaLink(r.number, finalMessage), "_blank");
+      }
+    }
+
     for (const r of recipients) {
       try {
         const res = await fetch("/api/whatsapp", {
@@ -170,22 +177,11 @@ export default function WhatsAppPage() {
           const saved = await res.json();
           if (saved) setLocalSent(prev => [saved, ...prev]);
           successCount++;
-          if (typeof window !== "undefined") {
-            window.open(buildWaLink(r.number, finalMessage), "_blank");
-          }
         } else {
           failCount++;
-          // Fallback if API response is not ok
-          if (typeof window !== "undefined") {
-            window.open(buildWaLink(r.number, finalMessage), "_blank");
-          }
         }
       } catch (err) {
         failCount++;
-        // Fallback on network/API exception
-        if (typeof window !== "undefined") {
-          window.open(buildWaLink(r.number, finalMessage), "_blank");
-        }
       }
     }
 
