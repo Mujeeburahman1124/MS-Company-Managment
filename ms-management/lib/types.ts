@@ -620,6 +620,8 @@ export interface ModuleFilter {
   sortOrder: "asc" | "desc";
   page: number;
   pageSize: number;
+  interviewType?: string;
+  clientCompany?: string;
 }
 
 export interface SentEmail {

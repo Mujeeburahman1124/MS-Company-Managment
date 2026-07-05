@@ -521,6 +521,214 @@ export default function PlacementPage() {
     window.print();
   };
 
+  const printAgreement = (p: Placement) => {
+    const printWindow = window.open("", "_blank", "width=850,height=950");
+    if (!printWindow) {
+      toast.error("Popup blocker blocked the print window. Please allow popups for this site.");
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Placement Agreement - ${p.applicantName}</title>
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #334155;
+            padding: 40px;
+            font-size: 12px;
+            line-height: 1.6;
+          }
+          .header {
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            position: relative;
+          }
+          .header h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #0f172a;
+            text-transform: uppercase;
+          }
+          .header p {
+            margin: 5px 0 0;
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: bold;
+            letter-spacing: 1px;
+          }
+          .stamp {
+            position: absolute;
+            right: 10px;
+            top: -10px;
+            border: 2px dashed rgba(59, 130, 246, 0.4);
+            border-radius: 50%;
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: rgba(59, 130, 246, 0.5);
+            text-transform: uppercase;
+            font-weight: bold;
+            transform: rotate(12deg);
+            flex-direction: column;
+            line-height: 1.2;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          td {
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+          }
+          td.label {
+            font-weight: bold;
+            color: #64748b;
+            background-color: #f8fafc;
+            width: 35%;
+          }
+          td.value {
+            color: #0f172a;
+            font-weight: 600;
+          }
+          .terms {
+            font-size: 10px;
+            color: #475569;
+            background-color: #f8fafc;
+            border: 1px solid #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            margin-bottom: 25px;
+          }
+          .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+          }
+          .sig-box {
+            text-align: center;
+          }
+          .sig-line {
+            border: 1px solid #f1f5f9;
+            background-color: #fafafa;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 6px;
+          }
+          .sig-line img {
+            max-height: 100%;
+            object-fit: contain;
+          }
+          .sig-title {
+            font-size: 10px;
+            font-weight: bold;
+            color: #0f172a;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 4px;
+          }
+          .sig-subtitle {
+            font-size: 8px;
+            color: #94a3b8;
+          }
+          @media print {
+            body {
+              padding: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2>Payment & Placement Service Agreement</h2>
+          <p>MS HORIZON F.Z.E  •  Website: msjobs.net</p>
+          <div class="stamp">
+            <span>MS Horizon</span>
+            <span style="font-size: 6px;">F.Z.E</span>
+            <span style="font-size: 5px;">Verified</span>
+          </div>
+        </div>
+        
+        <p>This Payment & Placement Service Agreement is entered into between <strong>MS Horizon F.Z.E</strong> ("Company") and the registered Applicant ("Applicant") detailed below:</p>
+
+        <table>
+          <tr>
+            <td class="label">Applicant Name</td>
+            <td class="value" style="color: #0f172a; font-size: 13px;">${p.applicantName}</td>
+          </tr>
+          <tr>
+            <td class="label">Passport / Emirates ID No.</td>
+            <td class="value">${p.passportNumber || "-"}</td>
+          </tr>
+          <tr>
+            <td class="label">Mobile Number</td>
+            <td class="value">${p.mobileNumber || "-"}</td>
+          </tr>
+          <tr>
+            <td class="label">Registration Date</td>
+            <td class="value">${p.registrationDate ? new Date(p.registrationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
+          </tr>
+          <tr>
+            <td class="label">Placement Deadline</td>
+            <td class="value">${p.placementDeadline ? new Date(p.placementDeadline).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
+          </tr>
+          <tr>
+            <td class="label">Registration Fee Paid</td>
+            <td class="value" style="font-size: 13px;">AED ${p.registrationFee?.toLocaleString() || "0"}</td>
+          </tr>
+          <tr>
+            <td class="label">Agreement Reference ID</td>
+            <td class="value" style="font-family: monospace; font-size: 10px;">${p.id}</td>
+          </tr>
+        </table>
+
+        <div class="terms">${p.termsAndConditions || ""}</div>
+
+        <div class="signatures">
+          <div class="sig-box">
+            <div class="sig-line">
+              ${p.applicantSign ? `<img src="${p.applicantSign}" alt="Applicant Sign">` : `<span style="font-style: italic; color: #cbd5e1; font-size: 10px;">Signature Pending</span>`}
+            </div>
+            <div class="sig-title">Applicant Signature</div>
+            <div class="sig-subtitle">${p.applicantName}</div>
+          </div>
+          
+          <div class="sig-box">
+            <div class="sig-line">
+              ${p.companySign ? `<img src="${p.companySign}" alt="Company Sign">` : `<div style="border: 1px solid rgba(59, 130, 246, 0.2); color: rgba(59, 130, 246, 0.3); padding: 5px; font-size: 8px; font-weight: bold; transform: rotate(6deg);">MS HORIZON F.Z.E</div>`}
+            </div>
+            <div class="sig-title">Authorized Representative</div>
+            <div class="sig-subtitle">MS Horizon F.Z.E Stamp & Sign</div>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() { window.close(); }, 500);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   return (
     <div className="flex flex-col h-full select-none print:bg-white print:p-0">
       
@@ -1316,10 +1524,10 @@ export default function PlacementPage() {
 
                 {/* Controls */}
                 <div className="flex gap-2 justify-end print:hidden">
-                  <Button variant="outline" onClick={handlePrint} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
+                  <Button variant="outline" onClick={() => printAgreement(agreementModal)} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
                     <Printer className="w-4 h-4" /> Print Agreement
                   </Button>
-                  <Button variant="outline" onClick={() => { toast.success("PDF agreement compilation simulated successfully!"); }} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
+                  <Button variant="outline" onClick={() => printAgreement(agreementModal)} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
                     <Download className="w-4 h-4" /> Download PDF Copy
                   </Button>
                 </div>

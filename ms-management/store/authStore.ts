@@ -446,10 +446,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(app)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => ({ applicants: [saved, ...state.applicants] }));
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to register applicant");
     }
+    const saved = await res.json();
+    set((state) => ({ applicants: [saved, ...state.applicants] }));
   },
   updateApplicant: async (app) => {
     const res = await fetch(`/api/applicants/${app.id}`, {
@@ -457,12 +459,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(app)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => ({
-        applicants: state.applicants.map((a) => (a.id === saved.id ? saved : a))
-      }));
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to update applicant");
     }
+    const saved = await res.json();
+    set((state) => ({
+      applicants: state.applicants.map((a) => (a.id === saved.id ? saved : a))
+    }));
   },
   deleteApplicant: async (id) => {
     const res = await fetch(`/api/applicants/${id}`, { method: "DELETE" });

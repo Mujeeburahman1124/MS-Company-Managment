@@ -106,9 +106,16 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
   ].sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
 
   // Document slot helper — returns the latest doc matching a slot keyword
-  const slotDoc = (keyword: string) =>
-    (applicant?.documents || []).find(d => d.name.toLowerCase().includes(keyword.toLowerCase())) ?? null;
-
+  const slotDoc = (keyword: string) => {
+    if (keyword === "CV") {
+      return (applicant?.documents || []).find(d => {
+        const dName = d.name.toLowerCase();
+        return dName === "cv.pdf" || dName === "cv.doc" || dName === "cv.docx";
+      }) ?? null;
+    }
+    return (applicant?.documents || []).find(d => d.name.toLowerCase().includes(keyword.toLowerCase())) ?? null;
+  };
+  
   // Read file as base64
   const readAsDataURL = (file: File): Promise<string> =>
     new Promise((resolve) => {
@@ -119,19 +126,70 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
   // Upload a named-slot document
   const handleSlotUpload = async (slotName: string, file: File) => {
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    
+    // Size and extension checks for CV
+    if (slotName === "CV") {
+      const allowed = ["pdf", "doc", "docx"];
+      if (!ext || !allowed.includes(ext)) {
+        toast.error("Invalid file type. Only PDF, DOC, and DOCX formats are allowed for CV.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File is too large. CV size must be less than 5MB.");
+        return;
+      }
+    }
+
     const url = await readAsDataURL(file);
+    const primaryName = `${slotName}.${ext}`;
+    
+    let updatedDocs = [...(applicant!.documents || [])];
+
+    if (slotName === "CV") {
+      const cvDocs = updatedDocs.filter(d => 
+        d.name.toLowerCase().startsWith("cv.") || 
+        d.name.toLowerCase().startsWith("cv_v")
+      );
+      const versionNum = cvDocs.length + 1;
+
+      // Rename existing primary CV (if exists) to archived version
+      updatedDocs = updatedDocs.map(d => {
+        const dName = d.name.toLowerCase();
+        if (dName === "cv.pdf" || dName === "cv.doc" || dName === "cv.docx") {
+          const oldExt = d.name.split(".").pop();
+          const today = new Date().toISOString().slice(0, 10);
+          return {
+            ...d,
+            name: `CV_v${versionNum - 1}_archived_${today}.${oldExt}`
+          };
+        }
+        return d;
+      });
+    } else {
+      // Overwrite previous for standard slots
+      updatedDocs = updatedDocs.filter(d => d.name !== primaryName);
+    }
+
     const doc: Document = {
       id: `DOC-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-      name: `${slotName}.${file.name.split(".").pop()}`,
+      name: primaryName,
       uploadedBy: currentUser.name,
       uploadedDate: new Date().toISOString().slice(0, 10),
       type: file.type || "application/octet-stream",
       url,
     };
-    const updated = { ...applicant!, documents: [...(applicant!.documents || []), doc] };
-    updateApplicant(updated);
-    addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Document Uploaded", module: "Applicants", oldValue: null, newValue: `${slotName} uploaded for ${applicant!.fullName}`, ipAddress: "192.168.1.102" });
-    toast.success(`${slotName} uploaded`);
+    
+    updatedDocs.push(doc);
+
+    const updated = { ...applicant!, documents: updatedDocs };
+    try {
+      await updateApplicant(updated);
+      addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Document Uploaded", module: "Applicants", oldValue: null, newValue: `${slotName} uploaded for ${applicant!.fullName}`, ipAddress: "192.168.1.102" });
+      toast.success(`${slotName} uploaded successfully`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload document");
+    }
   };
 
   // Handle other/additional docs upload
@@ -649,6 +707,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
                   { key: "Passport Copy", label: "Passport Copy", hint: "Upload passport bio-data page" },
                   { key: "Visa Page", label: "Visa Page", hint: "Upload current visa stamp page" },
                   { key: "Applicant Photo", label: "Profile Photo", hint: "Passport-style photo" },
+                  { key: "CV", label: "Curriculum Vitae (CV) / Resume", hint: "Upload PDF or DOCX format (Max 5MB)" }
                 ].map((slot) => {
                   const doc = slotDoc(slot.key);
                   return (
@@ -699,13 +758,48 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
                         {canUpload && (
                           <label className="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 flex items-center justify-center text-blue-600 cursor-pointer transition-colors" title={doc ? "Replace" : "Upload"}>
                             <UploadCloud className="w-3.5 h-3.5" />
-                            <input type="file" accept=".pdf,image/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await handleSlotUpload(slot.key, f); e.target.value = ""; }} />
+                            <input type="file" accept={slot.key === "CV" ? ".pdf,.doc,.docx" : ".pdf,image/*"} className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await handleSlotUpload(slot.key, f); e.target.value = ""; }} />
                           </label>
                         )}
                       </div>
                     </div>
                   );
                 })}
+
+                {/* CV Version History */}
+                {(() => {
+                  const cvHistoryDocs = (applicant?.documents || []).filter(d => 
+                    d.name.toLowerCase().includes("archived") && 
+                    (d.name.toLowerCase().startsWith("cv_") || d.name.toLowerCase().includes("cv_v"))
+                  );
+                  if (cvHistoryDocs.length === 0) return null;
+                  return (
+                    <div className="space-y-3 pt-2">
+                      <div className="border-t border-slate-100 pt-4">
+                        <div className="text-xs font-bold text-slate-800">CV History & Versions</div>
+                        <div className="text-[9px] text-slate-400 font-medium mt-0.5">Previous CV files archived on upload updates</div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {cvHistoryDocs.map((doc) => (
+                          <div key={doc.id} className="group flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/30 hover:border-blue-200 transition-all">
+                            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-4.5 h-4.5 text-slate-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-700 truncate">{doc.name}</p>
+                              <p className="text-[9px] text-slate-400 font-medium">{doc.uploadedBy} · {doc.uploadedDate}</p>
+                            </div>
+                            <div className="flex gap-1 flex-shrink-0">
+                              {canDownload && <button onClick={() => setPreviewDoc(doc)} className="w-6 h-6 rounded-lg bg-blue-50 hover:bg-blue-100 flex items-center justify-center text-blue-600"><Eye className="w-3 h-3" /></button>}
+                              {canDownload && <button onClick={() => handleDownloadDoc(doc)} className="w-6 h-6 rounded-lg bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500"><Download className="w-3 h-3" /></button>}
+                              {canDelete && <button onClick={() => handleDeleteDoc(doc.id)} className="w-6 h-6 rounded-lg bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500"><Trash2 className="w-3 h-3" /></button>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Other documents */}
                 <div className="space-y-3">
@@ -724,8 +818,13 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
                   {/* Other docs list — exclude the named slots */}
                   {(() => {
-                    const namedSlotKeywords = ["Passport Copy", "Visa Page", "Applicant Photo"];
-                    const otherDocs = (applicant.documents || []).filter(d => !namedSlotKeywords.some(kw => d.name.toLowerCase().includes(kw.toLowerCase())));
+                    const namedSlotKeywords = ["Passport Copy", "Visa Page", "Applicant Photo", "CV"];
+                    const otherDocs = (applicant.documents || []).filter(d => {
+                      const dName = d.name.toLowerCase();
+                      const isNamed = namedSlotKeywords.some(kw => dName.includes(kw.toLowerCase()));
+                      const isArchivedCv = dName.startsWith("cv_") || dName.includes("cv_v");
+                      return !isNamed && !isArchivedCv;
+                    });
                     if (otherDocs.length === 0) {
                       return (
                         <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center">

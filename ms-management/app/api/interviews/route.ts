@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
-import { sendEmail, sendWhatsApp } from "@/lib/notifications";
+import { sendEmail, sendWhatsApp, generateEmailContent } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -168,40 +168,40 @@ export async function POST(request: Request) {
     };
 
     // Trigger real-time notifications for the scheduled interview/meeting
-    if (mappedResponse.email) {
-      const isOnline = mappedResponse.isOnline;
-      const locationInfo = isOnline 
-        ? `Mode: ${mappedResponse.mode}\nMeeting Link: ${mappedResponse.meetingLink || "To be provided"}`
-        : `Location: Physical Address / Google Maps: ${mappedResponse.locationLink || "To be provided"}`;
+    if (mappedResponse.email && data.autoEmail !== false) {
+      const templateType = mappedResponse.type === "Meeting" 
+        ? "Interview" 
+        : (mappedResponse.isOnline ? "Interview_Online" : "Interview_Physical");
 
-      const emailBody = `Dear ${mappedResponse.personName},
-
-We have scheduled a ${mappedResponse.type} with you at MS Horizon F.Z.E.
-
-Here are the details of your schedule:
-- Position/Subject: ${mappedResponse.position || "Discussion"}
-- Date & Time: ${mappedResponse.dateTime.replace("T", " ")}
-- Type: ${mappedResponse.isOnline ? "Online" : "Physical"}
-- ${locationInfo}
-- Conducted By: ${mappedResponse.conductPerson}
-
-${mappedResponse.notes ? `Additional Notes:\n${mappedResponse.notes}\n` : ""}
-If you have any questions or need to reschedule, please contact us.
-
-Best regards,
-MS Horizon F.Z.E Recruitment Team`;
+      const generated = generateEmailContent(templateType as any, {
+        applicantName: mappedResponse.personName,
+        company: company,
+        branch: branch,
+        date: mappedResponse.dateTime.replace("T", " "),
+        role: mappedResponse.position || mappedResponse.meetingType || "Assessment Sync",
+        link: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : (mappedResponse.locationLink || ""),
+        notes: mappedResponse.notes || ""
+      });
 
       sendEmail({
         to: mappedResponse.email,
-        subject: `Schedule Confirmed: ${mappedResponse.type} on ${mappedResponse.dateTime.replace("T", " ")}`,
-        body: emailBody,
+        subject: generated.subject,
+        body: generated.body,
         candidateName: mappedResponse.personName,
         company: company,
-        branch: branch
+        branch: branch,
+        templateType: templateType as any,
+        templateData: {
+          applicantName: mappedResponse.personName,
+          role: mappedResponse.position || mappedResponse.meetingType || "Assessment Sync",
+          date: mappedResponse.dateTime.replace("T", " "),
+          link: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : (mappedResponse.locationLink || ""),
+          notes: mappedResponse.notes || ""
+        }
       }).catch(err => console.error("Async interview email error:", err));
     }
 
-    if (mappedResponse.whatsapp || mappedResponse.mobile) {
+    if ((mappedResponse.whatsapp || mappedResponse.mobile) && data.autoWhatsapp !== false) {
       const waNumber = mappedResponse.whatsapp || mappedResponse.mobile;
       const isOnline = mappedResponse.isOnline;
       const locationText = isOnline 

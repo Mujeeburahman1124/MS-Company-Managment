@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search, Briefcase, Eye, Calendar, ShieldCheck, PhoneCall, Mail,
   CheckCircle, Clock, ArrowLeft, RotateCcw, Building2, UserCheck,
-  Users, AlertTriangle, Download, FileText, CalendarRange, Globe
+  Users, AlertTriangle, Download, FileText, CalendarRange, Globe,
+  Printer, LayoutGrid, List
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { useFilterStore } from "@/store/filterStore";
 import PageHeader from "@/components/shared/PageHeader";
 import { NATIONALITIES } from "@/lib/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,15 +37,38 @@ export default function TrackingPage() {
     staff
   } = useAuthStore();
 
-  const [search, setSearch] = useState("");
-  const [companyFilter, setCompanyFilter] = useState("all");
-  const [branchFilter, setBranchFilter] = useState("all");
-  const [clientCompanyFilter, setClientCompanyFilter] = useState("all");
-  const [nationalityFilter, setNationalityFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const { filters, setFilter, clearFilter } = useFilterStore();
+  const f = filters.tracking || {};
+
+  const search = f.search || "";
+  const companyFilter = f.company || "all";
+  const branchFilter = f.branch || "all";
+  const clientCompanyFilter = f.clientCompany || "all";
+  const nationalityFilter = f.nationality || "all";
+  const statusFilter = f.status || "all";
+  const startDate = f.fromDate || "";
+  const endDate = f.toDate || "";
+
   const [selectedApp, setSelectedApp] = useState<Applicant | null>(null);
+
+  // Pagination and View states
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Reset page when filters update
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    f.search,
+    f.company,
+    f.branch,
+    f.clientCompany,
+    f.nationality,
+    f.status,
+    f.fromDate,
+    f.toDate
+  ]);
 
   // Status progression validations state
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
@@ -93,6 +118,151 @@ export default function TrackingPage() {
       (a.applyingPositions && a.applyingPositions.join(", ").toLowerCase().includes(q))
     );
   }
+
+  // Derive paginated list
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+  const paginatedList = filteredList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // CSV Export
+  const exportTrackingToCSV = () => {
+    const headers = ["Candidate ID", "Full Name", "Email", "Mobile", "Nationality", "Applying Positions", "Internal Company", "Branch", "Visa Type", "Visa Expiry", "Current Status", "Client Company"];
+    const rows = filteredList.map(a => [
+      a.id,
+      a.fullName,
+      a.email || "",
+      a.mobile || "",
+      a.nationality,
+      a.applyingPositions ? a.applyingPositions.join(" | ") : "",
+      a.company || "",
+      a.branch || "",
+      a.visaType,
+      a.visaExpiry || "",
+      a.status,
+      a.clientName || ""
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `applicant_tracking_pipeline_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV export initiated");
+  };
+
+  // Printable report report print popup window
+  const printTrackingReport = () => {
+    const printWindow = window.open("", "_blank", "width=950,height=800");
+    if (!printWindow) {
+      toast.error("Popup blocker blocked the print window.");
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Applicant Pipeline Report</title>
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #334155;
+            padding: 40px;
+            font-size: 11px;
+            line-height: 1.5;
+          }
+          .header {
+            text-align: center;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+          }
+          .header h2 {
+            margin: 0;
+            font-size: 15px;
+            color: #0f172a;
+            text-transform: uppercase;
+          }
+          .header p {
+            margin: 4px 0 0;
+            font-size: 8px;
+            color: #64748b;
+            font-weight: bold;
+            letter-spacing: 1px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+          th, td {
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+          }
+          th {
+            background-color: #f8fafc;
+            font-weight: bold;
+            color: #475569;
+          }
+          tr:nth-child(even) {
+            background-color: #fafafa;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2>Applicant Pipeline Tracking Report</h2>
+          <p>MS HORIZON F.Z.E  •  Total Candidates: ${filteredList.length}  •  Report Date: ${new Date().toLocaleDateString()}</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Nationality</th>
+              <th>Positions</th>
+              <th>Internal Company</th>
+              <th>Internal Branch</th>
+              <th>Visa Type</th>
+              <th>Pipeline Stage</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredList.map(a => `
+              <tr>
+                <td>${a.id}</td>
+                <td><strong>${a.fullName}</strong></td>
+                <td>${a.nationality}</td>
+                <td>${a.applyingPositions ? a.applyingPositions.join(", ") : "N/A"}</td>
+                <td>${a.company || "-"}</td>
+                <td>${a.branch || "-"}</td>
+                <td>${a.visaType}</td>
+                <td>${a.status}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() { window.close(); }, 500);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
 
   // Statistics calculations
   const totalStaffCount = staff.filter(s => isSuperAdmin ? true : s.company === currentUser.company).length;
@@ -286,14 +456,7 @@ export default function TrackingPage() {
   };
 
   const resetFilters = () => {
-    setSearch("");
-    setCompanyFilter("all");
-    setBranchFilter("all");
-    setClientCompanyFilter("all");
-    setNationalityFilter("all");
-    setStatusFilter("all");
-    setStartDate("");
-    setEndDate("");
+    clearFilter("tracking");
     toast.success("Filters cleared");
   };
 
@@ -367,7 +530,7 @@ export default function TrackingPage() {
               <Input
                 placeholder="Search candidates..."
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={e => setFilter("tracking", { search: e.target.value, page: 1 })}
                 className="pl-9 bg-slate-50 border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400 focus:bg-white w-full"
               />
             </div>
@@ -377,11 +540,10 @@ export default function TrackingPage() {
               <select
                 value={companyFilter}
                 onChange={e => {
-                  setCompanyFilter(e.target.value);
-                  setBranchFilter("all"); // reset branch on company change
+                  setFilter("tracking", { company: e.target.value, branch: "all", page: 1 });
                 }}
                 disabled={!isSuperAdmin}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700 disabled:opacity-50"
               >
                 <option value="all">Our Company</option>
                 {ownCompanies.map(c => (
@@ -394,7 +556,7 @@ export default function TrackingPage() {
             <div className="space-y-0.5">
               <select
                 value={branchFilter}
-                onChange={e => setBranchFilter(e.target.value)}
+                onChange={e => setFilter("tracking", { branch: e.target.value, page: 1 })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
               >
                 <option value="all">All Branches</option>
@@ -411,7 +573,7 @@ export default function TrackingPage() {
             <div className="space-y-0.5">
               <select
                 value={clientCompanyFilter}
-                onChange={e => setClientCompanyFilter(e.target.value)}
+                onChange={e => setFilter("tracking", { clientCompany: e.target.value, page: 1 })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
               >
                 <option value="all">Client Company</option>
@@ -425,7 +587,7 @@ export default function TrackingPage() {
             <div className="space-y-0.5">
               <select
                 value={nationalityFilter}
-                onChange={e => setNationalityFilter(e.target.value)}
+                onChange={e => setFilter("tracking", { nationality: e.target.value, page: 1 })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
               >
                 <option value="all">Nationality</option>
@@ -439,7 +601,7 @@ export default function TrackingPage() {
             <div className="space-y-0.5">
               <select
                 value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
+                onChange={e => setFilter("tracking", { status: e.target.value, page: 1 })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
               >
                 <option value="all">Pipeline Stage</option>
@@ -454,7 +616,7 @@ export default function TrackingPage() {
               <Input
                 type="date"
                 value={startDate}
-                onChange={e => setStartDate(e.target.value)}
+                onChange={e => setFilter("tracking", { fromDate: e.target.value, page: 1 })}
                 className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400 focus:bg-white w-full px-3"
                 title="Application Date From"
               />
@@ -466,7 +628,7 @@ export default function TrackingPage() {
               <Input
                 type="date"
                 value={endDate}
-                onChange={e => setEndDate(e.target.value)}
+                onChange={e => setFilter("tracking", { toDate: e.target.value, page: 1 })}
                 className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400 focus:bg-white w-full px-3"
                 title="Application Date To"
               />
@@ -474,89 +636,274 @@ export default function TrackingPage() {
             </div>
           </div>
 
-          <div className="flex gap-2 justify-end lg:pl-3">
+          <div className="flex gap-2 justify-end lg:pl-3 flex-wrap items-center">
+            {/* View Switcher Toggle */}
+            <div className="flex bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={`rounded-lg text-xs h-8 px-3 font-bold gap-1 ${
+                  viewMode === "grid" 
+                    ? "bg-white text-slate-800 shadow-sm" 
+                    : "text-slate-500 hover:text-slate-800 bg-transparent"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Kanban
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={() => setViewMode("table")}
+                className={`rounded-lg text-xs h-8 px-3 font-bold gap-1 ${
+                  viewMode === "table" 
+                    ? "bg-white text-slate-800 shadow-sm" 
+                    : "text-slate-500 hover:text-slate-800 bg-transparent"
+                }`}
+              >
+                <List className="w-3.5 h-3.5" />
+                List Table
+              </Button>
+            </div>
+
             <Button
               variant="outline"
+              type="button"
+              onClick={exportTrackingToCSV}
+              className="text-xs h-9 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 gap-1.5 font-bold px-3 flex-shrink-0"
+              title="Export CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={printTrackingReport}
+              className="text-xs h-9 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 gap-1.5 font-bold px-3 flex-shrink-0"
+              title="Print Report"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              Print
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
               onClick={resetFilters}
-              className="text-xs h-9 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 gap-1.5 font-bold px-4 flex-shrink-0"
+              className="text-xs h-9 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 gap-1.5 font-bold px-3 flex-shrink-0"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              Reset Filters
+              Reset
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Kanban Board Container */}
-      <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-50/50">
-        <div className="flex gap-4 h-full min-w-max pb-4">
-          {(statusFilter === "all" ? STAGES : STAGES.filter(s => s === statusFilter)).map(stage => {
-            const stageApplicants = filteredList.filter(a => a.status === stage);
-            return (
-              <div key={stage}
-                onDragOver={e => e.preventDefault()}
-                onDrop={e => handleDrop(e, stage)}
-                className={`w-72 sm:w-80 flex flex-col rounded-2xl border-2 ${getColColor(stage).split(" ")[1]} bg-slate-50/30 shadow-sm h-full`}
-              >
-                <div className={`px-4 py-3 border-b border-inherit rounded-t-xl font-bold text-xs uppercase tracking-wider flex justify-between items-center ${getColColor(stage).split(" ")[0]} ${getColColor(stage).split(" ")[2]}`}>
-                  {stage}
-                  <span className="bg-white px-2 py-0.5 rounded text-[10px] shadow-sm font-extrabold">{stageApplicants.length}</span>
-                </div>
+      {viewMode === "grid" ? (
+        /* Kanban Board Container */
+        <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-50/50">
+          <div className="flex gap-4 h-full min-w-max pb-4">
+            {(statusFilter === "all" ? STAGES : STAGES.filter(s => s === statusFilter)).map(stage => {
+              const stageApplicants = filteredList.filter(a => a.status === stage);
+              return (
+                <div key={stage}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => handleDrop(e, stage)}
+                  className={`w-72 sm:w-80 flex flex-col rounded-2xl border-2 ${getColColor(stage).split(" ")[1]} bg-slate-50/30 shadow-sm h-full`}
+                >
+                  <div className={`px-4 py-3 border-b border-inherit rounded-t-xl font-bold text-xs uppercase tracking-wider flex justify-between items-center ${getColColor(stage).split(" ")[0]} ${getColColor(stage).split(" ")[2]}`}>
+                    {stage}
+                    <span className="bg-white px-2 py-0.5 rounded text-[10px] shadow-sm font-extrabold">{stageApplicants.length}</span>
+                  </div>
 
-                <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                  {stageApplicants.map(app => (
-                    <Card key={app.id}
-                      draggable
-                      onDragStart={e => e.dataTransfer.setData("appId", app.id)}
-                      className="p-3.5 cursor-grab active:cursor-grabbing border-slate-100 shadow-sm hover:shadow-md hover:border-blue-300 transition-all bg-white rounded-2xl flex flex-col gap-2.5"
-                    >
-                      <div className="flex gap-3">
-                        <Avatar className="w-10 h-10 rounded-xl border border-slate-100 flex-shrink-0 shadow-sm">
-                          {app.photo ? (
-                            <AvatarImage src={app.photo} className="object-cover rounded-xl" />
-                          ) : (
-                            <AvatarFallback className="rounded-xl bg-blue-50 text-[10px] font-bold text-blue-700">
-                              {app.fullName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div className="min-w-0 flex-1">
-                          <Link href={`/applicants/${app.id}`} className="text-xs font-bold text-slate-800 hover:text-blue-600 block truncate" title={app.fullName}>
-                            {app.fullName}
-                          </Link>
-                          <div className="text-[10px] font-semibold text-slate-400 font-mono mt-0.5">{app.id} · {app.branch}</div>
-                          <div className="text-[9px] font-bold text-slate-500 flex gap-1 items-center mt-1 truncate">
-                            <Briefcase className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                            <span className="truncate">{app.applyingPositions ? app.applyingPositions.join(", ") : "N/A"}</span>
+                  <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                    {stageApplicants.map(app => (
+                      <Card key={app.id}
+                        draggable
+                        onDragStart={e => e.dataTransfer.setData("appId", app.id)}
+                        className="p-3.5 cursor-grab active:cursor-grabbing border-slate-100 shadow-sm hover:shadow-md hover:border-blue-300 transition-all bg-white rounded-2xl flex flex-col gap-2.5"
+                      >
+                        <div className="flex gap-3">
+                          <Avatar className="w-10 h-10 rounded-xl border border-slate-100 flex-shrink-0 shadow-sm">
+                            {app.photo ? (
+                              <AvatarImage src={app.photo} className="object-cover rounded-xl" />
+                            ) : (
+                              <AvatarFallback className="rounded-xl bg-blue-50 text-[10px] font-bold text-blue-700">
+                                {app.fullName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <Link href={`/applicants/${app.id}`} className="text-xs font-bold text-slate-800 hover:text-blue-600 block truncate" title={app.fullName}>
+                              {app.fullName}
+                            </Link>
+                            <div className="text-[10px] font-semibold text-slate-400 font-mono mt-0.5">{app.id} · {app.branch}</div>
+                            <div className="text-[9px] font-bold text-slate-500 flex gap-1 items-center mt-1 truncate">
+                              <Briefcase className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                              <span className="truncate">{app.applyingPositions ? app.applyingPositions.join(", ") : "N/A"}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex gap-1.5 flex-wrap pt-0.5">
-                        <span className="text-[8px] font-extrabold uppercase bg-slate-50 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded-md">{app.nationality}</span>
-                        <span className="text-[8px] font-extrabold uppercase bg-slate-50 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded-md">{app.visaType}</span>
-                      </div>
+                        <div className="flex gap-1.5 flex-wrap pt-0.5">
+                          <span className="text-[8px] font-extrabold uppercase bg-slate-50 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded-md">{app.nationality}</span>
+                          <span className="text-[8px] font-extrabold uppercase bg-slate-50 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded-md">{app.visaType}</span>
+                        </div>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedApp(app)}
-                        className="w-full text-[9px] font-bold h-7 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-blue-600 gap-1 mt-1"
-                      >
-                        <Eye className="w-3 h-3" /> Track Details
-                      </Button>
-                    </Card>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedApp(app)}
+                          className="w-full text-[9px] font-bold h-7 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-blue-600 gap-1 mt-1"
+                        >
+                          <Eye className="w-3 h-3" /> Track Details
+                        </Button>
+                      </Card>
+                    ))}
+
+                    {stageApplicants.length === 0 && (
+                      <div className="text-center py-12 text-[10px] text-slate-400 italic">No candidates in this stage</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        /* Table View Container */
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-slate-50/50 flex flex-col justify-between">
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex-1 mb-4 flex flex-col">
+            <div className="overflow-x-auto flex-1">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-[10px] uppercase tracking-wider font-extrabold text-slate-500">
+                    <th className="p-3.5 pl-6">Candidate</th>
+                    <th className="p-3.5">Positions</th>
+                    <th className="p-3.5">Nationality</th>
+                    <th className="p-3.5">Visa Category</th>
+                    <th className="p-3.5">Branch</th>
+                    <th className="p-3.5">Pipeline Stage</th>
+                    <th className="p-3.5">Client Company</th>
+                    <th className="p-3.5 pr-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
+                  {paginatedList.map(app => (
+                    <tr key={app.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-3.5 pl-6">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-8 h-8 rounded-lg border border-slate-100 shadow-sm flex-shrink-0">
+                            {app.photo ? (
+                              <AvatarImage src={app.photo} className="object-cover rounded-lg" />
+                            ) : (
+                              <AvatarFallback className="rounded-lg bg-blue-50 text-[9px] font-black text-blue-700">
+                                {app.fullName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="min-w-0">
+                            <Link href={`/applicants/${app.id}`} className="font-bold text-slate-900 hover:text-blue-600 truncate block max-w-[150px]">
+                              {app.fullName}
+                            </Link>
+                            <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{app.id}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3.5">
+                        <span className="text-[10px] text-slate-600 truncate max-w-[130px] block">
+                          {app.applyingPositions ? app.applyingPositions.join(", ") : "N/A"}
+                        </span>
+                      </td>
+                      <td className="p-3.5">{app.nationality}</td>
+                      <td className="p-3.5">
+                        <span className="bg-slate-100 text-slate-600 rounded px-2 py-0.5 text-[10px]">{app.visaType}</span>
+                      </td>
+                      <td className="p-3.5">
+                        <span className="text-slate-500">{app.branch}</span>
+                      </td>
+                      <td className="p-3.5">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${getColColor(app.status)}`}>
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="p-3.5">
+                        <span className="font-bold text-slate-800">{app.clientName || "-"}</span>
+                      </td>
+                      <td className="p-3.5 pr-6 text-right">
+                        <div className="flex justify-end gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedApp(app)}
+                            className="text-[10px] font-bold h-7 border border-slate-200 rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-blue-600 gap-1"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> Track Details
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
                   ))}
-
-                  {stageApplicants.length === 0 && (
-                    <div className="text-center py-12 text-[10px] text-slate-400 italic">No candidates in this stage</div>
+                  {paginatedList.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="text-center py-20 text-xs text-slate-400 italic">
+                        No candidates matching active filters found.
+                      </td>
+                    </tr>
                   )}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-slate-200 p-4 bg-slate-50/50 flex-shrink-0">
+                <span className="text-xs text-slate-500 font-semibold">
+                  Showing <strong className="text-slate-800">{((currentPage - 1) * itemsPerPage) + 1}</strong> to <strong className="text-slate-800">{Math.min(currentPage * itemsPerPage, filteredList.length)}</strong> of <strong className="text-slate-800">{filteredList.length}</strong> candidates
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className="rounded-lg text-xs h-8 border-slate-200"
+                  >
+                    Previous
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                    <Button
+                      key={p}
+                      variant={currentPage === p ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(p)}
+                      className={`rounded-lg text-xs w-8 h-8 font-bold ${
+                        currentPage === p 
+                          ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                          : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      {p}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className="rounded-lg text-xs h-8 border-slate-200"
+                  >
+                    Next
+                  </Button>
                 </div>
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Enhanced Linked Info Tracking Dialog (Applicant Tracker Core Feature) */}
       <Dialog open={!!selectedApp} onOpenChange={open => !open && setSelectedApp(null)}>

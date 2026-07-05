@@ -6,7 +6,20 @@ export async function GET() {
   try {
     const user = await getSessionUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const companies = await prisma.company.findMany({
+        where: { status: "Active" },
+        select: {
+          id: true,
+          name: true,
+          logo: true,
+          status: true,
+          email: true,
+          telephone: true,
+          whatsapp: true
+        },
+        orderBy: { name: "asc" }
+      });
+      return NextResponse.json(companies);
     }
 
     // Apply tenancy scoping

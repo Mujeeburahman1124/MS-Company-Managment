@@ -21,9 +21,21 @@ function ApplyContent() {
   const { applicants, addApplicant, interviews, addActivityLog } = useAuthStore();
   const [activeTab, setActiveTab] = useState<"apply" | "track">("apply");
   const searchParams = useSearchParams();
+  const [ownCompanies, setOwnCompanies] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
   const [clientCompanies, setClientCompanies] = useState<any[]>([]);
 
   useEffect(() => {
+    fetch("/api/own-companies")
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setOwnCompanies(data.filter((c: any) => c.status === "Active")))
+      .catch(err => console.error("Error own-companies:", err));
+
+    fetch("/api/branches")
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setBranches(data.filter((b: any) => b.status === "Active")))
+      .catch(err => console.error("Error branches:", err));
+
     fetch("/api/companies")
       .then(res => res.ok ? res.json() : [])
       .then(data => setClientCompanies(data.filter((c: any) => c.status === "Active")))
@@ -47,11 +59,8 @@ function ApplyContent() {
     passportExpiry: "",
     passportNumber: "",
     photo: null as string | null,
-    clientName: "",
-    clientPhoto: null as string | null,
-    clientMobile: "",
-    clientWhatsapp: "",
-    clientEmail: "",
+    company: "",
+    branch: ""
   });
 
   const [positionInput, setPositionInput] = useState("");
@@ -119,6 +128,35 @@ function ApplyContent() {
     }
   };
 
+  const handleCVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const allowedExtensions = ["pdf", "doc", "docx"];
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      if (!extension || !allowedExtensions.includes(extension)) {
+        toast.error("Invalid file type. Only PDF, DOC, and DOCX formats are allowed for CV.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File is too large. CV size must be less than 5MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploads(prev => ({
+          ...prev,
+          CV: {
+            name: file.name,
+            date: new Date().toISOString().slice(0, 10),
+            url: reader.result as string,
+          }
+        }));
+        toast.success("CV / Resume uploaded successfully");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -177,10 +215,10 @@ function ApplyContent() {
     }
   };
 
-  const handleApplySubmit = (e: React.FormEvent) => {
+  const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.fullName || !form.email || form.applyingPositions.length === 0 || !form.clientName) {
-      toast.error("Please fill in your name, email, applying positions, and select the Client Company you are applying for.");
+    if (!form.fullName || !form.email || form.applyingPositions.length === 0 || !form.company || !form.branch) {
+      toast.error("Please fill in your name, email, applying positions, and select the Company and Branch you are applying to.");
       return;
     }
 
@@ -188,11 +226,11 @@ function ApplyContent() {
     const newApplicant = {
       id: `APP${Math.floor(100 + Math.random() * 900)}`,
       photo: form.photo,
-      clientName: form.clientName,
-      clientPhoto: form.clientPhoto,
-      clientMobile: form.clientMobile,
-      clientWhatsapp: form.clientWhatsapp,
-      clientEmail: form.clientEmail,
+      clientName: "-",
+      clientPhoto: null,
+      clientMobile: "",
+      clientWhatsapp: "",
+      clientEmail: "",
       applicationDate: new Date().toISOString().slice(0, 10),
       fullName: form.fullName,
       dateOfBirth: form.dateOfBirth,
@@ -211,8 +249,8 @@ function ApplyContent() {
       passportNumber: form.passportNumber,
       status: "Pending" as const,
       trackingCode: trackingCode,
-      company: "Not Placed",
-      branch: "Not Placed",
+      company: form.company,
+      branch: form.branch,
       createdBy: form.fullName,
       createdAt: new Date().toISOString().replace("T", " ").slice(0, 19),
       documents: [
@@ -237,49 +275,50 @@ function ApplyContent() {
       ]
     };
 
-    addApplicant(newApplicant);
-    
-    // Add activity log
-    addActivityLog({
-      id: `LOG-${Date.now()}`,
-      dateTime: new Date().toISOString().replace("T"," ").slice(0,19),
-      userName: form.fullName,
-      role: "Applicant",
-      company: "System",
-      branch: "Main",
-      action: "Created",
-      module: "Applicant Portal",
-      oldValue: null,
-      newValue: `New application registered online. Code: ${trackingCode}`,
-      ipAddress: "127.0.0.1"
-    });
+    try {
+      await addApplicant(newApplicant);
+      
+      // Add activity log
+      addActivityLog({
+        id: `LOG-${Date.now()}`,
+        dateTime: new Date().toISOString().replace("T"," ").slice(0,19),
+        userName: form.fullName,
+        role: "Applicant",
+        company: form.company,
+        branch: form.branch,
+        action: "Created",
+        module: "Applicant Portal",
+        oldValue: null,
+        newValue: `New application registered online. Code: ${trackingCode}`,
+        ipAddress: "127.0.0.1"
+      });
 
-    setGeneratedCode(trackingCode);
-    setForm({
-      fullName: "",
-      dateOfBirth: "",
-      email: "",
-      mobile: "",
-      whatsapp: "",
-      nationality: "India",
-      currentCountry: "UAE",
-      applyingPositions: [],
-      salaryExpectation: "",
-      applyCountry: "UAE",
-      visaType: "Visit",
-      visaExpiry: "",
-      passportExpiry: "",
-      passportNumber: "",
-      photo: null,
-      clientName: "",
-      clientPhoto: null,
-      clientMobile: "",
-      clientWhatsapp: "",
-      clientEmail: "",
-    });
-    setUploads({});
-    setCustomDocs([]);
-    toast.success("Application Submitted Successfully!");
+      setGeneratedCode(trackingCode);
+      setForm({
+        fullName: "",
+        dateOfBirth: "",
+        email: "",
+        mobile: "",
+        whatsapp: "",
+        nationality: "India",
+        currentCountry: "UAE",
+        applyingPositions: [],
+        salaryExpectation: "",
+        applyCountry: "UAE",
+        visaType: "Visit",
+        visaExpiry: "",
+        passportExpiry: "",
+        passportNumber: "",
+        photo: null,
+        company: "",
+        branch: ""
+      });
+      setUploads({});
+      setCustomDocs([]);
+      toast.success("Application Submitted Successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit application");
+    }
   };
 
   const handleTrackSearch = async (e: React.FormEvent) => {
@@ -538,7 +577,7 @@ function ApplyContent() {
 
                 <div>
                   <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 uppercase tracking-wider">Upload Documents</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-3">
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 hover:border-blue-400 transition-colors relative cursor-pointer min-h-24">
                       <Input type="file" accept=".pdf,image/*" onChange={e => handleFileUpload("PassportCopy", e)} className="absolute inset-0 opacity-0 cursor-pointer h-full" />
                       <FileText className="w-6 h-6 text-slate-400" />
@@ -563,6 +602,14 @@ function ApplyContent() {
                         <div className="text-[8px] font-semibold text-slate-400 mt-0.5">{uploads.ProfilePhoto ? uploads.ProfilePhoto.name : "Click to select"}</div>
                       </div>
                     </div>
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 hover:border-blue-400 transition-colors relative cursor-pointer min-h-24">
+                      <Input type="file" accept=".pdf,.doc,.docx" onChange={handleCVUpload} className="absolute inset-0 opacity-0 cursor-pointer h-full" />
+                      <FileText className="w-6 h-6 text-slate-400" />
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-700">CV / Resume (PDF/DOCX)</div>
+                        <div className="text-[8px] font-semibold text-slate-400 mt-0.5">{uploads.CV ? uploads.CV.name : "Click to select (Max 5MB)"}</div>
+                      </div>
+                    </div>
                   </div>
                   {/* Multiple custom uploads */}
                   <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 hover:border-blue-400 transition-colors relative cursor-pointer min-h-24 mt-4">
@@ -576,56 +623,54 @@ function ApplyContent() {
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 uppercase tracking-wider">Client / Applicant Contact Details</h3>
+                  <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 uppercase tracking-wider">MS Company Assignment</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3">
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Applying for Client Company *</Label>
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select Our Company *</Label>
                       <Select
-                        value={form.clientName}
+                        value={form.company}
                         onValueChange={(val) => {
-                          const matched = clientCompanies.find(c => c.name === val);
                           setForm(f => ({
                             ...f,
-                            clientName: val || "",
-                            clientEmail: matched?.email || "",
-                            clientMobile: matched?.telephone || "",
-                            clientWhatsapp: matched?.whatsapp || matched?.telephone || "",
+                            company: val || "",
+                            branch: "" // Reset branch when company changes
                           }));
                         }}
                       >
                         <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10 focus:bg-white text-left font-normal text-slate-700">
-                          <SelectValue placeholder="Select Client Company *" />
+                          <SelectValue placeholder="Select Our Company *" />
                         </SelectTrigger>
                         <SelectContent className="bg-white rounded-xl text-xs">
-                          {clientCompanies.map(c => (
+                          {ownCompanies.map(c => (
                             <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
+
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Client Email Address</Label>
-                      <Input type="email" value={form.clientEmail} onChange={e => setForm(f => ({ ...f, clientEmail: e.target.value }))} placeholder="hr@company.com" className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10 focus:bg-white" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Client Mobile Number</Label>
-                      <Input value={form.clientMobile} onChange={e => setForm(f => ({ ...f, clientMobile: e.target.value }))} placeholder="+971 50 000 0000" className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10 focus:bg-white" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Client WhatsApp Number</Label>
-                      <Input value={form.clientWhatsapp} onChange={e => setForm(f => ({ ...f, clientWhatsapp: e.target.value }))} placeholder="+971 50 000 0000" className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10 focus:bg-white" />
-                    </div>
-                    <div className="space-y-1.5 md:col-span-2">
-                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Client Representative Photo</Label>
-                      <div className="flex gap-2 items-center">
-                        <Input type="file" accept="image/*" onChange={handleClientPhotoUpload} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10 focus:bg-white flex-1" />
-                        {form.clientPhoto && (
-                          <Avatar className="w-10 h-10 border border-slate-100 rounded-xl">
-                            <AvatarImage src={form.clientPhoto} className="object-cover rounded-xl" />
-                            <AvatarFallback className="rounded-xl text-[10px]">Client</AvatarFallback>
-                          </Avatar>
-                        )}
-                      </div>
+                      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select Branch *</Label>
+                      <Select
+                        value={form.branch}
+                        onValueChange={(val) => {
+                          setForm(f => ({
+                            ...f,
+                            branch: val || ""
+                          }));
+                        }}
+                        disabled={!form.company}
+                      >
+                        <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10 focus:bg-white text-left font-normal text-slate-700 disabled:opacity-50">
+                          <SelectValue placeholder={form.company ? "Select Branch *" : "Choose Company First"} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white rounded-xl text-xs">
+                          {branches
+                            .filter(b => b.company === form.company)
+                            .map(b => (
+                              <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>

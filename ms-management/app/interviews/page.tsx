@@ -27,6 +27,7 @@ export default function InterviewsPage() {
   const { currentRole, currentUser, interviews, applicants, companies, branches, addInterview, updateInterview, deleteInterview, addSentEmail, addSentWhatsApp } = useAuthStore();
   const { filters } = useFilterStore();
   const [modal, setModal] = useState(false);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [editInt, setEditInt] = useState<Interview | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedGreetingCard, setSelectedGreetingCard] = useState<Interview | null>(null);
@@ -132,6 +133,16 @@ HR Department`;
   if (f.search) { const q = f.search.toLowerCase(); list = list.filter(i => (i.personName ?? "").toLowerCase().includes(q) || (i.conductPerson ?? "").toLowerCase().includes(q)); }
   if (f.status && f.status !== "all") list = list.filter(i => i.status === f.status);
   if (f.company && f.company !== "all") list = list.filter(i => i.company === f.company);
+  if (f.branch && f.branch !== "all") list = list.filter(i => i.branch === f.branch);
+  if (f.nationality && f.nationality !== "all") list = list.filter(i => i.nationality === f.nationality);
+  if (f.assignedTo && f.assignedTo !== "all") {
+    const cond = f.assignedTo.toLowerCase();
+    list = list.filter(i => (i.conductPerson ?? "").toLowerCase().includes(cond));
+  }
+  if (f.interviewType && f.interviewType !== "all") {
+    const isOnlineTarget = f.interviewType === "Online";
+    list = list.filter(i => i.isOnline === isOnlineTarget);
+  }
   if (f.fromDate) list = list.filter(i => i.dateTime.slice(0,10) >= f.fromDate);
   if (f.toDate) list = list.filter(i => i.dateTime.slice(0,10) <= f.toDate);
 
@@ -151,8 +162,8 @@ HR Department`;
     }
     const flag = NATIONALITIES.find(n => n.name === form.nationality)?.flag || "🏳️";
     const onlineState = form.isOnline;
-    const locationLink = form.isOnline ? null : form.locationLink || null;
-    const meetingLink = form.meetingLink || null;
+    const locationLink = form.isOnline ? undefined : form.locationLink || undefined;
+    const meetingLink = form.meetingLink || undefined;
 
     if (editInt) {
       updateInterview({
@@ -176,33 +187,11 @@ HR Department`;
         status: "Scheduled",
         company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
         branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
-        createdBy: currentUser.name,
-        createdAt: new Date().toISOString().slice(0,10),
+        createdBy: currentUser.name || "System",
+        createdAt: new Date().toISOString().slice(0, 10),
       });
-
+      
       // Send auto invites if configured
-      if (form.autoEmail && form.email) {
-        addSentEmail({
-          id: `EML-${Math.floor(100+Math.random()*900)}`,
-          to: form.email,
-          subject: "Will be replaced by template backend",
-          body: "Will be replaced by template backend",
-          sentAt: new Date().toISOString().slice(0, 16).replace("T", " "),
-          company: form.company || (currentUser.company === "System" ? "Alpha Solutions LLC" : currentUser.company),
-          branch: form.branch || (currentUser.branch === "All" ? "Main Branch" : currentUser.branch),
-          candidateName: form.personName,
-          templateType: "Interview",
-          templateData: {
-            applicantName: form.personName,
-            role: form.type === "Interview" ? form.position : form.meetingType,
-            date: form.dateTime.replace("T", " "),
-            link: form.meetingLink || form.locationLink,
-            notes: form.notes || getEmailTemplateBody(emailTemplate, form)
-          }
-        });
-        toast.success("Auto invite email sent successfully");
-      }
-
       if (form.autoWhatsapp && form.whatsapp) {
         addSentWhatsApp({
           id: `WHA-${Math.floor(100+Math.random()*900)}`,
@@ -270,7 +259,27 @@ HR Department`;
       <PageHeader title="Interviews & Meetings" subtitle="Schedule and manage all interviews and team meetings"
         actions={<Button onClick={() => { setEditInt(null); setForm({ applicantId:"", type:"Interview", conductPerson:currentUser.name, personName:"", mobile:"", whatsapp:"", email:"", nationality:"India", position:"", meetingType:"", isOnline:true, dateTime:"", mode:"Zoom", meetingLink:"", locationLink:"", notes:"", company: currentUser.company === "System" ? "" : currentUser.company, branch: currentUser.branch === "All" ? "" : currentUser.branch, autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5 shadow-sm"><Plus className="w-4 h-4"/>Schedule</Button>}
       />
-      <FilterBar moduleKey="interviews" statusOptions={["Scheduled","Completed","Cancelled","Rescheduled"]} onExport={() => { exportToCSV(list.map(i=>({ID:i.id,Type:i.type,Person:i.personName,DateTime:i.dateTime,Mode:i.mode,Status:i.status})),"interviews"); toast.success("Exported"); }} />
+      <FilterBar 
+        moduleKey="interviews" 
+        statusOptions={["Scheduled","Completed","Cancelled","Rescheduled"]} 
+        showNationality={true}
+        showAssignee={true}
+        onExport={() => { 
+          exportToCSV(list.map(i=>({
+            ID: i.id,
+            Type: i.type,
+            Person: i.personName,
+            DateTime: i.dateTime,
+            Mode: i.mode,
+            Status: i.status,
+            Conductor: i.conductPerson,
+            Nationality: i.nationality,
+            Company: i.company,
+            Branch: i.branch
+          })), "interviews"); 
+          toast.success("Exported"); 
+        }} 
+      />
 
       <div className="flex-1 p-4 md:p-6 overflow-y-auto">
         {paginated.length === 0 ? (
@@ -659,10 +668,122 @@ HR Department`;
             </div>
             
             <DialogFooter className="p-4 px-6 border-t border-slate-100 bg-slate-50/50 flex gap-2 justify-end flex-shrink-0">
+              {form.email && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setShowEmailPreview(true)} 
+                  className="text-xs rounded-xl px-4 h-9 border-slate-200 gap-1.5 mr-auto font-bold"
+                >
+                  <Mail className="w-3.5 h-3.5" /> Preview Email Invite
+                </Button>
+              )}
               <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9">{editInt ? "Update" : "Schedule"}</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Live Email Invitation Preview Modal */}
+      <Dialog open={showEmailPreview} onOpenChange={setShowEmailPreview}>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl w-[95vw] overflow-hidden flex flex-col">
+          <DialogHeader className="p-6 pb-4 border-b border-slate-100 flex-shrink-0">
+            <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <Mail className="w-5 h-5 text-blue-600" /> Live Invitation Email Preview
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
+              Review how the candidate's invitation email looks before scheduling.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 p-6 overflow-y-auto bg-slate-50 space-y-4 font-sans max-h-[60vh]">
+            <div className="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm space-y-3.5 text-xs text-slate-700">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <span className="font-bold text-slate-400 w-16">To:</span>
+                <span className="font-bold text-slate-800 flex-1 truncate">{form.email || "[Candidate Email Not Provided]"}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <span className="font-bold text-slate-400 w-16">From:</span>
+                <span className="font-bold text-slate-800 flex-1 truncate">MS Horizon F.Z.E HR Support</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <span className="font-bold text-slate-400 w-16">Subject:</span>
+                <span className="font-black text-blue-600 flex-1">
+                  {form.type === "Meeting" 
+                    ? `Initial Interview Invitation: ${form.position || form.meetingType || "Discussion"} - ${form.personName || "Candidate"}`
+                    : form.isOnline 
+                    ? `Online Interview Invitation: ${form.position || "Discussion"} - ${form.personName || "Candidate"}`
+                    : `Office Interview Invitation: ${form.position || "Discussion"} - ${form.personName || "Candidate"}`}
+                </span>
+              </div>
+
+              <div className="mt-4 border border-slate-150 rounded-xl overflow-hidden shadow-xs">
+                <div className={`p-5 text-center text-white font-bold bg-gradient-to-r ${
+                  form.type === "Meeting"
+                    ? "from-slate-800 to-blue-600"
+                    : form.isOnline 
+                    ? "from-teal-800 to-teal-600" 
+                    : "from-amber-800 to-amber-600"
+                }`}>
+                  <div className="text-sm font-extrabold tracking-wide">MS HORIZON F.Z.E</div>
+                  <div className="text-[10px] text-white/80 font-medium mt-0.5">
+                    {form.type === "Meeting" ? "Initial Screen Sync" : form.isOnline ? "Virtual Interview Portal" : "On-site Interview Assessment"}
+                  </div>
+                </div>
+
+                <div className="p-6 bg-white space-y-4 text-[11px] leading-relaxed text-slate-600">
+                  <p>Dear <strong className="text-slate-800">{form.personName || "[Candidate Name]"}</strong>,</p>
+                  
+                  {form.type === "Meeting" ? (
+                    <p>We are pleased to invite you for an Initial screening interview for the position of <strong>{form.position || form.meetingType || "Discussion"}</strong> at MS Horizon.</p>
+                  ) : form.isOnline ? (
+                    <p>We are pleased to invite you for an Online Virtual Interview for the position of <strong>{form.position || "Discussion"}</strong> at MS Horizon.</p>
+                  ) : (
+                    <p>We are pleased to invite you for an In-person/Physical Interview for the position of <strong>{form.position || "Discussion"}</strong> at MS Horizon.</p>
+                  )}
+
+                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-2">
+                    <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                      <span className="font-bold text-slate-400">Date & Time:</span>
+                      <strong className="text-slate-800">{form.dateTime ? form.dateTime.replace("T", " ") : "TBD"}</strong>
+                    </div>
+                    {form.isOnline ? (
+                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                        <span className="font-bold text-slate-400">Platform Link:</span>
+                        <strong className="text-blue-600 truncate max-w-[250px]">{form.meetingLink || "To be provided"}</strong>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between border-b border-slate-100/50 pb-1.5">
+                        <span className="font-bold text-slate-400">Office Location:</span>
+                        <strong className="text-slate-800 truncate max-w-[250px]">{form.locationLink || "To be provided"}</strong>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="font-bold text-slate-400">Conductor:</span>
+                      <strong className="text-slate-800">{form.conductPerson || "HR Team"}</strong>
+                    </div>
+                  </div>
+
+                  {form.notes && (
+                    <div className="space-y-1">
+                      <strong className="text-[10px] uppercase text-slate-400 block tracking-wider">Additional Instructions / Notes:</strong>
+                      <p className="whitespace-pre-wrap italic bg-slate-50 p-3 rounded-lg border border-slate-100">"{form.notes}"</p>
+                    </div>
+                  )}
+
+                  <p>If you have any questions or need to reschedule, please contact our coordinator.</p>
+                  <p>Best regards,<br/><strong className="text-slate-800">MS Horizon F.Z.E HR Team</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="p-4 px-6 border-t border-slate-100 bg-slate-50/50 flex justify-end flex-shrink-0">
+            <Button onClick={() => setShowEmailPreview(false)} className="bg-slate-900 text-white rounded-xl text-xs font-bold px-5 h-9">
+              Close Preview
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

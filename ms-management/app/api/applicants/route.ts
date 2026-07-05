@@ -61,9 +61,21 @@ export async function POST(request: Request) {
 
     // Tenancy Check: only if session exists
     if (!user) {
-      // Guest registering via public portal
-      if (data.company !== "Not Placed" || data.branch !== "Not Placed") {
-        return NextResponse.json({ error: "Unauthorized: External registration must be 'Not Placed'" }, { status: 401 });
+      // Guest registering via public portal - validate selected company and branch
+      if (!data.company || !data.branch) {
+        return NextResponse.json({ error: "Company and branch selection is required for registration." }, { status: 400 });
+      }
+      const activeComp = await prisma.internalCompany.findFirst({
+        where: { name: data.company, status: "Active" }
+      });
+      if (!activeComp) {
+        return NextResponse.json({ error: "The selected company is invalid or inactive." }, { status: 400 });
+      }
+      const activeBranch = await prisma.branch.findFirst({
+        where: { name: data.branch, company: data.company, status: "Active" }
+      });
+      if (!activeBranch) {
+        return NextResponse.json({ error: "The selected branch is invalid or inactive." }, { status: 400 });
       }
     } else {
       if (user.role !== "Super Admin") {
@@ -73,6 +85,31 @@ export async function POST(request: Request) {
         if (user.role === "Branch Admin" && data.branch !== user.branch) {
           return NextResponse.json({ error: "Cannot create applicant for another branch" }, { status: 403 });
         }
+      }
+    }
+
+    // Validate passport uniqueness in Staff and Applicant tables
+    if (data.passportNumber && data.passportNumber.trim() !== "") {
+      const passportTrimmed = data.passportNumber.trim();
+      
+      const existingStaffPassport = await prisma.staff.findFirst({
+        where: { passportNumber: { equals: passportTrimmed, mode: 'insensitive' } }
+      });
+      if (existingStaffPassport) {
+        return NextResponse.json(
+          { error: `Passport number (${passportTrimmed}) is already registered for staff member ${existingStaffPassport.name}.` },
+          { status: 400 }
+        );
+      }
+
+      const existingAppPassport = await prisma.applicant.findFirst({
+        where: { passportNumber: { equals: passportTrimmed, mode: 'insensitive' } }
+      });
+      if (existingAppPassport) {
+        return NextResponse.json(
+          { error: `Passport number (${passportTrimmed}) is already registered for applicant ${existingAppPassport.fullName}.` },
+          { status: 400 }
+        );
       }
     }
 

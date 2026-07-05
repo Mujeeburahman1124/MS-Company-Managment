@@ -234,6 +234,28 @@ export default function AdvancedFilter({
         </div>
       )}
 
+      {/* 6.5. Interview Type (For Interviews module only) */}
+      {moduleKey === "interviews" && (
+        <div className="space-y-1">
+          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Interview Type
+          </Label>
+          <Select
+            value={currentFilters.interviewType || "all"}
+            onValueChange={(val) => setFilter(moduleKey, { interviewType: val || "", page: 1 })}
+          >
+            <SelectTrigger className="bg-white border-slate-200 rounded-xl text-xs h-9">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border-slate-100 rounded-xl text-xs">
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="Online">Online</SelectItem>
+              <SelectItem value="Physical">Physical</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {/* 7. From Date */}
       <div className="space-y-1">
         <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">

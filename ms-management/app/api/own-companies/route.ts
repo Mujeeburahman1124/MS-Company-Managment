@@ -6,7 +6,17 @@ export async function GET() {
   try {
     const user = await getSessionUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const ownCompanies = await prisma.internalCompany.findMany({
+        where: { status: "Active" },
+        select: {
+          id: true,
+          name: true,
+          logo: true,
+          status: true
+        },
+        orderBy: { name: "asc" }
+      });
+      return NextResponse.json(ownCompanies);
     }
 
     const ownCompanies = await prisma.internalCompany.findMany({

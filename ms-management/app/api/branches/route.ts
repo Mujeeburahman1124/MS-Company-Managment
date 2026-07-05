@@ -6,7 +6,18 @@ export async function GET() {
   try {
     const user = await getSessionUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const branches = await prisma.branch.findMany({
+        where: { status: "Active" },
+        select: {
+          id: true,
+          name: true,
+          company: true,
+          companyId: true,
+          status: true
+        },
+        orderBy: { name: "asc" }
+      });
+      return NextResponse.json(branches);
     }
 
     const filter = getTenantScopeFilter(user, "company", "name");

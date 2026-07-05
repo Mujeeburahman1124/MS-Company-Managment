@@ -229,13 +229,25 @@ Best regards,
 ${mappedResponse.company} Recruitment Team`;
       }
 
+      let templateType: any = "Interview";
+      if (data.status === "Cancelled") {
+        templateType = "Visa"; // Red banner
+      } else if (data.status === "Completed") {
+        templateType = "Offer"; // Green banner
+      } else if (mappedResponse.isOnline) {
+        templateType = "Interview_Online"; // Teal banner
+      } else {
+        templateType = "Interview_Physical"; // Amber/Gold banner
+      }
+
       sendEmail({
         to: targetEmail,
         subject,
         body,
         candidateName: mappedResponse.personName,
         company: mappedResponse.company,
-        branch: mappedResponse.branch
+        branch: mappedResponse.branch,
+        templateType: templateType
       }).catch(err => console.error("Async PUT interview email error:", err));
     }
 

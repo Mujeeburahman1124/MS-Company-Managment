@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard, Users, Briefcase, Clock, ClipboardList, DollarSign,
-    Calendar, Car, FileText, Settings, ShieldCheck
+    Calendar, Car, FileText, Settings, ShieldCheck, FileCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/authStore';
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Applicants', href: '/applicants', icon: Users, module: 'applicants' },
+    { name: 'Placement Agreements', href: '/placement', icon: FileCheck, module: 'placement' },
     { name: 'Staff Management', href: '/staff', icon: Briefcase, module: 'staff' },
     { name: 'Shift Management', href: '/shifts', icon: Clock, module: 'staff' },
     { name: 'Attendance', href: '/attendance', icon: ClipboardList, module: 'attendance' },
