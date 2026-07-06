@@ -1,6 +1,3 @@
 {
-  "buildCommand": "cd ms-management && npm install && npm run build",
-  "outputDirectory": "ms-management/.next",
-  "installCommand": "echo 'skip root install'",
   "framework": "nextjs"
 }
