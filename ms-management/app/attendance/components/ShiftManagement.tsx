@@ -144,13 +144,13 @@ export default function ShiftManagement() {
       </div>
 
       <Dialog open={modal} onOpenChange={open => { setModal(open); if (!open) resetForm(); }}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <DialogHeader>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">{form.id ? "Edit Shift" : "Create Shift"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Configure standard working hours and grace periods.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
               {isSuperAdmin && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
@@ -230,7 +230,7 @@ export default function ShiftManagement() {
                 <Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className="bg-white border-slate-200 rounded-xl text-xs h-9" placeholder="Optional notes about this shift" />
               </div>
             </div>
-            <DialogFooter className="flex gap-2 justify-end pt-2">
+            <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4">Cancel</Button>
               <Button type="submit" disabled={submitting} className="bg-blue-600 text-white font-bold rounded-xl text-xs px-5 h-10">
                 {submitting ? "Saving..." : "Save Shift"}

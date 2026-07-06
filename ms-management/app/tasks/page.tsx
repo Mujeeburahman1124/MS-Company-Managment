@@ -573,13 +573,13 @@ export default function TasksPage() {
       {view === "table" && <Pagination moduleKey="tasks" totalItems={totalItems} />}
 
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <DialogHeader>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">{editTask ? "Edit Task" : "Create New Task"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Assign the task with specific start and deadline dates.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Task Title <span className="text-rose-500">*</span></Label>
                 <Input required value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" placeholder="e.g. Process applicant visa" />
@@ -813,7 +813,7 @@ export default function TasksPage() {
                 </div>
               )}
             </div>
-            <DialogFooter className="flex gap-2 justify-end pt-2">
+            <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4">Cancel</Button>
               <Button type="submit" className="bg-blue-600 text-white font-bold rounded-xl text-xs px-5 h-10">{editTask ? "Update Task" : "Create Task"}</Button>
             </DialogFooter>
@@ -825,17 +825,17 @@ export default function TasksPage() {
 
       {/* Incomplete Reason Modal */}
       <Dialog open={incompleteModalOpen} onOpenChange={setIncompleteModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
-          <form onSubmit={handleIncompleteSubmit} className="space-y-4">
-            <DialogHeader>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-sm w-[95vw] max-h-[80vh] flex flex-col overflow-hidden">
+          <form onSubmit={handleIncompleteSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">Task Incomplete Reason</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Please provide a reason why this task cannot be completed.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-1">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1">
               <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reason <span className="text-rose-500">*</span></Label>
               <textarea required rows={3} value={incompleteReasonInput} onChange={e => setIncompleteReasonInput(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" placeholder="e.g. Awaiting client signature copy..." />
             </div>
-            <DialogFooter className="flex gap-2 justify-end pt-2">
+            <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <Button type="button" variant="ghost" onClick={() => setIncompleteModalOpen(false)} className="text-xs rounded-xl px-4">Cancel</Button>
               <Button type="submit" className="bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs px-5 h-10">Confirm</Button>
             </DialogFooter>

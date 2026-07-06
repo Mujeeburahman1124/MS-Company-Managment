@@ -108,18 +108,20 @@ export default function OvertimeManagement() {
       )}
 
       <Dialog open={!!approveModal} onOpenChange={open => !open && setApproveModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
-          <DialogHeader>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-sm w-[95vw] max-h-[80vh] flex flex-col overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
             <DialogTitle className="text-base font-bold text-slate-800">{approveModal?.action === "Approved" ? "Approve Overtime?" : "Reject Overtime?"}</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">{approveModal?.req.staffName} requested {approveModal?.req.hours} hours of overtime.</DialogDescription>
           </DialogHeader>
-          {approveModal?.action === "Rejected" && (
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Rejection Reason *</label>
-              <textarea rows={2} value={rejectReason} onChange={e => setRejectReason(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" placeholder="Enter reason..." />
-            </div>
-          )}
-          <DialogFooter className="flex gap-2 justify-end pt-2">
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            {approveModal?.action === "Rejected" && (
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Rejection Reason *</label>
+                <textarea rows={2} value={rejectReason} onChange={e => setRejectReason(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" placeholder="Enter reason..." />
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
             <Button variant="ghost" onClick={() => setApproveModal(null)} className="text-xs rounded-xl px-4">Cancel</Button>
             <Button onClick={handleApproveReject} className={`text-white font-bold rounded-xl text-xs px-5 h-10 ${approveModal?.action === "Approved" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"}`}>{approveModal?.action}</Button>
           </DialogFooter>

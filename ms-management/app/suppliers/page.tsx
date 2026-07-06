@@ -221,13 +221,13 @@ export default function SuppliersPage() {
       <Pagination moduleKey="suppliers" totalItems={totalItems} />
 
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <DialogHeader>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">{editSup ? "Edit Supplier" : "Add New Supplier"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Register details of manpower agencies or independent suppliers.</DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 grid grid-cols-2 gap-3">
               <div className="space-y-1 col-span-2">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Agency/Supplier Name <span className="text-rose-500">*</span></Label>
                 <Input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
@@ -255,7 +255,7 @@ export default function SuppliersPage() {
                 <textarea rows={2} value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" />
               </div>
             </div>
-            <DialogFooter className="flex gap-2 justify-end pt-2">
+            <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4">Cancel</Button>
               <Button type="submit" className="bg-blue-600 text-white font-bold rounded-xl text-xs px-5 h-10">{editSup ? "Save Changes" : "Add Supplier"}</Button>
             </DialogFooter>

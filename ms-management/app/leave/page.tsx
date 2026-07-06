@@ -231,13 +231,13 @@ export default function LeavePage() {
 
       {/* New Request Modal */}
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <DialogHeader>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">Submit Leave Request</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Complete the leave request on behalf of a staff member.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Staff Member <span className="text-rose-500">*</span></Label>
                 <Select disabled={!isAdmin && !!currentStaff} value={form.staffId} onValueChange={v => { const s = filteredStaff.find(s => s.id === v); setForm(f => ({...f, staffId: v || "", staffName: s?.name || ""})); }}>
@@ -276,7 +276,7 @@ export default function LeavePage() {
                 </div>
               </div>
             </div>
-            <DialogFooter className="flex gap-2 justify-end pt-2">
+            <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4">Cancel</Button>
               <Button type="submit" className="bg-blue-600 text-white font-bold rounded-xl text-xs px-5 h-10">Submit Request</Button>
             </DialogFooter>
