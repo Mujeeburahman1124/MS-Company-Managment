@@ -21,6 +21,9 @@ function buildHtmlEmail(
   companyLogo = ""
 ): string {
   // Parse paragraphs and table items
+  let meetingLink = "";
+  let locationLink = "";
+
   const lines = body.split("\n");
   const tableRows: { key: string; val: string }[] = [];
   const normalParas: string[] = [];
@@ -28,6 +31,18 @@ function buildHtmlEmail(
   for (const line of lines) {
     const trimmed = line.trim();
     if (trimmed === "") continue;
+    
+    // Parse links if present
+    if (trimmed.toLowerCase().startsWith("meeting link:")) {
+      const match = trimmed.match(/https?:\/\/\S+/i);
+      if (match) meetingLink = match[0];
+      continue;
+    }
+    if (trimmed.toLowerCase().startsWith("location link:")) {
+      const match = trimmed.match(/https?:\/\/\S+/i);
+      if (match) locationLink = match[0];
+      continue;
+    }
     
     // Treat as key-value row if it contains ":" and isn't a link/greeting/salutation
     if (trimmed.includes(":") && 
@@ -181,6 +196,46 @@ function buildHtmlEmail(
     ? `www.${domainMatch[1]}`
     : "www.msjobs.net";
 
+  // Generate call to action button
+  let ctaHtml = "";
+  if (templateType === "Registration") {
+    ctaHtml = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
+        <tr>
+          <td>
+            <a href="http://localhost:3000/apply" target="_blank" style="display: inline-block; background: #166534; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(22,101,52,0.15);">Track Application Status</a>
+          </td>
+        </tr>
+      </table>`;
+  } else if (meetingLink) {
+    ctaHtml = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
+        <tr>
+          <td>
+            <a href="${meetingLink}" target="_blank" style="display: inline-block; background: #1e3a8a; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(30,58,138,0.15);">Join Online Interview</a>
+          </td>
+        </tr>
+      </table>`;
+  } else if (locationLink) {
+    ctaHtml = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
+        <tr>
+          <td>
+            <a href="${locationLink}" target="_blank" style="display: inline-block; background: #1e3a8a; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(30,58,138,0.15);">View Office Location Map</a>
+          </td>
+        </tr>
+      </table>`;
+  } else if (templateType === "Visa") {
+    ctaHtml = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
+        <tr>
+          <td>
+            <a href="mailto:${companyEmail}" target="_blank" style="display: inline-block; background: #dc2626; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(220,38,38,0.15);">Contact HR Support</a>
+          </td>
+        </tr>
+      </table>`;
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -239,6 +294,7 @@ function buildHtmlEmail(
             <td style="font-family:'Segoe UI',sans-serif; text-align: left;">
               ${introHtml}
               ${tableHtml}
+              ${ctaHtml}
               ${alertHtml}
               
               <!-- Optional Callout Support Widget -->

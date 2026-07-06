@@ -703,7 +703,7 @@ export default function NewApplicantPage() {
 
 
           {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-3 select-none w-full">
+          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-3 select-none w-full pb-20 sm:pb-0">
             <Button
               type="button"
               variant="outline"

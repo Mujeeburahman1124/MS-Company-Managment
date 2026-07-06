@@ -422,7 +422,7 @@ export default function NewStaffPage() {
             )}
           </Card>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-3 select-none w-full">
+          <div className="flex flex-col sm:flex-row justify-end gap-2.5 sm:gap-3 select-none w-full pb-20 sm:pb-0">
             <Button type="button" variant="outline" onClick={() => router.back()} className="w-full sm:w-auto text-xs font-semibold rounded-xl px-4 h-10 border-slate-200">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-10 gap-1.5 shadow-md"><Save className="w-4 h-4" /> Save Staff Member</Button>
           </div>
