@@ -35,18 +35,31 @@ export async function PUT(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
     }
-    // Validate email uniqueness in Staff, Applicant, and User tables (excluding current ID)
+    // Validate email uniqueness in Staff, Applicant, and User tables (excluding current ID/email)
     if (data.email && data.email.trim() !== "") {
       const emailLower = data.email.trim().toLowerCase();
+      const oldEmailLower = existing.email ? existing.email.trim().toLowerCase() : "";
       
-      const existingUser = await prisma.user.findFirst({
-        where: { email: emailLower }
-      });
-      if (existingUser) {
-        return NextResponse.json(
-          { error: "A user account with this email address already exists." },
-          { status: 400 }
-        );
+      if (emailLower !== oldEmailLower) {
+        const existingUser = await prisma.user.findFirst({
+          where: { email: emailLower }
+        });
+        if (existingUser) {
+          return NextResponse.json(
+            { error: "A user account with this email address already exists." },
+            { status: 400 }
+          );
+        }
+
+        const existingApplicant = await prisma.applicant.findFirst({
+          where: { email: emailLower }
+        });
+        if (existingApplicant) {
+          return NextResponse.json(
+            { error: "An applicant with this email address already exists." },
+            { status: 400 }
+          );
+        }
       }
 
       const existingStaff = await prisma.staff.findFirst({
@@ -55,16 +68,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       if (existingStaff) {
         return NextResponse.json(
           { error: "A staff member with this email address already exists." },
-          { status: 400 }
-        );
-      }
-
-      const existingApplicant = await prisma.applicant.findFirst({
-        where: { email: emailLower }
-      });
-      if (existingApplicant) {
-        return NextResponse.json(
-          { error: "An applicant with this email address already exists." },
           { status: 400 }
         );
       }
