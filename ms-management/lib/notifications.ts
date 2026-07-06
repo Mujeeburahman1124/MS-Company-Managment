@@ -29,19 +29,25 @@ function buildHtmlEmail(
     const trimmed = line.trim();
     if (trimmed === "") continue;
     
-    // Check if line is a key-value pair (contains ":" and fits profile)
-    if (trimmed.includes(":") && (
-      trimmed.startsWith("-") || 
-      trimmed.startsWith("•") || 
-      /^(Position|Client|Interview|Contact|Additional|Candidate|Passport|Visa|Days|Remarks|Leave|Period|Total)/i.test(trimmed)
-    )) {
-      const parts = trimmed.replace(/^[-•]\s*/, "").split(":");
-      const key = parts[0].trim();
-      const val = parts.slice(1).join(":").trim();
-      tableRows.push({ key, val });
-    } else {
-      normalParas.push(trimmed);
+    // Treat as key-value row if it contains ":" and isn't a link/greeting/salutation
+    if (trimmed.includes(":") && 
+        !trimmed.toLowerCase().includes("http:") && 
+        !trimmed.toLowerCase().includes("https:") && 
+        !trimmed.startsWith("Dear") && 
+        !trimmed.startsWith("Hello") &&
+        !trimmed.startsWith("Subject:")
+    ) {
+      const cleanLine = trimmed.replace(/^[-•*]\s*/, "");
+      const colonIdx = cleanLine.indexOf(":");
+      const key = cleanLine.substring(0, colonIdx).trim();
+      const val = cleanLine.substring(colonIdx + 1).trim();
+      if (key && val) {
+        tableRows.push({ key, val });
+        continue;
+      }
     }
+    
+    normalParas.push(trimmed);
   }
 
   // Generate body introduction and footer greetings
