@@ -603,6 +603,26 @@ ${data.extraDetails || ""}
 Best regards,
 ${company} Notification System`,
       };
+    case "Registration" as any:
+      return {
+        subject: `Registration Completed: Thank You for Joining Us! - ${name}`,
+        body: `Dear ${name},
+ 
+Thank you for registering your application with ${company}.
+Your application has been successfully received. Our recruitment team will review your profile and contact you if your qualifications match any suitable vacancies.
+ 
+Here are your registration details:
+- Candidate Name: ${name}
+- Position(s) Applied: ${data.role || "N/A"}
+- Application Tracking Code: ${data.extraDetails || "N/A"}
+ 
+Please keep your mobile number and email active for further updates. You can track your status anytime at http://localhost:3000/apply.
+ 
+We look forward to helping you find the right opportunity.
+ 
+Best regards,
+${company} Team`,
+      };
     default:
       throw new Error("Invalid templateType");
   }

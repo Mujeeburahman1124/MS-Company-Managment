@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth-helpers";
-import { sendEmail, sendWhatsApp } from "@/lib/notifications";
+import { sendEmail, sendWhatsApp, generateEmailContent } from "@/lib/notifications";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -229,6 +229,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
           }
         }).catch(err => console.error("Async offer letter email error:", err));
       } else {
+        const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
         const emailBody = `Dear ${updated.fullName},
 
 Your application status has been updated to: ${updated.status}.
@@ -240,20 +241,22 @@ Registration Details:
 You can track your application details anytime at http://localhost:3000/apply.
 
 Best regards,
-MS Horizon F.Z.E Recruitment Team`;
+${companyName} Recruitment Team`;
 
         sendEmail({
           to: updated.email,
           subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
           body: emailBody,
           candidateName: updated.fullName,
-          company: updated.company,
+          company: companyName,
           branch: updated.branch,
-          type: "Status Update"
+          type: "Status Update",
+          templateType: "Registration"
         }).catch(err => console.error("Async status update email error:", err));
       }
     } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
       // General profile update
+      const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
       const emailBody = `Dear ${updated.fullName},
 
 This is to notify you that your application profile details have been updated in our recruitment system.
@@ -265,15 +268,16 @@ Profile Details:
 If you did not authorize this change or have questions, please contact our support team.
 
 Best regards,
-MS Horizon F.Z.E Recruitment Team`;
+${companyName} Recruitment Team`;
 
       sendEmail({
         to: updated.email,
         subject: `Application Profile Updated - Tracking Code: ${updated.trackingCode}`,
         body: emailBody,
         candidateName: updated.fullName,
-        company: updated.company,
-        branch: updated.branch
+        company: companyName,
+        branch: updated.branch,
+        templateType: "Registration"
       }).catch(err => console.error("Async general update email error:", err));
     }
 

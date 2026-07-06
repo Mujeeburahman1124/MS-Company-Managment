@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
-import { sendEmail, sendWhatsApp } from "@/lib/notifications";
+import { sendEmail, sendWhatsApp, generateEmailContent } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -267,28 +267,25 @@ export async function POST(request: Request) {
     }
     // Trigger real-time notifications asynchronously
     if (applicant.email && applicant.email.trim() !== "") {
-      const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Horizon F.Z.E";
-      const emailBody = `Dear ${applicant.fullName},
-
-Thank you for registering your application with ${companyName}.
-
-Here are your registration details:
-- Applicant Name: ${applicant.fullName}
-- Position(s) Applied: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions}
-- Application Tracking Code: ${applicant.trackingCode}
-
-You can track your application status anytime at http://localhost:3000/apply by entering your email or tracking code.
-
-Best regards,
-${companyName} Recruitment Team`;
+      const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Human Resource Consultancies";
+      const generated = generateEmailContent("Registration" as any, {
+        applicantName: applicant.fullName,
+        company: companyName,
+        branch: applicant.branch || undefined,
+        role: Array.isArray(applicant.applyingPositions) 
+          ? (applicant.applyingPositions as string[]).join(", ") 
+          : (applicant.applyingPositions ? String(applicant.applyingPositions) : undefined),
+        extraDetails: applicant.trackingCode ? String(applicant.trackingCode) : undefined
+      });
 
       sendEmail({
         to: applicant.email,
-        subject: `Application Registered successfully - Tracking Code: ${applicant.trackingCode}`,
-        body: emailBody,
+        subject: generated.subject,
+        body: generated.body,
         candidateName: applicant.fullName,
         company: companyName,
-        branch: applicant.branch
+        branch: applicant.branch || undefined,
+        templateType: "Registration"
       }).catch(err => console.error("Async email sending error:", err));
     }
 
