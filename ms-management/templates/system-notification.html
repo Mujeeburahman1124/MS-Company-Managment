@@ -1,0 +1,49 @@
+{{> header}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #1e3a8a; font-size: 16px; font-weight: 600; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      System Alert Notification
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear User,<br/><br/>
+      Below is an automated update or notice generated from your <strong>{{companyName}}</strong> system panel.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <!-- Details Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.6; font-family: Arial, sans-serif;">
+            {{body}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{#if actionLink}}
+  <tr>
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+        <tr>
+          <td align="center" style="background-color: {{companyPrimaryColor}}; border-radius: 8px;">
+            <a href="{{actionLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
+              View Updates Portal
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+  <tr>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.5; font-family: Arial, sans-serif;">
+      If you did not expect this notification, please contact the IT Administrator.<br/><br/>
+      Best Regards,<br/>
+      <strong>System Alert Engine</strong>
+    </td>
+  </tr>
+</table>
+{{> footer}}

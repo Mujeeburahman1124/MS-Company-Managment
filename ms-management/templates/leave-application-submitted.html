@@ -1,0 +1,70 @@
+{{> header}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #1e3a8a; font-size: 16px; font-weight: 600; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Leave Application Submitted
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear Team / Admin,<br/><br/>
+      A new leave application has been submitted by <strong>{{staffName}}</strong>. Below are the details for your review and approval.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <!-- Details Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td colspan="2" style="font-size: 13px; font-weight: 700; color: #1e293b; padding-bottom: 12px; text-transform: uppercase; font-family: Arial, sans-serif;">
+            Application Details
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Staff Name:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{staffName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Leave Type:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{leaveType}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Start Date:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{startDate}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">End Date:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{endDate}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Total Days:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{days}} Days</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Reason:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{reason}}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+        <tr>
+          <td align="center" style="background-color: {{companyPrimaryColor}}; border-radius: 8px;">
+            <a href="{{website}}/leaves" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
+              Go to Approval Panel
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.5; font-family: Arial, sans-serif;">
+      Best Regards,<br/>
+      <strong>System Notification Center</strong>
+    </td>
+  </tr>
+</table>
+{{> footer}}

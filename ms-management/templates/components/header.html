@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{subject}}</title>
+  <style type="text/css">
+    /* Reset styles */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    table { border-collapse: collapse !important; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+    /* Client-specific styles */
+    img[class="img-max"] { max-width: 100% !important; width: 100% !important; height: auto !important; }
+
+    /* Mobile styles */
+    @media screen and (max-width: 600px) {
+      .container { width: 100% !important; max-width: 100% !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .card { padding: 20px 16px !important; }
+      .header-text { font-size: 20px !important; }
+      .button-wrapper { width: 100% !important; }
+      .button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc;">
+  <!-- Double-open tag wrapping for some email clients -->
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; table-layout: fixed;">
+    <tr>
+      <td align="center" style="padding: 24px 0 40px 0;" class="mobile-padding">
+        <!-- Main Email Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" class="container" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);">
+          
+          <!-- Banner / Header Image Badge -->
+          <tr>
+            <td align="center" style="background: linear-gradient(135deg, {{companyPrimaryColor}} 0%, #1e3a8a 100%); padding: 32px 24px; color: #ffffff;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="left" style="font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2;">
+                    <!-- Logo / Text Icon Badge -->
+                    <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+                      <tr>
+                        <td align="center" style="background-color: rgba(255, 255, 255, 0.15); border-radius: 8px; width: 44px; height: 44px; font-size: 18px; font-weight: 800; color: #ffffff;">
+                          {{logoText}}
+                        </td>
+                      </tr>
+                    </table>
+                    <span style="vertical-align: middle; margin-left: 12px; font-family: Arial, sans-serif;">{{companyName}}</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Colored Alert Section (Dynamic Indicator) -->
+          {{#if bannerText}}
+          <tr>
+            <td style="background-color: {{bannerBg}}; border-bottom: 1px solid {{bannerBorder}}; padding: 12px 24px; text-align: center; font-size: 12px; font-weight: 700; color: {{bannerColor}}; letter-spacing: 1px; text-transform: uppercase;">
+              {{bannerIcon}} {{bannerText}}
+            </td>
+          </tr>
+          {{/if}}
+
+          <!-- Body Content Area -->
+          <tr>
+            <td class="card" style="padding: 32px 24px; background-color: #ffffff;">

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard, Users, Briefcase, Clock, ClipboardList, DollarSign,
-    Calendar, Car, FileText, Settings, ShieldCheck, FileCheck
+    Calendar, Car, FileText, Settings, ShieldCheck, FileCheck, Mail
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -20,6 +20,7 @@ const navigation = [
     { name: 'Interviews', href: '/interviews', icon: Calendar, module: 'interviews' },
     { name: 'Vehicles', href: '/vehicles', icon: Car, module: 'vehicles' },
     { name: 'Documents', href: '/documents', icon: FileText, module: 'documents' },
+    { name: 'Email Center', href: '/emails', icon: Mail, module: 'emails' },
     { name: 'Roles & Permissions', href: '/settings/roles', icon: ShieldCheck, module: 'roles' },
     { name: 'Site Settings', href: '/settings/site', icon: Settings, module: 'settings' },
 ];

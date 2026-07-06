@@ -11,393 +11,43 @@ const cleanEnvVar = (val: string | undefined) => {
 };
 
 // ─── HTML Email Template ──────────────────────────────────────────────────────
-function buildHtmlEmail(
-  subject: string, 
-  body: string, 
-  company = "MS Human Resource Consultancies",
-  templateType?: 
-    | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
-    | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday",
-  companyEmail = "hr@safayar-msjobs.com",
-  companyPhone = "+971 58 532 2913",
-  companyAddress = "Industrial Area 2, Ajman, UAE",
-  companyLogo = ""
-): string {
-  // Parse paragraphs and table items
-  let meetingLink = "";
-  let locationLink = "";
-
-  const lines = body.split("\n");
-  const tableRows: { key: string; val: string }[] = [];
-  const normalParas: string[] = [];
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed === "") continue;
-    
-    // Parse links if present
-    if (trimmed.toLowerCase().startsWith("meeting link:")) {
-      const match = trimmed.match(/https?:\/\/\S+/i);
-      if (match) meetingLink = match[0];
-      continue;
-    }
-    if (trimmed.toLowerCase().startsWith("location link:")) {
-      const match = trimmed.match(/https?:\/\/\S+/i);
-      if (match) locationLink = match[0];
-      continue;
-    }
-    
-    // Treat as key-value row if it contains ":" and isn't a link/greeting/salutation
-    if (trimmed.includes(":") && 
-        !trimmed.toLowerCase().includes("http:") && 
-        !trimmed.toLowerCase().includes("https:") && 
-        !trimmed.startsWith("Dear") && 
-        !trimmed.startsWith("Hello") &&
-        !trimmed.startsWith("Subject:")
-    ) {
-      const cleanLine = trimmed.replace(/^[-•*]\s*/, "");
-      const colonIdx = cleanLine.indexOf(":");
-      const key = cleanLine.substring(0, colonIdx).trim();
-      const val = cleanLine.substring(colonIdx + 1).trim();
-      if (key && val) {
-        tableRows.push({ key, val });
-        continue;
-      }
-    }
-    
-    normalParas.push(trimmed);
-  }
-
-  // Generate body introduction and footer greetings
-  let introHtml = "";
-  let closingHtml = "";
-  let alertHtml = "";
-  
-  // Clean up candidate/user salutations & identify notice text
-  for (const p of normalParas) {
-    if (p.startsWith("Dear") || p.startsWith("Hello")) {
-      introHtml += `<p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #1e293b;">${p}</p>`;
-    } else if (p.toLowerCase().includes("pleased to invite") || p.toLowerCase().includes("welcome") || p.toLowerCase().includes("inform you")) {
-      introHtml += `<p style="margin: 0 0 16px 0; font-size: 13px; color: #475569; line-height: 1.6;">${p}</p>`;
-    } else if (p.toLowerCase().includes("unable to attend") || p.toLowerCase().includes("renew before the expiry") || p.toLowerCase().includes("keep your mobile number")) {
-      const isWarning = p.toLowerCase().includes("renew") || p.toLowerCase().includes("expiry");
-      const alertBg = isWarning ? "#fef2f2" : "#eff6ff";
-      const alertBorder = isWarning ? "#fecaca" : "#bfdbfe";
-      const alertColor = isWarning ? "#991b1b" : "#1e40af";
-      const alertIcon = isWarning ? "⚠" : "🔔";
-      
-      alertHtml += `
-        <table width="100%" cellpadding="0" cellspacing="0" style="background: ${alertBg}; border: 1px solid ${alertBorder}; border-radius: 12px; padding: 14px 16px; margin: 16px 0 20px 0;">
-          <tr>
-            <td width="6%" style="vertical-align: top; font-size: 18px; line-height: 1;">${alertIcon}</td>
-            <td width="94%" style="font-size: 12px; font-weight: 600; color: ${alertColor}; line-height: 1.5;">${p}</td>
-          </tr>
-        </table>`;
-    } else if (p.startsWith("Best Regards") || p.startsWith("Regards") || p.toLowerCase().includes("look forward") || p.toLowerCase().includes("thank you")) {
-      closingHtml += `<p style="margin: 8px 0; font-size: 13px; color: #475569; line-height: 1.5;">${p}</p>`;
-    } else {
-      // General body text
-      introHtml += `<p style="margin: 0 0 14px 0; font-size: 13px; color: #475569; line-height: 1.6;">${p}</p>`;
-    }
-  }
-
-  const getIconForKey = (kName: string): string => {
-    const k = kName.toLowerCase();
-    if (k.includes("name")) return "👤";
-    if (k.includes("position") || k.includes("role") || k.includes("job")) return "💼";
-    if (k.includes("client") || k.includes("company")) return "🏢";
-    if (k.includes("date")) return "📅";
-    if (k.includes("time")) return "⏰";
-    if (k.includes("location") || k.includes("address")) return "📍";
-    if (k.includes("type") || k.includes("format")) return "👥";
-    if (k.includes("person") || k.includes("conductor")) return "👤";
-    if (k.includes("number") || k.includes("mobile") || k.includes("phone") || k.includes("whatsapp")) return "📞";
-    if (k.includes("passport") || k.includes("visa")) return "🆔";
-    if (k.includes("days") || k.includes("remaining")) return "⚠️";
-    if (k.includes("instruction") || k.includes("remarks") || k.includes("notes") || k.includes("feedback")) return "ℹ️";
-    return "🔹";
-  };
-
-  // Build the details table
-  let tableHtml = "";
-  if (tableRows.length > 0) {
-    tableHtml += `
-      <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin: 16px 0 24px 0; border-collapse: separate; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">`;
-    tableRows.forEach((row, index) => {
-      const isLast = index === tableRows.length - 1;
-      const borderStyle = isLast ? "" : "border-bottom: 1px solid #f1f5f9;";
-      const icon = getIconForKey(row.key);
-      const isWarningField = row.key.toLowerCase().includes("expiry") || row.key.toLowerCase().includes("remaining") || row.key.toLowerCase().includes("expired");
-      const valColor = isWarningField ? "#dc2626" : "#1e293b";
-      
-      tableHtml += `
-        <tr style="background: #ffffff;">
-          <td width="42%" style="padding: 10px 16px; font-size: 12px; font-weight: 700; color: #475569; ${borderStyle}">
-            <span style="margin-right: 6px; font-size: 13px; vertical-align: middle;">${icon}</span>${row.key}
-          </td>
-          <td width="3%" style="padding: 10px 0; font-size: 12px; font-weight: 700; color: #94a3b8; ${borderStyle} text-align: center;">:</td>
-          <td width="55%" style="padding: 10px 16px; font-size: 12px; font-weight: 700; color: ${valColor}; ${borderStyle}">${row.val}</td>
-        </tr>`;
-    });
-    tableHtml += `</table>`;
-  }
-
-  // Set titles and custom banners
-  let bannerIcon = "📅";
-  let bannerText = "NOTIFICATION";
-  let bannerBg = "#eff6ff";
-  let bannerBorder = "#bfdbfe";
-  let bannerColor = "#1e40af";
-  let showCallout = false;
-
-  if (templateType?.startsWith("Interview")) {
-    bannerIcon = "📅";
-    bannerText = "INTERVIEW INVITATION";
-    bannerBg = "#eff6ff";
-    bannerBorder = "#bfdbfe";
-    bannerColor = "#1e40af";
-  } else if (templateType === "Offer") {
-    bannerIcon = "🎉";
-    bannerText = "JOB OFFER LETTER";
-    bannerBg = "#f0fdf4";
-    bannerBorder = "#bbf7d0";
-    bannerColor = "#166534";
-  } else if (templateType === "Visa") {
-    bannerIcon = "🔔";
-    bannerText = "VISA EXPIRY ALERT";
-    bannerBg = "#fef2f2";
-    bannerBorder = "#fecaca";
-    bannerColor = "#991b1b";
-    showCallout = true;
-  } else if (templateType === "Registration") {
-    bannerIcon = "✔";
-    bannerText = "REGISTRATION COMPLETED";
-    bannerBg = "#f0fdf4";
-    bannerBorder = "#bbf7d0";
-    bannerColor = "#166534";
-  } else if (templateType === "Birthday") {
-    bannerIcon = "🎂";
-    bannerText = "HAPPY BIRTHDAY WISHES";
-    bannerBg = "#fff7ed";
-    bannerBorder = "#fed7aa";
-    bannerColor = "#c2410c";
-  }
-
-  // Break company name dynamically for customized logo badges
-  const nameParts = company.toUpperCase().split(" ");
-  const logoText = companyLogo || (
-    nameParts.length > 1 
-      ? `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}` 
-      : company.slice(0, 2).toUpperCase()
-  );
-
-  const logoLine1 = nameParts.slice(0, 2).join(" ");
-  const logoLine2 = nameParts.slice(2).join(" ") || "MANAGEMENT SYSTEM";
-
-  const domainMatch = companyEmail.match(/@(.+)$/);
-  const webContact = domainMatch && !companyEmail.includes("gmail") && !companyEmail.includes("outlook") && !companyEmail.includes("yahoo")
-    ? `www.${domainMatch[1]}`
-    : "www.msjobs.net";
-
-  // Generate call to action button
-  let ctaHtml = "";
-  if (templateType === "Registration") {
-    ctaHtml = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
-        <tr>
-          <td>
-            <a href="http://localhost:3000/apply" target="_blank" style="display: inline-block; background: #166534; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(22,101,52,0.15);">Track Application Status</a>
-          </td>
-        </tr>
-      </table>`;
-  } else if (meetingLink) {
-    ctaHtml = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
-        <tr>
-          <td>
-            <a href="${meetingLink}" target="_blank" style="display: inline-block; background: #1e3a8a; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(30,58,138,0.15);">Join Online Interview</a>
-          </td>
-        </tr>
-      </table>`;
-  } else if (locationLink) {
-    ctaHtml = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
-        <tr>
-          <td>
-            <a href="${locationLink}" target="_blank" style="display: inline-block; background: #1e3a8a; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(30,58,138,0.15);">View Office Location Map</a>
-          </td>
-        </tr>
-      </table>`;
-  } else if (templateType === "Visa") {
-    ctaHtml = `
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0 10px 0; text-align: center;">
-        <tr>
-          <td>
-            <a href="mailto:${companyEmail}" target="_blank" style="display: inline-block; background: #dc2626; color: #ffffff; text-decoration: none; font-weight: 800; font-size: 13px; padding: 12px 28px; border-radius: 8px; font-family: 'Segoe UI',sans-serif; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(220,38,38,0.15);">Contact HR Support</a>
-          </td>
-        </tr>
-      </table>`;
-  }
-
-  // NOTE: We now use Handlebars template files for full HTML templates.
-  const htmlBody = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${subject}</title>
-</head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
-    <tr>
-      <td align="center">
-        <table width="100%" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06); padding: 32px;">
-          
-          <!-- Premium Header -->
-          <tr>
-            <td>
-              <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px;">
-                <tr>
-                  <td width="55%" align="left" style="vertical-align: middle;">
-                    <table cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td>
-                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:24px; padding:8px 12px; border-radius:6px; display:inline-block; margin-right:12px; font-family:'Segoe UI',sans-serif; letter-spacing:1px;">${logoText}</div>
-                        </td>
-                        <td>
-                          <div style="font-size:15px; font-weight:800; color:#1e293b; text-transform:uppercase; letter-spacing:-0.2px; line-height:1.2;">${logoLine1}</div>
-                          <div style="font-size:13px; font-weight:700; color:#2563eb; text-transform:uppercase; line-height:1.2;">${logoLine2}</div>
-                          <div style="font-size:9px; color:#64748b; font-style:italic; margin-top:2px;">Right People. Right Opportunity.</div>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                  <td width="45%" align="right" style="font-size:11px; color:#475569; line-height:1.5; border-left:1px solid #e2e8f0; padding-left:16px; vertical-align: middle; font-family:'Segoe UI',sans-serif;">
-                    <div style="margin-bottom:2px;">✉ ${companyEmail}</div>
-                    <div style="margin-bottom:2px;">📞 ${companyPhone}</div>
-                    <div style="margin-bottom:2px;">🌐 ${webContact}</div>
-                    <div>📍 ${companyAddress}</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Dynamic Banner Title -->
-          <tr>
-            <td align="center" style="padding-bottom: 16px;">
-              <div style="display:inline-block; background:${bannerBg}; border: 1px solid ${bannerBorder}; border-radius: 50px; padding: 6px 18px;">
-                <span style="font-size: 14px; vertical-align: middle; margin-right: 6px;">${bannerIcon}</span>
-                <span style="font-size: 12px; font-weight: 800; color: ${bannerColor}; text-transform: uppercase; letter-spacing: 0.5px;">${bannerText}</span>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Body Content Area -->
-          <tr>
-            <td style="font-family:'Segoe UI',sans-serif; text-align: left;">
-              ${introHtml}
-              ${tableHtml}
-              ${ctaHtml}
-              ${alertHtml}
-              
-              <!-- Optional Callout Support Widget -->
-              ${showCallout ? `
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 14px 16px; margin: 16px 0;">
-                <tr>
-                  <td width="10%" style="vertical-align: middle; font-size: 24px;">🎧</td>
-                  <td width="90%" style="font-family:'Segoe UI',sans-serif; font-size: 11px; color: #991b1b; line-height: 1.4; padding-left: 10px;">
-                    <div style="font-weight: 800;">Need Help?</div>
-                    <div style="font-weight: 500; margin-top: 2px;">Contact our support team for assistance.</div>
-                    <div style="font-weight: 800; font-size: 12px; margin-top: 2px;">${companyPhone}</div>
-                  </td>
-                </tr>
-              </table>` : ""}
-
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td width="60%" style="vertical-align: bottom;">
-                    ${closingHtml}
-                  </td>
-                  <td width="40%" align="right" style="vertical-align: bottom;">
-                    <div style="font-family:'Brush Script MT', cursive, sans-serif; font-size: 26px; color:#2563eb; font-style:italic;">Thank You!</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Premium Stay Connected Footer -->
-          <tr>
-            <td>
-              <div style="border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;"></div>
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
-                <tr>
-                  <td width="40%" align="left" style="vertical-align: middle;">
-                    <table cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td>
-                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:18px; padding:5px 8px; border-radius:4px; display:inline-block; margin-right:8px;">${logoText}</div>
-                        </td>
-                        <td>
-                          <div style="font-size:10px; font-weight:800; color:#1e293b; text-transform:uppercase;">${logoLine1}</div>
-                          <div style="font-size:8px; font-weight:700; color:#2563eb; text-transform:uppercase;">${logoLine2}</div>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                  <td width="30%" align="center" style="font-size: 10px; font-weight: 700; color: #64748b; vertical-align: middle;">
-                    <div>Stay Connected</div>
-                    <div style="margin-top: 6px;">
-                      <a href="https://facebook.com" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#1e3a8a; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">FB</a>
-                      <a href="https://linkedin.com" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#2563eb; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">LN</a>
-                      <a href="https://wa.me/${companyPhone.replace(/[^0-9]/g, '')}" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#166534; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">WA</a>
-                    </div>
-                  </td>
-                  <td width="30%" align="right" style="font-size:10px; color:#64748b; line-height:1.4; border-left:1px solid #e2e8f0; padding-left:12px; vertical-align: middle;">
-                    <div>${companyEmail}</div>
-                    <div>${companyPhone}</div>
-                    <div>${webContact}</div>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Light Gray Confidentiality Disclaimer -->
-              <div style="background:#f8fafc; padding:12px; border-radius:8px; font-size:9px; color:#94a3b8; text-align:center; line-height:1.4; border: 1px solid #f1f5f9;">
-                This email is confidential and intended solely for the use of the individual to whom it is addressed.<br/>
-                If you have received this email in error, please notify us and delete it from your system.
-              </div>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-  return htmlBody;
-}
 
 // Helper: load template by name
-function loadTemplate(templateName: string) {
-  const templatesDir = path.join(process.cwd(), "lib", "email-templates");
-  const templatePath = path.join(templatesDir, "templates", `${templateName}.hbs`);
-  if (!fs.existsSync(templatePath)) throw new Error(`Template not found: ${templateName}`);
+function loadTemplate(templateName: string): string {
+  const templatesDir = path.join(process.cwd(), "templates");
+  const templatePath = path.join(templatesDir, `${templateName}.html`);
+  if (!fs.existsSync(templatePath)) {
+    // Check if it exists with fallback path
+    const fallbackPath = path.join(process.cwd(), "templates", "system-notification.html");
+    if (fs.existsSync(fallbackPath)) {
+      return fs.readFileSync(fallbackPath, "utf8");
+    }
+    throw new Error(`Template not found: ${templateName}`);
+  }
   return fs.readFileSync(templatePath, "utf8");
 }
 
 // Register partials (header/footer/components)
 function registerPartials() {
   try {
-    const componentsDir = path.join(process.cwd(), "lib", "email-templates", "components");
-    const files = fs.readdirSync(componentsDir);
-    files.forEach(f => {
-      const content = fs.readFileSync(path.join(componentsDir, f), "utf8");
-      const name = path.basename(f, path.extname(f));
-      Handlebars.registerPartial(name, content);
-    });
+    const componentsDir = path.join(process.cwd(), "templates", "components");
+    if (fs.existsSync(componentsDir)) {
+      const files = fs.readdirSync(componentsDir);
+      files.forEach(f => {
+        if (f.endsWith(".html") || f.endsWith(".hbs")) {
+          const content = fs.readFileSync(path.join(componentsDir, f), "utf8");
+          const name = path.basename(f, path.extname(f));
+          Handlebars.registerPartial(name, content);
+        }
+      });
+    }
     // Helpers
+    Handlebars.unregisterHelper('year');
+    Handlebars.unregisterHelper('companyPrimaryColor');
+  } catch (err) {
+    // ignore
+  }
+  try {
     Handlebars.registerHelper('year', () => new Date().getFullYear());
     Handlebars.registerHelper('companyPrimaryColor', (fallback: string) => fallback || '#2563eb');
   } catch (err) {
@@ -431,11 +81,10 @@ export async function sendEmail({
   deliveryStatus?: string;
   sentBy?: string;
   type?: string;
-  templateType?: 
-    | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
-    | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday";
+  templateType?: string;
   templateData?: any;
 }) {
+  const isPrecompiledHtml = body.trim().startsWith("<html") || body.trim().startsWith("<!DOCTYPE");
   const host = cleanEnvVar(process.env.SMTP_HOST);
   const port = Number(cleanEnvVar(process.env.SMTP_PORT)) || 587;
   const user = cleanEnvVar(process.env.SMTP_USER);
@@ -447,7 +96,7 @@ export async function sendEmail({
   let realEmailSent = false;
   let statusStr = deliveryStatus || "Pending";
 
-  // Look up sender company details in DB to keep the template branded (no hardcoded example placeholders)
+  // Look up sender company details in DB to keep the template branded
   let companyEmail = "hr@safayar-msjobs.com";
   let companyPhone = "+971 58 532 2913";
   let companyAddress = "Industrial Area 2, Ajman, UAE";
@@ -455,7 +104,6 @@ export async function sendEmail({
 
   if (company && company !== "System" && company !== "Not Placed") {
     try {
-      // 1. Try finding in Company model
       const dbComp = await prisma.company.findFirst({
         where: { name: company }
       });
@@ -467,7 +115,6 @@ export async function sendEmail({
         if (dbComp.address) companyAddress = dbComp.address;
         if (dbComp.logo) companyLogo = dbComp.logo;
       } else {
-        // 2. Try finding in InternalCompany model
         const dbIntComp = await prisma.internalCompany.findFirst({
           where: { name: company }
         });
@@ -487,78 +134,80 @@ export async function sendEmail({
   registerPartials();
 
   let htmlContent = "";
-  let usedTemplateName: string | null = null;
-
-  // message tracking variables (initialized for all code paths)
+  let usedTemplateName = "system-notification";
   let sentMessageId: string | null = null;
   let sendError: string | null = null;
 
-  if (templateType && templateData) {
-    try {
-      // Map templateType to file names we created
-      const map: Record<string, string> = {
-        Interview: "interview-invitation",
-        Interview_Initial: "interview-invitation",
-        Interview_Online: "interview-invitation",
-        Interview_Physical: "interview-invitation",
-        Interview_Cancelled: "interview-cancelled",
-        Interview_Completed: "interview-invitation",
-        Offer: "offer-letter",
-        Visa: "visa-expiry-reminder",
-        Registration: "applicant-registration-confirmation",
-        Placement: "placement-confirmation",
-        Placement_Agreement: "placement-agreement",
-        Password_Reset: "password-reset",
-        Staff_Registration: "staff-registration",
-        User_Account_Created: "user-account-created",
-        Leave: "leave-application-submitted",
-        Leave_Approved: "leave-approved",
-        Leave_Rejected: "leave-rejected",
-        Staff_Request_Submitted: "staff-request-submitted",
-        Staff_Request_Approved: "staff-request-approved",
-        Staff_Request_Rejected: "staff-request-rejected",
-        Task_Assigned: "task-assigned",
-        Task_Deadline_Reminder: "task-deadline-reminder",
-        Payroll: "payroll-generated",
-        Payslip: "payslip-available",
-        Birthday: "birthday-wishes",
-        System: "system-notification",
-      };
+  // Map templateType to file names we created
+  const map: Record<string, string> = {
+    Interview: "interview-invitation",
+    Interview_Initial: "interview-invitation",
+    Interview_Online: "interview-invitation",
+    Interview_Physical: "interview-invitation",
+    Interview_Cancelled: "interview-cancelled",
+    Interview_Completed: "interview-invitation",
+    Interview_Rescheduled: "interview-rescheduled",
+    Offer: "offer-letter",
+    Visa: "visa-expiry-reminder",
+    Passport_Expiry: "passport-expiry-reminder",
+    Registration: "applicant-registration-confirmation",
+    Placement: "placement-confirmation",
+    Placement_Agreement: "placement-agreement",
+    Password_Reset: "password-reset",
+    Staff_Registration: "staff-registration",
+    User_Account_Created: "user-account-created",
+    Leave: "leave-application-submitted",
+    Leave_Approved: "leave-approved",
+    Leave_Rejected: "leave-rejected",
+    Staff_Request_Submitted: "staff-request-submitted",
+    Staff_Request_Approved: "staff-request-approved",
+    Staff_Request_Rejected: "staff-request-rejected",
+    Task_Assigned: "task-assigned",
+    Task_Deadline_Reminder: "task-deadline-reminder",
+    Payroll: "payroll-generated",
+    Payslip: "payslip-available",
+    Birthday: "birthday-wishes",
+    System: "system-notification",
+  };
 
-      const fileName = map[templateType] || map[templateType as any];
-      if (!fileName) throw new Error(`No template mapping for ${templateType}`);
-      usedTemplateName = fileName;
+  const selectedTemplate = templateType ? (map[templateType] || templateType) : "system-notification";
+  usedTemplateName = isPrecompiledHtml ? (templateType || "Precompiled") : selectedTemplate;
 
-      const tpl = loadTemplate(fileName);
+  try {
+    if (isPrecompiledHtml) {
+      htmlContent = body;
+    } else {
+      const tpl = loadTemplate(selectedTemplate);
       const compiled = Handlebars.compile(tpl);
 
-      const recipientName = templateData.recipientName || candidateName || templateData.applicantName || "Recipient";
-      const logoText = (company || "").toUpperCase().split(" ").slice(0,2).map(s=>s.charAt(0)).join("") || "MS";
+    const recipientName = templateData?.recipientName || candidateName || templateData?.applicantName || "Recipient";
+    const logoText = (company || "").toUpperCase().split(" ").slice(0, 2).map(s => s.charAt(0)).join("") || "MS";
 
-      const context = {
-        recipientName,
-        companyName: company || "MS Management",
-        companyEmail,
-        companyPhone,
-        companyAddress,
-        logoText,
-        website: `https://${(companyEmail.match(/@(.+)$/)||["","msjobs.net"])[1]}`,
-        year: new Date().getFullYear(),
-        companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
-        ...templateData,
-      };
+    const context = {
+      recipientName,
+      companyName: company || "MS Management",
+      companyEmail,
+      companyPhone,
+      companyAddress,
+      logoText,
+      website: `https://${(companyEmail.match(/@(.+)$/)||["","msjobs.net"])[1]}`,
+      year: new Date().getFullYear(),
+      companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
+      body,
+      subject,
+      ...templateData,
+    };
 
-      htmlContent = compiled(context);
-    } catch (tplErr) {
-      console.error(`[EMAIL-SERVICE] Template render error for ${templateType}:`, tplErr);
-      // fallback to generic
-      htmlContent = buildHtmlEmail(subject, body, company, templateType, companyEmail, companyPhone, companyAddress, companyLogo);
+    htmlContent = compiled(context);
     }
-  } else {
-    htmlContent = buildHtmlEmail(subject, body, company, templateType, companyEmail, companyPhone, companyAddress, companyLogo);
+  } catch (tplErr) {
+    console.error(`[EMAIL-SERVICE] Template render error for ${selectedTemplate}:`, tplErr);
+    sendError = `Template render error: ${tplErr?.message || tplErr}`;
+    statusStr = "Failed";
+    htmlContent = `<p>${body}</p>`;
   }
 
-  if (host && user && pass) {
+  if (htmlContent && host && user && pass) {
     try {
       const transporter = nodemailer.createTransport({
         host,
@@ -579,16 +228,15 @@ export async function sendEmail({
       console.log(`[EMAIL-SERVICE] Email sent successfully to ${to}`);
       realEmailSent = true;
       statusStr = "Sent";
-      // capture messageId
       sentMessageId = info && (info as any).messageId ? String((info as any).messageId) : null;
-    } catch (err: any) {
+    } catch (err) {
       console.error(`[EMAIL-SERVICE] SMTP error sending to ${to}:`, err);
       statusStr = "Failed";
       sendError = err?.toString?.() || JSON.stringify(err);
     }
-  } else {
+  } else if (!host || !user || !pass) {
     console.warn(`[EMAIL-SERVICE] SMTP credentials not configured. Logged to DB only.`);
-    statusStr = "Simulated"; // Simulated success
+    statusStr = "Simulated";
   }
 
   // Always log to DB for tracking regardless of real send
@@ -597,15 +245,15 @@ export async function sendEmail({
       data: {
         to,
         subject,
-        body,
+        body: htmlContent || body,
         sentAt: new Date().toISOString(),
         candidateName: candidateName || "System",
         company: company || "System",
         branch: branch || "Main",
         deliveryStatus: statusStr,
         templateName: usedTemplateName,
-        messageId: typeof sentMessageId !== 'undefined' ? sentMessageId : null,
-        errorLog: typeof sendError !== 'undefined' ? sendError : null,
+        messageId: sentMessageId,
+        errorLog: sendError,
         sentBy: sentBy || "System",
         type: type || "Email",
       },
@@ -633,60 +281,66 @@ export async function previewEmail({
   templateType?: string;
   templateData?: any;
 }) {
-  // reuse partials
   registerPartials();
 
-  if (templateType && templateData) {
-    try {
-      const map: Record<string, string> = {
-        Interview: "interview-invitation",
-        Interview_Initial: "interview-invitation",
-        Interview_Online: "interview-invitation",
-        Interview_Physical: "interview-invitation",
-        Interview_Cancelled: "interview-cancelled",
-        Offer: "offer-letter",
-        Visa: "visa-expiry-reminder",
-        Registration: "applicant-registration-confirmation",
-        Placement: "placement-confirmation",
-        Placement_Agreement: "placement-agreement",
-        Password_Reset: "password-reset",
-        Staff_Registration: "staff-registration",
-        User_Account_Created: "user-account-created",
-        Leave: "leave-application-submitted",
-        Leave_Approved: "leave-approved",
-        Leave_Rejected: "leave-rejected",
-        Staff_Request_Submitted: "staff-request-submitted",
-        Staff_Request_Approved: "staff-request-approved",
-        Staff_Request_Rejected: "staff-request-rejected",
-        Task_Assigned: "task-assigned",
-        Task_Deadline_Reminder: "task-deadline-reminder",
-        Payroll: "payroll-generated",
-        Payslip: "payslip-available",
-        Birthday: "birthday-wishes",
-        System: "system-notification",
-      };
-      const fileName = map[templateType] || templateType;
-      const tpl = loadTemplate(fileName);
-      const compiled = Handlebars.compile(tpl);
-      const context = {
-        recipientName: templateData.recipientName || templateData.applicantName || "Recipient",
-        companyName: company || templateData.company || "MS Management",
-        companyEmail: templateData.companyEmail || "hr@example.com",
-        companyPhone: templateData.companyPhone || "+971000000",
-        companyAddress: templateData.companyAddress || "",
-        logoText: (company || "MS").slice(0,2).toUpperCase(),
-        website: `https://${(templateData.companyEmail||'msjobs.net').match(/@(.+)$/)?.[1]||'msjobs.net'}`,
-        year: new Date().getFullYear(),
-        companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
-        ...templateData,
-      };
-      return compiled(context);
-    } catch (err) {
-      return buildHtmlEmail(subject || "", body || "", company || "", undefined, undefined, undefined, undefined, "");
-    }
-  }
+  const map: Record<string, string> = {
+    Interview: "interview-invitation",
+    Interview_Initial: "interview-invitation",
+    Interview_Online: "interview-invitation",
+    Interview_Physical: "interview-invitation",
+    Interview_Cancelled: "interview-cancelled",
+    Interview_Rescheduled: "interview-rescheduled",
+    Offer: "offer-letter",
+    Visa: "visa-expiry-reminder",
+    Passport_Expiry: "passport-expiry-reminder",
+    Registration: "applicant-registration-confirmation",
+    Placement: "placement-confirmation",
+    Placement_Agreement: "placement-agreement",
+    Password_Reset: "password-reset",
+    Staff_Registration: "staff-registration",
+    User_Account_Created: "user-account-created",
+    Leave: "leave-application-submitted",
+    Leave_Approved: "leave-approved",
+    Leave_Rejected: "leave-rejected",
+    Staff_Request_Submitted: "staff-request-submitted",
+    Staff_Request_Approved: "staff-request-approved",
+    Staff_Request_Rejected: "staff-request-rejected",
+    Task_Assigned: "task-assigned",
+    Task_Deadline_Reminder: "task-deadline-reminder",
+    Payroll: "payroll-generated",
+    Payslip: "payslip-available",
+    Birthday: "birthday-wishes",
+    System: "system-notification",
+  };
 
-  return buildHtmlEmail(subject || "", body || "", company || "");
+  const selectedTemplate = templateType ? (map[templateType] || templateType) : "system-notification";
+
+  try {
+    const tpl = loadTemplate(selectedTemplate);
+    const compiled = Handlebars.compile(tpl);
+
+    const recipientName = templateData?.recipientName || templateData?.applicantName || "Recipient";
+    const logoText = (company || "MS").slice(0, 2).toUpperCase();
+
+    const context = {
+      recipientName,
+      companyName: company || templateData?.company || "MS Management",
+      companyEmail: templateData?.companyEmail || "hr@example.com",
+      companyPhone: templateData?.companyPhone || "+971000000",
+      companyAddress: templateData?.companyAddress || "",
+      logoText,
+      website: `https://${(templateData?.companyEmail || 'msjobs.net').match(/@(.+)$/)?.[1] || 'msjobs.net'}`,
+      year: new Date().getFullYear(),
+      companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
+      body,
+      subject,
+      ...templateData,
+    };
+
+    return compiled(context);
+  } catch (err) {
+    return `<p>Error rendering preview for ${selectedTemplate}: ${err?.message || err}</p><br/>${body}`;
+  }
 }
 
 /**

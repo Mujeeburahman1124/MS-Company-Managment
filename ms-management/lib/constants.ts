@@ -95,7 +95,8 @@ export const MODULE_PERMISSION_MAP: Record<string, string> = {
   reports: "Reports",
   settings: "Site Settings",
   tracking: "Applicant Tracking",
-  vehicles: "Vehicles"
+  vehicles: "Vehicles",
+  emails: "Email Center"
 };
 
 export const getPermissionModuleName = (moduleKey: string): string | undefined =>

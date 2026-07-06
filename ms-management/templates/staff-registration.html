@@ -1,0 +1,54 @@
+{{> header}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #1e3a8a; font-size: 16px; font-weight: 600; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Staff Registration Confirmation
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear {{recipientName}},<br/><br/>
+      Welcome! Your profile has been registered in the <strong>{{companyName}}</strong> staff directory. Below are your registration and assignment details.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <!-- Details Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td colspan="2" style="font-size: 13px; font-weight: 700; color: #1e293b; padding-bottom: 12px; text-transform: uppercase; font-family: Arial, sans-serif;">
+            Employment Profile
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Employee ID/Name:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{recipientName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Position:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{position}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Company:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{company}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Branch:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{branch}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Joining Date:</td>
+          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{joiningDate}}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.5; font-family: Arial, sans-serif;">
+      Please contact the HR team or your branch manager to set up your logins and complete the onboarding process.<br/><br/>
+      Best Regards,<br/>
+      <strong>The HR Operations Team</strong>
+    </td>
+  </tr>
+</table>
+{{> footer}}
