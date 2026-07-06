@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "npm --prefix ms-management run dev",
-    "build": "bash build.sh",
+    "build": "npm --prefix ms-management run build",
     "start": "npm --prefix ms-management run start"
   }
 }
