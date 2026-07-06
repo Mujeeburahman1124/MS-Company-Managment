@@ -200,9 +200,10 @@ export async function sendEmail({
 
     htmlContent = compiled(context);
     }
-  } catch (tplErr) {
-    console.error(`[EMAIL-SERVICE] Template render error for ${selectedTemplate}:`, tplErr);
-    sendError = `Template render error: ${tplErr?.message || tplErr}`;
+  } catch (tplErr: unknown) {
+    const tplErrMsg = tplErr instanceof Error ? tplErr.message : String(tplErr);
+    console.error(`[EMAIL-SERVICE] Template render error for ${selectedTemplate}:`, tplErrMsg);
+    sendError = `Template render error: ${tplErrMsg}`;
     statusStr = "Failed";
     htmlContent = `<p>${body}</p>`;
   }
@@ -229,10 +230,11 @@ export async function sendEmail({
       realEmailSent = true;
       statusStr = "Sent";
       sentMessageId = info && (info as any).messageId ? String((info as any).messageId) : null;
-    } catch (err) {
-      console.error(`[EMAIL-SERVICE] SMTP error sending to ${to}:`, err);
+    } catch (err: unknown) {
+      const smtpErrMsg = err instanceof Error ? err.message : String(err);
+      console.error(`[EMAIL-SERVICE] SMTP error sending to ${to}:`, smtpErrMsg);
       statusStr = "Failed";
-      sendError = err?.toString?.() || JSON.stringify(err);
+      sendError = smtpErrMsg;
     }
   } else if (!host || !user || !pass) {
     console.warn(`[EMAIL-SERVICE] SMTP credentials not configured. Logged to DB only.`);
@@ -338,8 +340,9 @@ export async function previewEmail({
     };
 
     return compiled(context);
-  } catch (err) {
-    return `<p>Error rendering preview for ${selectedTemplate}: ${err?.message || err}</p><br/>${body}`;
+  } catch (err: unknown) {
+    const previewErrMsg = err instanceof Error ? err.message : String(err);
+    return `<p>Error rendering preview for ${selectedTemplate}: ${previewErrMsg}</p><br/>${body}`;
   }
 }
 
