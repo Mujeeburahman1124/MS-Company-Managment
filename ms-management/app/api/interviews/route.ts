@@ -183,26 +183,30 @@ export async function POST(request: Request) {
         notes: mappedResponse.notes || ""
       });
 
-      sendEmail({
-        to: mappedResponse.email,
-        subject: generated.subject,
-        body: generated.body,
-        candidateName: mappedResponse.personName,
-        company: company,
-        branch: branch,
-        templateType: templateType as any,
-        templateData: {
-          recipientName: mappedResponse.personName,
-          role: mappedResponse.position || mappedResponse.meetingType || "Assessment Sync",
-          dateTime: mappedResponse.dateTime.replace("T", " "),
-          onlinePhysical: mappedResponse.isOnline ? "Online" : "Physical",
-          meetingMode: mappedResponse.mode || "",
-          conductPersonName: mappedResponse.conductPerson || "",
-          meetingLink: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : "",
-          googleMapLink: !mappedResponse.isOnline ? (mappedResponse.locationLink || "") : "",
-          notes: mappedResponse.notes || ""
-        }
-      }).catch(err => console.error("Async interview email error:", err));
+      try {
+        await sendEmail({
+          to: mappedResponse.email,
+          subject: generated.subject,
+          body: generated.body,
+          candidateName: mappedResponse.personName,
+          company: company,
+          branch: branch,
+          templateType: templateType as any,
+          templateData: {
+            recipientName: mappedResponse.personName,
+            role: mappedResponse.position || mappedResponse.meetingType || "Assessment Sync",
+            dateTime: mappedResponse.dateTime.replace("T", " "),
+            onlinePhysical: mappedResponse.isOnline ? "Online" : "Physical",
+            meetingMode: mappedResponse.mode || "",
+            conductPersonName: mappedResponse.conductPerson || "",
+            meetingLink: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : "",
+            googleMapLink: !mappedResponse.isOnline ? (mappedResponse.locationLink || "") : "",
+            notes: mappedResponse.notes || ""
+          }
+        });
+      } catch (err) {
+        console.error("Async interview email error:", err);
+      }
     }
 
     if ((mappedResponse.whatsapp || mappedResponse.mobile) && data.autoWhatsapp !== false) {
@@ -214,13 +218,17 @@ export async function POST(request: Request) {
 
       const waMessage = `Dear ${mappedResponse.personName}, your ${mappedResponse.type} is scheduled on ${mappedResponse.dateTime.replace("T", " ")}. Type: ${mappedResponse.isOnline ? "Online" : "Physical"} - ${locationText}. Conducted by: ${mappedResponse.conductPerson}.`;
 
-      sendWhatsApp({
-        to: waNumber,
-        message: waMessage,
-        candidateName: mappedResponse.personName,
-        company: company,
-        branch: branch
-      }).catch(err => console.error("Async interview WhatsApp error:", err));
+      try {
+        await sendWhatsApp({
+          to: waNumber,
+          message: waMessage,
+          candidateName: mappedResponse.personName,
+          company: company,
+          branch: branch
+        });
+      } catch (err) {
+        console.error("Async interview WhatsApp error:", err);
+      }
     }
 
     return NextResponse.json(mappedResponse);

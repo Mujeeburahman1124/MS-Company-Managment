@@ -278,23 +278,27 @@ export async function POST(request: Request) {
         extraDetails: applicant.trackingCode ? String(applicant.trackingCode) : undefined
       });
 
-      sendEmail({
-        to: applicant.email,
-        subject: generated.subject,
-        body: generated.body,
-        candidateName: applicant.fullName,
-        company: companyName,
-        branch: applicant.branch || undefined,
-        templateType: "Registration",
-        templateData: {
-          recipientName: applicant.fullName,
-          trackingCode: applicant.trackingCode || "",
-          applicationDate: new Date().toISOString().split("T")[0],
-          applyingPositions: Array.isArray(applicant.applyingPositions)
-            ? (applicant.applyingPositions as string[]).join(", ")
-            : (applicant.applyingPositions ? String(applicant.applyingPositions) : "")
-        }
-      }).catch(err => console.error("Async email sending error:", err));
+      try {
+        await sendEmail({
+          to: applicant.email,
+          subject: generated.subject,
+          body: generated.body,
+          candidateName: applicant.fullName,
+          company: companyName,
+          branch: applicant.branch || undefined,
+          templateType: "Registration",
+          templateData: {
+            recipientName: applicant.fullName,
+            trackingCode: applicant.trackingCode || "",
+            applicationDate: new Date().toISOString().split("T")[0],
+            applyingPositions: Array.isArray(applicant.applyingPositions)
+              ? (applicant.applyingPositions as string[]).join(", ")
+              : (applicant.applyingPositions ? String(applicant.applyingPositions) : "")
+          }
+        });
+      } catch (err) {
+        console.error("Async email sending error:", err);
+      }
     }
 
     // Link applicant with Client Company, create Placement + Agreement, and dispatch email alerts
@@ -372,40 +376,23 @@ export async function POST(request: Request) {
             ? applicant.documents.map((d: any) => `- ${d.type || 'Doc'}: ${d.name}`).join("\n")
             : "No documents uploaded.";
 
-          const hrEmailBody = `Dear Team at ${clientCompany.name},
-
-A new online application has been registered for your company.
-
-Candidate Details:
-- Name: ${applicant.fullName}
-- Position Applied: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions}
-- Nationality: ${applicant.nationality || "N/A"}
-- Mobile Number: ${applicant.mobile || "N/A"}
-- WhatsApp Number: ${applicant.whatsapp || "N/A"}
-- Email Address: ${applicant.email || "N/A"}
-- Application Date: ${applicant.applicationDate}
-- Tracking Code: ${applicant.trackingCode}
-
-Uploaded Documents:
-${docsText}
-
-You can view the full applicant details by clicking the link below:
-http://localhost:3000/applicants/${applicant.id}
-
-Best regards,
-MS Company Management Solutions Operations Team`;
+          const hrEmailBody = `Dear Team at ${clientCompany.name},\n\nA new online application has been registered for your company.\n\nCandidate Details:\n- Name: ${applicant.fullName}\n- Position Applied: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions}\n- Nationality: ${applicant.nationality || "N/A"}\n- Mobile Number: ${applicant.mobile || "N/A"}\n- WhatsApp Number: ${applicant.whatsapp || "N/A"}\n- Email Address: ${applicant.email || "N/A"}\n- Application Date: ${applicant.applicationDate}\n- Tracking Code: ${applicant.trackingCode}\n\nUploaded Documents:\n${docsText}\n\nYou can view the full applicant details by clicking the link below:\nhttp://localhost:3000/applicants/${applicant.id}\n\nBest regards,\nMS Company Management Solutions Operations Team`;
 
           for (const recipient of recipients) {
-            sendEmail({
-              to: recipient,
-              subject: `[New Application] ${applicant.fullName} - ${clientCompany.name}`,
-              body: hrEmailBody,
-              candidateName: applicant.fullName,
-              company: clientCompany.name,
-              branch: applicant.branch && applicant.branch !== "Not Placed" ? applicant.branch : "Dubai Main Branch",
-              sentBy: "System",
-              type: "Email"
-            }).catch(err => console.error(`Error sending email to ${recipient}:`, err));
+            try {
+              await sendEmail({
+                to: recipient,
+                subject: `[New Application] ${applicant.fullName} - ${clientCompany.name}`,
+                body: hrEmailBody,
+                candidateName: applicant.fullName,
+                company: clientCompany.name,
+                branch: applicant.branch && applicant.branch !== "Not Placed" ? applicant.branch : "Dubai Main Branch",
+                sentBy: "System",
+                type: "Email"
+              });
+            } catch (err) {
+              console.error(`Error sending email to ${recipient}:`, err);
+            }
           }
         }
       } catch (err) {
@@ -418,13 +405,17 @@ MS Company Management Solutions Operations Team`;
       const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Horizon F.Z.E";
       const waMessage = `Dear ${applicant.fullName}, your application for positions: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions} has been registered successfully. Track your status using code: ${applicant.trackingCode}. Welcome to ${companyName}!`;
 
-      sendWhatsApp({
-        to: waNumber,
-        message: waMessage,
-        candidateName: applicant.fullName,
-        company: applicant.company,
-        branch: applicant.branch
-      }).catch(err => console.error("Async WhatsApp sending error:", err));
+      try {
+        await sendWhatsApp({
+          to: waNumber,
+          message: waMessage,
+          candidateName: applicant.fullName,
+          company: applicant.company,
+          branch: applicant.branch
+        });
+      } catch (err) {
+        console.error("Async WhatsApp sending error:", err);
+      }
     }
 
     return NextResponse.json(applicant);

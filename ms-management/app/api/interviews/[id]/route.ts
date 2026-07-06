@@ -240,26 +240,30 @@ ${mappedResponse.company} Recruitment Team`;
         templateType = "Interview_Physical"; // Amber/Gold banner
       }
 
-      sendEmail({
-        to: targetEmail,
-        subject,
-        body,
-        candidateName: mappedResponse.personName,
-        company: mappedResponse.company,
-        branch: mappedResponse.branch,
-        templateType: templateType,
-        templateData: {
-          recipientName: mappedResponse.personName,
-          role: mappedResponse.position || mappedResponse.meetingType || "Discussion",
-          dateTime: mappedResponse.dateTime.replace("T", " "),
-          onlinePhysical: mappedResponse.isOnline ? "Online" : "Physical",
-          meetingMode: mappedResponse.mode || "",
-          conductPersonName: mappedResponse.conductPerson || "",
-          meetingLink: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : "",
-          googleMapLink: !mappedResponse.isOnline ? (mappedResponse.locationLink || "") : "",
-          notes: updateReason || mappedResponse.notes || ""
-        }
-      }).catch(err => console.error("Async PUT interview email error:", err));
+      try {
+        await sendEmail({
+          to: targetEmail,
+          subject,
+          body,
+          candidateName: mappedResponse.personName,
+          company: mappedResponse.company,
+          branch: mappedResponse.branch,
+          templateType: templateType,
+          templateData: {
+            recipientName: mappedResponse.personName,
+            role: mappedResponse.position || mappedResponse.meetingType || "Discussion",
+            dateTime: mappedResponse.dateTime.replace("T", " "),
+            onlinePhysical: mappedResponse.isOnline ? "Online" : "Physical",
+            meetingMode: mappedResponse.mode || "",
+            conductPersonName: mappedResponse.conductPerson || "",
+            meetingLink: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : "",
+            googleMapLink: !mappedResponse.isOnline ? (mappedResponse.locationLink || "") : "",
+            notes: updateReason || mappedResponse.notes || ""
+          }
+        });
+      } catch (err) {
+        console.error("Async PUT interview email error:", err);
+      }
     }
 
     if (shouldNotify && targetPhone) {
@@ -272,13 +276,17 @@ ${mappedResponse.company} Recruitment Team`;
         waMessage = `Dear ${mappedResponse.personName}, your ${mappedResponse.type} status is now: ${data.status || mappedResponse.status}.`;
       }
 
-      sendWhatsApp({
-        to: targetPhone,
-        message: waMessage,
-        candidateName: mappedResponse.personName,
-        company: mappedResponse.company,
-        branch: mappedResponse.branch
-      }).catch(err => console.error("Async PUT interview WhatsApp error:", err));
+      try {
+        await sendWhatsApp({
+          to: targetPhone,
+          message: waMessage,
+          candidateName: mappedResponse.personName,
+          company: mappedResponse.company,
+          branch: mappedResponse.branch
+        });
+      } catch (err) {
+        console.error("Async PUT interview WhatsApp error:", err);
+      }
     }
 
     return NextResponse.json(mappedResponse);

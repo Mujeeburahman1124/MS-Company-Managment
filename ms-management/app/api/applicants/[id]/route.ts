@@ -216,76 +216,92 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (data.status && data.status !== existing.status && updated.email) {
       if (updated.status === "Selected") {
         const positionsStr = Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions;
-        sendEmail({
-          to: updated.email,
-          subject: `Job Offer Invitation: ${positionsStr}`,
-          body: "Job Offer Details",
-          candidateName: updated.fullName,
-          company: updated.company,
-          branch: updated.branch,
-          type: "Offer",
-          templateType: "Offer",
-          templateData: {
-            recipientName: updated.fullName,
-            position: positionsStr,
-            salary: updated.salaryExpectation ? String(updated.salaryExpectation) : "As agreed in interviews",
-            joiningDate: "Immediate or as per visa processing",
-            allowances: "Standard accommodation and transport as per UAE Labor Law",
-            offerLetterLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
-          }
-        }).catch(err => console.error("Async offer letter email error:", err));
+        try {
+          await sendEmail({
+            to: updated.email,
+            subject: `Job Offer Invitation: ${positionsStr}`,
+            body: "Job Offer Details",
+            candidateName: updated.fullName,
+            company: updated.company,
+            branch: updated.branch,
+            type: "Offer",
+            templateType: "Offer",
+            templateData: {
+              recipientName: updated.fullName,
+              position: positionsStr,
+              salary: updated.salaryExpectation ? String(updated.salaryExpectation) : "As agreed in interviews",
+              joiningDate: "Immediate or as per visa processing",
+              allowances: "Standard accommodation and transport as per UAE Labor Law",
+              offerLetterLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+            }
+          });
+        } catch (err) {
+          console.error("Async offer letter email error:", err);
+        }
       } else {
         const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
         const emailBody = `Please be informed that your application status has been updated to: **${updated.status}**.\n\n**Registration Summary:**\n- Candidate Name: ${updated.fullName}\n- Tracking Code: ${updated.trackingCode}\n- Position: ${Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions}`;
 
-        sendEmail({
-          to: updated.email,
-          subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
-          body: emailBody,
-          candidateName: updated.fullName,
-          company: companyName,
-          branch: updated.branch,
-          type: "Status Update",
-          templateType: "System",
-          templateData: {
-            recipientName: updated.fullName,
+        try {
+          await sendEmail({
+            to: updated.email,
+            subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
             body: emailBody,
-            actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
-          }
-        }).catch(err => console.error("Async status update email error:", err));
+            candidateName: updated.fullName,
+            company: companyName,
+            branch: updated.branch,
+            type: "Status Update",
+            templateType: "System",
+            templateData: {
+              recipientName: updated.fullName,
+              body: emailBody,
+              actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+            }
+          });
+        } catch (err) {
+          console.error("Async status update email error:", err);
+        }
       }
     } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
       // General profile update
       const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
       const emailBody = `This is to notify you that your application profile details have been updated in our recruitment system.\n\n**Profile Summary:**\n- Tracking Code: ${updated.trackingCode}\n- Position: ${Array.isArray(updated.applyingPositions) ? (updated.applyingPositions as string[]).join(", ") : updated.applyingPositions}`;
 
-      sendEmail({
-        to: updated.email,
-        subject: `Application Profile Updated - Tracking Code: ${updated.trackingCode}`,
-        body: emailBody,
-        candidateName: updated.fullName,
-        company: companyName,
-        branch: updated.branch,
-        templateType: "System",
-        templateData: {
-          recipientName: updated.fullName,
+      try {
+        await sendEmail({
+          to: updated.email,
+          subject: `Application Profile Updated - Tracking Code: ${updated.trackingCode}`,
           body: emailBody,
-          actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
-        }
-      }).catch(err => console.error("Async general update email error:", err));
+          candidateName: updated.fullName,
+          company: companyName,
+          branch: updated.branch,
+          templateType: "System",
+          templateData: {
+            recipientName: updated.fullName,
+            body: emailBody,
+            actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+          }
+        });
+      } catch (err) {
+        console.error("Async general update email error:", err);
+      }
     }
 
     if (data.status && data.status !== existing.status && (updated.whatsapp || updated.mobile)) {
       const waNumber = updated.whatsapp || updated.mobile;
       const waMessage = `Dear ${updated.fullName}, your application status has been updated to: ${updated.status}. You can track it using code: ${updated.trackingCode}.`;
 
-      sendWhatsApp({
-        to: waNumber,
-        message: waMessage,
-        candidateName: updated.fullName,
-        company: updated.company,
-        branch: updated.branch
-      }).catch(err => console.error("Async status update WhatsApp error:", err));
+      try {
+        await sendWhatsApp({
+          to: waNumber,
+          message: waMessage,
+          candidateName: updated.fullName,
+          company: updated.company,
+          branch: updated.branch
+        });
+      } catch (err) {
+        console.error("Async status update WhatsApp error:", err);
+      }
     }
 
     return NextResponse.json(updated);
