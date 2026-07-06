@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
 import prisma from "./prisma";
+import fs from "fs";
+import path from "path";
+import Handlebars from "handlebars";
 
 
 const cleanEnvVar = (val: string | undefined) => {
@@ -236,7 +239,8 @@ function buildHtmlEmail(
       </table>`;
   }
 
-  return `<!DOCTYPE html>
+  // NOTE: We now use Handlebars template files for full HTML templates.
+  const htmlBody = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -372,6 +376,33 @@ function buildHtmlEmail(
   </table>
 </body>
 </html>`;
+  return htmlBody;
+}
+
+// Helper: load template by name
+function loadTemplate(templateName: string) {
+  const templatesDir = path.join(process.cwd(), "lib", "email-templates");
+  const templatePath = path.join(templatesDir, "templates", `${templateName}.hbs`);
+  if (!fs.existsSync(templatePath)) throw new Error(`Template not found: ${templateName}`);
+  return fs.readFileSync(templatePath, "utf8");
+}
+
+// Register partials (header/footer/components)
+function registerPartials() {
+  try {
+    const componentsDir = path.join(process.cwd(), "lib", "email-templates", "components");
+    const files = fs.readdirSync(componentsDir);
+    files.forEach(f => {
+      const content = fs.readFileSync(path.join(componentsDir, f), "utf8");
+      const name = path.basename(f, path.extname(f));
+      Handlebars.registerPartial(name, content);
+    });
+    // Helpers
+    Handlebars.registerHelper('year', () => new Date().getFullYear());
+    Handlebars.registerHelper('companyPrimaryColor', (fallback: string) => fallback || '#2563eb');
+  } catch (err) {
+    // ignore
+  }
 }
 
 /**
@@ -452,7 +483,76 @@ export async function sendEmail({
     }
   }
 
-  const htmlContent = buildHtmlEmail(subject, body, company, templateType, companyEmail, companyPhone, companyAddress, companyLogo);
+  // Register partials/helpers once
+  registerPartials();
+
+  let htmlContent = "";
+  let usedTemplateName: string | null = null;
+
+  if (templateType && templateData) {
+    try {
+      // Map templateType to file names we created
+      const map: Record<string, string> = {
+        Interview: "interview-invitation",
+        Interview_Initial: "interview-invitation",
+        Interview_Online: "interview-invitation",
+        Interview_Physical: "interview-invitation",
+        Interview_Cancelled: "interview-cancelled",
+        Interview_Completed: "interview-invitation",
+        Offer: "offer-letter",
+        Visa: "visa-expiry-reminder",
+        Registration: "applicant-registration-confirmation",
+        Placement: "placement-confirmation",
+        Placement_Agreement: "placement-agreement",
+        Password_Reset: "password-reset",
+        Staff_Registration: "staff-registration",
+        User_Account_Created: "user-account-created",
+        Leave: "leave-application-submitted",
+        Leave_Approved: "leave-approved",
+        Leave_Rejected: "leave-rejected",
+        Staff_Request_Submitted: "staff-request-submitted",
+        Staff_Request_Approved: "staff-request-approved",
+        Staff_Request_Rejected: "staff-request-rejected",
+        Task_Assigned: "task-assigned",
+        Task_Deadline_Reminder: "task-deadline-reminder",
+        Payroll: "payroll-generated",
+        Payslip: "payslip-available",
+        Birthday: "birthday-wishes",
+        System: "system-notification",
+      };
+
+      const fileName = map[templateType] || map[templateType as any];
+      if (!fileName) throw new Error(`No template mapping for ${templateType}`);
+      usedTemplateName = fileName;
+
+      const tpl = loadTemplate(fileName);
+      const compiled = Handlebars.compile(tpl);
+
+      const recipientName = templateData.recipientName || candidateName || templateData.applicantName || "Recipient";
+      const logoText = (company || "").toUpperCase().split(" ").slice(0,2).map(s=>s.charAt(0)).join("") || "MS";
+
+      const context = {
+        recipientName,
+        companyName: company || "MS Management",
+        companyEmail,
+        companyPhone,
+        companyAddress,
+        logoText,
+        website: `https://${(companyEmail.match(/@(.+)$/)||["","msjobs.net"])[1]}`,
+        year: new Date().getFullYear(),
+        companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
+        ...templateData,
+      };
+
+      htmlContent = compiled(context);
+    } catch (tplErr) {
+      console.error(`[EMAIL-SERVICE] Template render error for ${templateType}:`, tplErr);
+      // fallback to generic
+      htmlContent = buildHtmlEmail(subject, body, company, templateType, companyEmail, companyPhone, companyAddress, companyLogo);
+    }
+  } else {
+    htmlContent = buildHtmlEmail(subject, body, company, templateType, companyEmail, companyPhone, companyAddress, companyLogo);
+  }
 
   if (host && user && pass) {
     try {
@@ -464,7 +564,7 @@ export async function sendEmail({
         tls: { rejectUnauthorized: false },
       });
 
-      await transporter.sendMail({
+      const info = await transporter.sendMail({
         from,
         to,
         subject,
@@ -475,9 +575,12 @@ export async function sendEmail({
       console.log(`[EMAIL-SERVICE] Email sent successfully to ${to}`);
       realEmailSent = true;
       statusStr = "Sent";
-    } catch (err) {
+      // capture messageId
+      var sentMessageId = info && (info as any).messageId ? String((info as any).messageId) : null;
+    } catch (err: any) {
       console.error(`[EMAIL-SERVICE] SMTP error sending to ${to}:`, err);
       statusStr = "Failed";
+      var sendError = err?.toString?.() || JSON.stringify(err);
     }
   } else {
     console.warn(`[EMAIL-SERVICE] SMTP credentials not configured. Logged to DB only.`);
@@ -496,6 +599,9 @@ export async function sendEmail({
         company: company || "System",
         branch: branch || "Main",
         deliveryStatus: statusStr,
+        templateName: usedTemplateName,
+        messageId: typeof sentMessageId !== 'undefined' ? sentMessageId : null,
+        errorLog: typeof sendError !== 'undefined' ? sendError : null,
         sentBy: sentBy || "System",
         type: type || "Email",
       },
@@ -505,6 +611,78 @@ export async function sendEmail({
   }
 
   return realEmailSent;
+}
+
+/**
+ * Render a template preview without sending.
+ */
+export async function previewEmail({
+  subject,
+  body,
+  company,
+  templateType,
+  templateData,
+}: {
+  subject?: string;
+  body?: string;
+  company?: string;
+  templateType?: string;
+  templateData?: any;
+}) {
+  // reuse partials
+  registerPartials();
+
+  if (templateType && templateData) {
+    try {
+      const map: Record<string, string> = {
+        Interview: "interview-invitation",
+        Interview_Initial: "interview-invitation",
+        Interview_Online: "interview-invitation",
+        Interview_Physical: "interview-invitation",
+        Interview_Cancelled: "interview-cancelled",
+        Offer: "offer-letter",
+        Visa: "visa-expiry-reminder",
+        Registration: "applicant-registration-confirmation",
+        Placement: "placement-confirmation",
+        Placement_Agreement: "placement-agreement",
+        Password_Reset: "password-reset",
+        Staff_Registration: "staff-registration",
+        User_Account_Created: "user-account-created",
+        Leave: "leave-application-submitted",
+        Leave_Approved: "leave-approved",
+        Leave_Rejected: "leave-rejected",
+        Staff_Request_Submitted: "staff-request-submitted",
+        Staff_Request_Approved: "staff-request-approved",
+        Staff_Request_Rejected: "staff-request-rejected",
+        Task_Assigned: "task-assigned",
+        Task_Deadline_Reminder: "task-deadline-reminder",
+        Payroll: "payroll-generated",
+        Payslip: "payslip-available",
+        Birthday: "birthday-wishes",
+        System: "system-notification",
+      };
+      const fileName = map[templateType] || templateType;
+      const tpl = loadTemplate(fileName);
+      const compiled = Handlebars.compile(tpl);
+      const context = {
+        recipientName: templateData.recipientName || templateData.applicantName || "Recipient",
+        companyName: company || templateData.company || "MS Management",
+        companyEmail: templateData.companyEmail || "hr@example.com",
+        companyPhone: templateData.companyPhone || "+971000000",
+        companyAddress: templateData.companyAddress || "",
+        logoText: (company || "MS").slice(0,2).toUpperCase(),
+        website: `https://${(templateData.companyEmail||'msjobs.net').match(/@(.+)$/)?.[1]||'msjobs.net'}`,
+        year: new Date().getFullYear(),
+        companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
+        ...templateData,
+      };
+      return compiled(context);
+    } catch (err) {
+      return buildHtmlEmail(subject || "", body || "", company || "", undefined, undefined, undefined, undefined, "");
+    }
+  }
+
+  return buildHtmlEmail(subject || "", body || "", company || "");
 }
 
 /**

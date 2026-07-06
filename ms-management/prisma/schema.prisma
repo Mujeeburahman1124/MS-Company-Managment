@@ -479,6 +479,9 @@ model SentEmail {
   branch         String?
   candidateName  String?
   deliveryStatus String?  @default("Sent")
+  templateName   String?
+  messageId      String?
+  errorLog       String?
   sentBy         String?  @default("System")
   type           String?  @default("Email")
 }

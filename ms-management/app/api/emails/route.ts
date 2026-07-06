@@ -36,6 +36,11 @@ export async function POST(request: Request) {
     if (!data.to) {
       return NextResponse.json({ error: "To is required" }, { status: 400 });
     }
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.to)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    }
 
     let finalSubject = data.subject;
     let finalBody = data.body;

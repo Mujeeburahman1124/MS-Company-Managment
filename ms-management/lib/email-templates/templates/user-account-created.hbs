@@ -1,0 +1,13 @@
+{{> header}}
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
+  <tr>
+    <td>
+      <h2>User Account Created</h2>
+      <p>Hello {{recipientName}},</p>
+      <p>Your user account has been created. Login: {{loginEmail}}</p>
+      <p>Please set your password using the secure link below.</p>
+      <p><a href="{{resetLink}}" style="background:{{companyPrimaryColor '#2563eb'}}; color:#fff; padding:10px 14px; border-radius:8px; text-decoration:none;">Set Password</a></p>
+    </td>
+  </tr>
+</table>
+{{> footer}}

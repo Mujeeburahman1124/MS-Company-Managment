@@ -1,0 +1,17 @@
+{{> header}}
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
+  <tr>
+    <td>
+      <h2 style="margin:0 0 8px 0; font-size:18px; color:#0f172a;">Interview Invitation</h2>
+      <p style="color:#475569;">Hello {{recipientName}},</p>
+      <p style="color:#475569;">You are invited to an interview for the role of <strong>{{role}}</strong> at {{companyName}}.</p>
+      <table style="background:#fff; padding:12px; border-radius:8px; border:1px solid #eef2ff; width:100%;">
+        <tr><td>Date</td><td>{{date}}</td></tr>
+        <tr><td>Time</td><td>{{time}}</td></tr>
+        <tr><td>Location / Link</td><td>{{link}}</td></tr>
+      </table>
+      <p style="margin-top:12px;">Notes: {{notes}}</p>
+    </td>
+  </tr>
+</table>
+{{> footer}}

@@ -1,0 +1,17 @@
+{{> header}}
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
+  <tr>
+    <td>
+      <h2 style="font-size:18px; margin:0 0 8px 0;">Interview Rescheduled</h2>
+      <p>Dear {{recipientName}},</p>
+      <p>Your interview for <strong>{{role}}</strong> has been rescheduled.</p>
+      <div style="background:#fff; border-radius:8px; padding:12px; border:1px solid #f0f9ff;">
+        <p style="margin:0">New Date: {{date}}</p>
+        <p style="margin:6px 0 0 0">New Time: {{time}}</p>
+        <p style="margin:6px 0 0 0">Meeting Link: {{link}}</p>
+      </div>
+      <p style="margin-top:12px;">If this is inconvenient, please contact HR at {{companyEmail}}.</p>
+    </td>
+  </tr>
+</table>
+{{> footer}}

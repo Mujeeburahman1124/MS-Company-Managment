@@ -430,7 +430,7 @@ export default function NotificationsPage() {
                       </div>
                     </div>
                     {isExpanded && (
-                      <div className="mt-4 pt-3 border-t border-slate-50 font-mono text-[10px] text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100 whitespace-pre-wrap leading-relaxed">
+                      <div className="mt-4 pt-3 border-t border-slate-50 font-mono text-[10px] text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100 whitespace-pre-wrap leading-relaxed overflow-x-auto break-words">
                         {email.body}
                       </div>
                     )}
@@ -530,7 +530,7 @@ export default function NotificationsPage() {
 
       {shareEmail && (
         <Dialog open={!!shareEmail} onOpenChange={(open) => !open && setShareEmail(null)}>
-          <DialogContent className="sm:max-w-md bg-white border border-slate-100 rounded-3xl p-6 shadow-2xl">
+          <DialogContent className="max-w-full sm:max-w-md bg-white border border-slate-100 rounded-3xl p-6 shadow-2xl">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-blue-600" />
@@ -555,7 +555,7 @@ export default function NotificationsPage() {
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] uppercase font-bold text-slate-400">Email Body</span>
-                <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl max-h-40 overflow-y-auto font-mono text-[10px] leading-relaxed text-slate-600 whitespace-pre-wrap">
+                <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl max-h-40 overflow-y-auto overflow-x-auto font-mono text-[10px] leading-relaxed text-slate-600 whitespace-pre-wrap break-words">
                   {shareEmail.body}
                 </div>
               </div>
