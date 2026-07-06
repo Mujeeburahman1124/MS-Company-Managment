@@ -40,15 +40,15 @@ function StatCard({ title, value, icon: Icon, sub, trend, theme }: {
   const t = STAT_THEMES[theme];
   return (
     <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.bg} p-5 text-white shadow-lg`}>
-      <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-card/10" />
-      <div className="absolute -right-2 -bottom-8 w-20 h-20 rounded-full bg-card/5" />
+      <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
+      <div className="absolute -right-2 -bottom-8 w-20 h-20 rounded-full bg-white/5" />
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-3">
           <div className={`w-10 h-10 rounded-xl ${t.icon} flex items-center justify-center ring-1 ${t.ring}`}>
             <Icon className="w-5 h-5 text-white" />
           </div>
           {trend && (
-            <span className={`flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full ${trend.up ? "bg-card/20" : "bg-black/15"}`}>
+            <span className={`flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full ${trend.up ? "bg-white/20" : "bg-black/15"}`}>
               {trend.up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               {trend.val}
             </span>
@@ -178,7 +178,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
       {/* Main grids */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="space-y-5">
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={CheckSquare} title="My Pending Tasks" href="/tasks" linkLabel="View all" />
             {myPendingTasks.length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">All caught up! 🎉</div>
@@ -201,7 +201,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
             }
           </Card>
 
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Clock} title="My Leave Requests" href="/leave" linkLabel="Apply" />
             {myLeave.length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No leave requests yet</div>
@@ -222,7 +222,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
 
         <div className="space-y-5">
           {/* Attendance Calendar */}
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Calendar} title="My Attendance Calendar" />
             <p className="text-[10px] text-slate-400 mb-3 font-medium">Monthly view for {currentMonthName} {currentYear}</p>
             <div className="grid grid-cols-7 gap-1.5">
@@ -277,7 +277,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
           </Card>
 
           {/* Payslips */}
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={DollarSign} title="My Payslips" />
             {myPayslips.length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No payslips generated yet</div>
@@ -312,7 +312,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
       {/* Payslip Modal Dialog */}
       {selectedPayslip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
-          <Card className="w-full max-w-lg bg-card rounded-3xl p-6 shadow-2xl border border-slate-100 flex flex-col animate-in fade-in zoom-in-95 duration-150">
+          <Card className="w-full max-w-lg bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 flex flex-col animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div>
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">MS HORIZON F.Z.E</h3>
@@ -436,7 +436,7 @@ function RecruiterDashboard({ fApplicants, fInterviews, placements, now, compani
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Users} title="Applicant Pipeline" />
           <div className="h-52">
             {pieData.length === 0
@@ -454,7 +454,7 @@ function RecruiterDashboard({ fApplicants, fInterviews, placements, now, compani
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Calendar} title="Today's Interviews" href="/interviews" />
           {todayInterviews.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No interviews today</div>
@@ -528,7 +528,7 @@ function HRDashboard({ fStaff, leaveRequests, staffRequests, staffAttendance, no
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Pending Leave */}
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Clock} title="Pending Leave Requests" href="/leave" />
           {companyLeave.filter(l => l.status === "Pending").length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No pending requests</div>
@@ -547,7 +547,7 @@ function HRDashboard({ fStaff, leaveRequests, staffRequests, staffAttendance, no
         </Card>
 
         {/* Staff Requests */}
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={ClipboardList} title="Staff Requests" href="/requests" />
           {companyRequests.filter(r => r.status === "Pending").length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No pending requests</div>
@@ -566,7 +566,7 @@ function HRDashboard({ fStaff, leaveRequests, staffRequests, staffAttendance, no
         </Card>
 
         {/* Birthdays */}
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Cake} title="Upcoming Birthdays" href="/birthday" />
           {upcomingBirthdays.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No birthdays this week</div>
@@ -630,7 +630,7 @@ function AccountantDashboard({ payroll, fStaff, currentUser }: {
       </div>
 
       {approvedPayroll > 0 && (
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Payable (Approved)</p>
@@ -644,7 +644,7 @@ function AccountantDashboard({ payroll, fStaff, currentUser }: {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={DollarSign} title="Recent Payroll Records" href="/payroll" />
           {companyPayroll.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No payroll records</div>
@@ -665,7 +665,7 @@ function AccountantDashboard({ payroll, fStaff, currentUser }: {
           }
         </Card>
 
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Users} title="Active Staff" href="/staff" />
           {fStaff.filter(s => s.status === "Active").length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No active staff</div>
@@ -795,7 +795,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
       {hasPermission("tasks", "view") && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Team Task Summary & Completion Rate */}
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={CheckSquare} title="Team Task Summary" />
             <div className="flex items-center justify-between mb-4 mt-2">
               <div className="space-y-1">
@@ -827,7 +827,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
           </Card>
 
           {/* Employee Performance Leaderboard */}
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Briefcase} title="Employee Performance" />
             <div className="space-y-2 overflow-y-auto max-h-48 pr-1 mt-2">
               {employeePerformance.length === 0 ? (
@@ -848,7 +848,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
           </Card>
 
           {/* Delayed Tasks Watchlist */}
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={AlertTriangle} title="Delayed Tasks Watchlist" />
             {delayedTasks.length === 0 ? (
               <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400 font-semibold italic">All tasks on schedule! ✓</div>
@@ -873,7 +873,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
       {/* Charts Grid - Scoped by Permissions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {hasPermission("applicants", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Users} title="Applicant Pipeline" />
             <div className="h-52">
               {pieData.length === 0
@@ -893,7 +893,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
         )}
 
         {hasPermission("visaExpiry", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={AlertTriangle} title="Visa Expiry Watchlist" href="/visa-expiry" />
             {visaAlerts.length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">All visas are valid ✓</div>
@@ -921,7 +921,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
       {/* Tasks + Interviews + Requests */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {hasPermission("tasks", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={CheckSquare} title="Active Tasks" href="/tasks" />
             <div className="flex items-center gap-3 mb-3 flex-wrap">
               <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">{activeTasks.length} Active</span>
@@ -943,7 +943,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
         )}
 
         {hasPermission("interviews", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Calendar} title="Today's Schedule" href="/interviews" />
             {todayInterviews.length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No meetings today</div>
@@ -960,7 +960,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
         )}
 
         {hasPermission("leave", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Clock} title="Pending Leave Requests" href="/leave" />
             {companyLeave.filter(l => l.status === "Pending").length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400 font-semibold">No pending leave requests</div>
@@ -980,7 +980,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
         )}
 
         {hasPermission("requests", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={ClipboardList} title="Pending Requests" href="/requests" />
             {companyRequests.filter(r => r.status === "Pending").length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No pending requests</div>
@@ -997,7 +997,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
         )}
 
         {hasPermission("payroll", "view") && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={DollarSign} title="Recent Payroll" href="/payroll" />
             {companyPayroll.length === 0
               ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400 font-semibold">No payroll records</div>
@@ -1020,7 +1020,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
         )}
 
         {hasPermission("staff", "view") && upcomingBirthdays.length > 0 && (
-          <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+          <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
             <SectionHeader icon={Cake} title="Upcoming Birthdays" />
             <div className="space-y-2.5 overflow-y-auto max-h-60 pr-1 mt-2">
               {upcomingBirthdays.slice(0, 5).map(s => (
@@ -1180,7 +1180,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
       {/* Super Admin Payroll Command Center */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Payroll Stats Widget */}
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col justify-between">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col justify-between">
           <SectionHeader icon={DollarSign} title="Payroll Cost Audit" />
           <div className="space-y-4 my-2">
             <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between">
@@ -1235,7 +1235,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
         </Card>
 
         {/* Pending Payroll Approvals List with Quick Actions */}
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 lg:col-span-2 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 lg:col-span-2 flex flex-col">
           <SectionHeader icon={FileSpreadsheet} title="Pending Payroll Approvals" />
           <div className="flex-1 overflow-y-auto max-h-56 pr-1 mt-2">
             {payroll.filter(p => p.status === "Pending Approval").length === 0 ? (
@@ -1289,7 +1289,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
 
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Users} title="Applicant Pipeline" />
           <div className="h-52 mt-2">
             {pieData.length === 0
@@ -1307,7 +1307,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={TrendingUp} title="Placement Trend" />
           <div className="h-52 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -1328,7 +1328,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
           </div>
         </Card>
 
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Activity} title="Attendance Overview" />
           <div className="h-52 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -1352,7 +1352,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
       </div>
 
       {/* Company-wise overview (Super Admin only) */}
-      <Card className="rounded-2xl border-0 shadow-md bg-card p-5">
+      <Card className="rounded-2xl border-0 shadow-md bg-white p-5">
         <SectionHeader icon={Building2} title="Company-wise Overview" href="/companies" linkLabel="Manage" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
           {companyStats.slice(0, 6).map(c => (
@@ -1378,7 +1378,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
 
       {/* Alerts + Birthdays + Tasks */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Shield} title="Visa Expiry Watchlist" href="/visa-expiry" />
           {visaAlerts.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">All visas valid ✓</div>
@@ -1399,7 +1399,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
           }
         </Card>
 
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={Cake} title="Birthday Celebrations" href="/birthday" />
           {upcomingBirthdays.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">No birthdays this week</div>
@@ -1424,7 +1424,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
           }
         </Card>
 
-        <Card className="rounded-2xl border-0 shadow-md bg-card p-5 flex flex-col">
+        <Card className="rounded-2xl border-0 shadow-md bg-white p-5 flex flex-col">
           <SectionHeader icon={CheckSquare} title="Active Tasks" href="/tasks" />
           {activeTasks.length === 0
             ? <div className="flex-1 flex items-center justify-center py-8 text-xs text-slate-400">All caught up! 🎉</div>
@@ -1531,7 +1531,7 @@ function AttendanceWidget({ currentUser, now, staffAttendance, saveAttendance, a
   };
 
   return (
-    <Card className="rounded-3xl border-0 shadow-xl bg-card p-6 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+    <Card className="rounded-3xl border-0 shadow-xl bg-white p-6 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
       <div className="absolute -right-10 -top-10 w-40 h-40 bg-emerald-50 rounded-full blur-3xl opacity-60" />
       <div className="flex items-center gap-5 z-10">
         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${hasCheckedIn ? "bg-emerald-500 shadow-emerald-200" : "bg-blue-600 shadow-blue-200"}`}>
