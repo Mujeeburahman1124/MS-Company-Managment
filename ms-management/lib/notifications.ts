@@ -83,20 +83,42 @@ function buildHtmlEmail(
     }
   }
 
+  const getIconForKey = (kName: string): string => {
+    const k = kName.toLowerCase();
+    if (k.includes("name")) return "👤";
+    if (k.includes("position") || k.includes("role") || k.includes("job")) return "💼";
+    if (k.includes("client") || k.includes("company")) return "🏢";
+    if (k.includes("date")) return "📅";
+    if (k.includes("time")) return "⏰";
+    if (k.includes("location") || k.includes("address")) return "📍";
+    if (k.includes("type") || k.includes("format")) return "👥";
+    if (k.includes("person") || k.includes("conductor")) return "👤";
+    if (k.includes("number") || k.includes("mobile") || k.includes("phone") || k.includes("whatsapp")) return "📞";
+    if (k.includes("passport") || k.includes("visa")) return "🆔";
+    if (k.includes("days") || k.includes("remaining")) return "⚠️";
+    if (k.includes("instruction") || k.includes("remarks") || k.includes("notes") || k.includes("feedback")) return "ℹ️";
+    return "🔹";
+  };
+
   // Build the details table
   let tableHtml = "";
   if (tableRows.length > 0) {
     tableHtml += `
       <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin: 16px 0 24px 0; border-collapse: separate; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">`;
     tableRows.forEach((row, index) => {
-      const bg = index % 2 === 0 ? "#ffffff" : "#f8fafc";
       const isLast = index === tableRows.length - 1;
       const borderStyle = isLast ? "" : "border-bottom: 1px solid #f1f5f9;";
+      const icon = getIconForKey(row.key);
+      const isWarningField = row.key.toLowerCase().includes("expiry") || row.key.toLowerCase().includes("remaining") || row.key.toLowerCase().includes("expired");
+      const valColor = isWarningField ? "#dc2626" : "#1e293b";
+      
       tableHtml += `
-        <tr style="background: ${bg};">
-          <td width="35%" style="padding: 10px 16px; font-size: 12px; font-weight: 750; color: #475569; ${borderStyle}">${row.key}</td>
-          <td width="5%" style="padding: 10px 0; font-size: 12px; font-weight: 750; color: #94a3b8; ${borderStyle} text-align: center;">:</td>
-          <td width="60%" style="padding: 10px 16px; font-size: 12px; font-weight: 750; color: #1e293b; ${borderStyle}">${row.val}</td>
+        <tr style="background: #ffffff;">
+          <td width="42%" style="padding: 10px 16px; font-size: 12px; font-weight: 700; color: #475569; ${borderStyle}">
+            <span style="margin-right: 6px; font-size: 13px; vertical-align: middle;">${icon}</span>${row.key}
+          </td>
+          <td width="3%" style="padding: 10px 0; font-size: 12px; font-weight: 700; color: #94a3b8; ${borderStyle} text-align: center;">:</td>
+          <td width="55%" style="padding: 10px 16px; font-size: 12px; font-weight: 700; color: ${valColor}; ${borderStyle}">${row.val}</td>
         </tr>`;
     });
     tableHtml += `</table>`;
