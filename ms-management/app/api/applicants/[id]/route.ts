@@ -240,7 +240,32 @@ export async function PUT(request: Request, { params }: RouteParams) {
         }
       } else {
         const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
-        const emailBody = `Please be informed that your application status has been updated to: **${updated.status}**.\n\n**Registration Summary:**\n- Candidate Name: ${updated.fullName}\n- Tracking Code: ${updated.trackingCode}\n- Position: ${Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions}`;
+        const positions = Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions;
+        const emailBody = `
+          <p style="font-size: 14px; color: #334155; margin-bottom: 16px;">
+            Please be informed that your application status has been updated to: <strong style="color: #2563eb;">${updated.status}</strong>.
+          </p>
+          <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <h4 style="margin-top: 0; margin-bottom: 12px; color: #0f172a; font-size: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">Registration Summary</h4>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #059669; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Candidate Name:</span> 
+                <span style="color: #059669; font-weight: 600;">${updated.fullName}</span>
+              </li>
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #ea580c; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Tracking Code:</span> 
+                <span style="color: #ea580c; font-weight: 600; font-family: monospace; font-size: 15px;">${updated.trackingCode}</span>
+              </li>
+              <li style="font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #4f46e5; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Position:</span> 
+                <span style="color: #4f46e5; font-weight: 600;">${positions}</span>
+              </li>
+            </ul>
+          </div>
+        `;
 
         try {
           await sendEmail({
@@ -265,8 +290,31 @@ export async function PUT(request: Request, { params }: RouteParams) {
     } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
       // General profile update
       const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
-      const emailBody = `This is to notify you that your application profile details have been updated in our recruitment system.\n\n**Profile Summary:**\n- Tracking Code: ${updated.trackingCode}\n- Position: ${Array.isArray(updated.applyingPositions) ? (updated.applyingPositions as string[]).join(", ") : updated.applyingPositions}`;
-
+      const emailBody = `
+          <p style="font-size: 14px; color: #334155; margin-bottom: 16px;">
+            This is to notify you that your application profile details have been updated in our recruitment system.
+          </p>
+          <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <h4 style="margin-top: 0; margin-bottom: 12px; color: #0f172a; font-size: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">Profile Summary</h4>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #059669; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Candidate Name:</span> 
+                <span style="color: #059669; font-weight: 600;">${updated.fullName}</span>
+              </li>
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #ea580c; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Tracking Code:</span> 
+                <span style="color: #ea580c; font-weight: 600; font-family: monospace; font-size: 15px;">${updated.trackingCode}</span>
+              </li>
+              <li style="font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #4f46e5; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Position:</span> 
+                <span style="color: #4f46e5; font-weight: 600;">${Array.isArray(updated.applyingPositions) ? (updated.applyingPositions as string[]).join(", ") : updated.applyingPositions}</span>
+              </li>
+            </ul>
+          </div>
+        `;
       try {
         await sendEmail({
           to: updated.email,

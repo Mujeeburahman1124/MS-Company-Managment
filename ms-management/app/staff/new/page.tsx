@@ -264,8 +264,8 @@ export default function NewStaffPage() {
                 <Input id="transportAllowance" type="number" defaultValue={500} className="bg-white border-slate-200 rounded-xl text-xs h-10" {...register("transportAllowance")} />
               </div>
               <div className="space-y-1 col-span-2">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Shift Assignment <span className="text-rose-500">*</span></Label>
-                <select className={cn("w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400 focus:outline-none", errors.shiftId && "border-rose-500")} {...register("shiftId", { required: "Shift must be assigned" })}>
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Shift Assignment</Label>
+                <select className={cn("w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400 focus:outline-none", errors.shiftId && "border-rose-500")} {...register("shiftId")}>
                   <option value="">-- Assign a Shift --</option>
                   {(currentRole === "Super Admin" ? shifts : shifts.filter((s: any) => s.company === (selectedCompany || currentUser.company))).map((s: any) => (
                     <option key={s.id} value={s.id}>{s.name} ({s.startTime} - {s.endTime})</option>

@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { formatDate, cn } from "@/lib/utils";
-import type { Applicant, Document, StatusHistory } from "@/lib/types";
+import type { Applicant, Document, StatusHistory, Placement } from "@/lib/types";
 import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
 import TimelineItem from "@/components/shared/TimelineItem";
@@ -30,7 +30,7 @@ import { toast } from "sonner";
 export default function ApplicantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { applicants, updateApplicant, addActivityLog, addInterview, companies, currentUser, hasPermission, interviews, placements, updatePlacement, sentEmails, sentWhatsApp, addSentEmail, currentRole } = useAuthStore();
+  const { applicants, updateApplicant, addActivityLog, addInterview, companies, currentUser, hasPermission, interviews, placements, addPlacement, updatePlacement, sentEmails, sentWhatsApp, addSentEmail, currentRole } = useAuthStore();
   
   const applicant = applicants.find((a: Applicant) => a.id === id);
 
@@ -248,7 +248,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
     }
 
     if (targetStatus === "Placed" && (!placedCompany || !placedDate)) {
-      toast.error("Please provide company name and placement date validation.");
+      toast.error("Please specify both the Placed Company and the Placement Date.");
       return;
     }
 
@@ -279,6 +279,23 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
     };
 
     updateApplicant(updated);
+
+    if (targetStatus === "Placed" && addPlacement) {
+      const newPlacement: Placement = {
+        id: `PLC-${Math.floor(100 + Math.random() * 900)}`,
+        applicantName: applicant.fullName,
+        applicantId: applicant.id,
+        companyName: placedCompany,
+        position: applicant.applyingPositions[0] || "General Position",
+        placementDate: placedDate,
+        salary: 3000,
+        status: "Placed",
+        agreementStatus: "Pending",
+        createdBy: currentUser.name,
+        createdAt: new Date().toISOString()
+      };
+      addPlacement(newPlacement);
+    }
 
     // Log Activity
     addActivityLog({

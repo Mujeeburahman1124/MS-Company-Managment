@@ -34,19 +34,20 @@ export async function POST(request: Request) {
 
     const data = await request.json();
 
-    if (!data.name || !data.company || !data.branch) {
+    if (!data.name || !data.company) {
       return NextResponse.json(
-        { error: "Name, company, and branch are required" },
+        { error: "Name and company are required" },
         { status: 400 }
       );
     }
+    const branch = data.branch || user.branch || "Main Branch";
 
     // Tenancy Check: Company Admin / Branch Admin can only create staff for their company/branch
     if (user.role !== "Super Admin") {
       if (data.company !== user.company) {
         return NextResponse.json({ error: "Cannot create staff for another company" }, { status: 403 });
       }
-      if (user.role === "Branch Admin" && data.branch !== user.branch) {
+      if (user.role === "Branch Admin" && branch !== user.branch) {
         return NextResponse.json({ error: "Cannot create staff for another branch" }, { status: 403 });
       }
     }
@@ -177,7 +178,7 @@ export async function POST(request: Request) {
         emiratesId: data.emiratesId || "",
         status: data.status || "Active",
         company: data.company,
-        branch: data.branch,
+        branch: branch,
         createdBy: user.name,
         createdAt: data.createdAt || new Date().toISOString().slice(0, 10),
         documents: data.documents || [],
@@ -224,37 +225,73 @@ export async function POST(request: Request) {
 
     // Trigger real-time notifications for staff
     if (newStaff.email) {
-      let emailBody = `Dear ${newStaff.name},
-
-Welcome to the team at ${newStaff.company}!
-
-Here are your details as registered in our system:
-- Name: ${newStaff.name}
-- Position: ${newStaff.position}
-- Company: ${newStaff.company}
-- Branch: ${newStaff.branch}
-- Joining Date: ${newStaff.joiningDate}`;
+      let emailBody = `
+        <div style="font-family: sans-serif; color: #334155;">
+          <p style="font-size: 15px; margin-bottom: 16px;">
+            Dear <strong style="color: #0f172a;">${newStaff.name}</strong>,
+          </p>
+          <p style="font-size: 14px; margin-bottom: 20px;">
+            Welcome to the team at <strong style="color: #2563eb;">${newStaff.company}</strong>! We are excited to have you on board.
+          </p>
+          <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+            <h4 style="margin-top: 0; margin-bottom: 12px; color: #0f172a; font-size: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">Registration Details</h4>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #059669; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Name:</span> 
+                <span style="color: #059669; font-weight: 600;">${newStaff.name}</span>
+              </li>
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #4f46e5; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Position:</span> 
+                <span style="color: #4f46e5; font-weight: 600;">${newStaff.position}</span>
+              </li>
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #0284c7; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Company:</span> 
+                <span style="color: #0284c7; font-weight: 600;">${newStaff.company}</span>
+              </li>
+              <li style="margin-bottom: 10px; font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #9333ea; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Branch:</span> 
+                <span style="color: #9333ea; font-weight: 600;">${newStaff.branch}</span>
+              </li>
+              <li style="font-size: 14px; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #ea580c; margin-right: 10px;"></span>
+                <span style="color: #64748b; font-weight: 600; min-width: 130px; display: inline-block;">Joining Date:</span> 
+                <span style="color: #ea580c; font-weight: 600;">${newStaff.joiningDate}</span>
+              </li>
+            </ul>
+          </div>
+      `;
 
       if (temporaryPassword) {
         emailBody += `
-
-We have automatically generated a user login account for you:
-- Login Email: ${newStaff.email}
-- Temporary Password: ${temporaryPassword}
-
-Please log in and update your password immediately by clicking on your profile avatar in the sidebar.`;
+          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+            <h4 style="margin-top: 0; margin-bottom: 8px; color: #166534; font-size: 14px;">System Access Created</h4>
+            <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; color: #15803d;">We have automatically generated a user login account for you:</p>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 6px; font-size: 13px;"><strong style="color: #166534;">Login Email:</strong> ${newStaff.email}</li>
+              <li style="font-size: 13px;"><strong style="color: #166534;">Temporary Password:</strong> <span style="font-family: monospace; background-color: #dcfce7; padding: 2px 6px; border-radius: 4px;">${temporaryPassword}</span></li>
+            </ul>
+            <p style="margin-top: 12px; margin-bottom: 0; font-size: 12px; color: #15803d; font-style: italic;">Please log in and update your password immediately by clicking on your profile avatar in the sidebar.</p>
+          </div>
+        `;
       } else {
         emailBody += `
-
-Please note: A system login account was not requested for your profile. If you require access to the employee portal in the future, please contact your HR or System Administrator.`;
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+            <p style="margin: 0; font-size: 12px; color: #64748b;">
+              <strong>Note:</strong> A system login account was not requested for your profile. If you require access to the employee portal in the future, please contact your HR or System Administrator.
+            </p>
+          </div>
+        `;
       }
 
       emailBody += `
-
-We are excited to have you on board!
-
-Best regards,
-${newStaff.company} HR Team`;
+          <p style="font-size: 14px; margin-bottom: 8px;">Best regards,</p>
+          <p style="font-size: 14px; font-weight: 600; color: #0f172a; margin-top: 0;">${newStaff.company} HR Team</p>
+        </div>
+      `;
 
       await sendEmail({
         to: newStaff.email,

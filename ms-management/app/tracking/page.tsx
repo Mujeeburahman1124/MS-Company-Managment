@@ -298,7 +298,7 @@ export default function TrackingPage() {
     }
 
     if (targetStatus === "Placed" && (!placedCompany || !placedDate)) {
-      toast.error("Please provide company name and placement date validation.");
+      toast.error("Please specify both the Placed Company and the Placement Date.");
       return;
     }
 

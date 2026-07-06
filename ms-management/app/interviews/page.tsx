@@ -130,7 +130,15 @@ HR Department`;
   const f = filters.interviews;
   let list = interviews;
   if (currentRole !== "Super Admin" && currentUser.company !== "System") list = list.filter(i => i.company === currentUser.company);
-  if (f.search) { const q = f.search.toLowerCase(); list = list.filter(i => (i.personName ?? "").toLowerCase().includes(q) || (i.conductPerson ?? "").toLowerCase().includes(q)); }
+  if (f.search) { 
+    const q = f.search.toLowerCase(); 
+    list = list.filter(i => {
+      const linkedApp = applicants.find(a => a.id === i.applicantId);
+      return (i.personName ?? "").toLowerCase().includes(q) || 
+             (i.conductPerson ?? "").toLowerCase().includes(q) ||
+             (linkedApp?.fullName ?? "").toLowerCase().includes(q);
+    }); 
+  }
   if (f.status && f.status !== "all") list = list.filter(i => i.status === f.status);
   if (f.company && f.company !== "all") list = list.filter(i => i.company === f.company);
   if (f.branch && f.branch !== "all") list = list.filter(i => i.branch === f.branch);

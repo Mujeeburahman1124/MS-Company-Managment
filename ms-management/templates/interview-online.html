@@ -1,22 +1,22 @@
 {{> header}}
-<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #fdf4ff 0%, #ffffff 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden;">
   <tr>
-    <td align="center" style="padding: 40px 20px; background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);">
-      <h1 style="color: #ffffff; font-size: 28px; font-weight: 800; margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;">Interview Invitation</h1>
-      <p style="color: #f3e8ff; font-size: 16px; margin: 10px 0 0 0; font-family: Arial, sans-serif;">An exciting opportunity</p>
+    <td align="center" style="padding: 40px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+      <h1 style="color: #ffffff; font-size: 28px; font-weight: 800; margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;">Online Interview Invitation</h1>
+      <p style="color: #a7f3d0; font-size: 16px; margin: 10px 0 0 0; font-family: Arial, sans-serif;">Your next career step awaits</p>
     </td>
   </tr>
   <tr>
     <td style="padding: 40px 30px;">
       <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0; font-family: Arial, sans-serif;">
         Dear <strong>{{recipientName}}</strong>,<br/><br/>
-        We are very pleased to formally invite you to an interview for the <strong style="color: #7e22ce;">{{role}}</strong> role. 
+        We are thrilled to invite you to an online interview for the position of <strong style="color: #059669;">{{role}}</strong>. We were very impressed by your background and would love to learn more about you.
       </p>
       
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; padding: 24px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
         <tr>
           <td colspan="2" style="font-size: 14px; font-weight: 800; color: #111827; padding-bottom: 16px; text-transform: uppercase; font-family: Arial, sans-serif; letter-spacing: 1px;">
-            Schedule Overview
+            Meeting Details
           </td>
         </tr>
         <tr>
@@ -24,8 +24,8 @@
           <td style="font-size: 14px; font-weight: 700; color: #1f2937; padding: 8px 0; font-family: Arial, sans-serif;">{{dateTime}}</td>
         </tr>
         <tr>
-          <td style="font-size: 14px; color: #6b7280; padding: 8px 0; font-family: Arial, sans-serif;">📍 Format:</td>
-          <td style="font-size: 14px; font-weight: 700; color: #1f2937; padding: 8px 0; font-family: Arial, sans-serif;">{{onlinePhysical}} ({{meetingMode}})</td>
+          <td style="font-size: 14px; color: #6b7280; padding: 8px 0; font-family: Arial, sans-serif;">💻 Platform:</td>
+          <td style="font-size: 14px; font-weight: 700; color: #1f2937; padding: 8px 0; font-family: Arial, sans-serif;">{{meetingMode}}</td>
         </tr>
         {{#if notes}}
         <tr>
@@ -37,12 +37,12 @@
       
       {{#if meetingLink}}
       <div style="text-align: center; margin-bottom: 30px;">
-        <a href="{{meetingLink}}" target="_blank" style="display: inline-block; padding: 14px 32px; background: #7e22ce; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 50px; font-family: Arial, sans-serif; box-shadow: 0 4px 12px rgba(126,34,206,0.3);">Join / View Location</a>
+        <a href="{{meetingLink}}" target="_blank" style="display: inline-block; padding: 14px 32px; background: #059669; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 50px; font-family: Arial, sans-serif; box-shadow: 0 4px 12px rgba(5,150,105,0.3);">Join Online Meeting</a>
       </div>
       {{/if}}
       
       <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0; font-family: Arial, sans-serif; text-align: center;">
-        We look forward to learning more about your skills and experiences.
+        Please ensure you have a stable internet connection and a quiet environment. We look forward to meeting you!
       </p>
     </td>
   </tr>

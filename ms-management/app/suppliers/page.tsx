@@ -27,7 +27,7 @@ export default function SuppliersPage() {
   const [modal, setModal] = useState(false);
   const [editSup, setEditSup] = useState<Supplier | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", nationality: "India", mobile: "", whatsapp: "", email: "", notes: "" });
+  const [form, setForm] = useState({ name: "", nationality: "India", mobile: "", whatsapp: "", email: "", notes: "", company: "", branch: "" });
 
   // Email Broadcaster states
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
@@ -40,6 +40,7 @@ export default function SuppliersPage() {
   const [specificSupplierSearch, setSpecificSupplierSearch] = useState("");
 
   const isSuperAdmin = currentRole === "Super Admin";
+  const allAvailableCompanies = Array.from(new Set(suppliers.map(s => (s as any).company).filter(Boolean)));
 
   const f = filters.suppliers || { page: 1, pageSize: 10 };
   // Apply company scoping for non-SA roles
@@ -65,11 +66,11 @@ export default function SuppliersPage() {
       toast.success("Supplier updated");
     } else {
       const id = `SUP-${Math.floor(100+Math.random()*900)}`;
-      addSupplier({ ...form, id, nationalityFlag: flag, status: "Active", documents: [], createdBy: currentUser.name, createdAt: new Date().toISOString().slice(0,10), company: isSuperAdmin ? "System" : currentUser.company } as any);
+      addSupplier({ ...form, id, nationalityFlag: flag, status: "Active", documents: [], createdBy: currentUser.name, createdAt: new Date().toISOString().slice(0,10), company: isSuperAdmin ? (form.company || "System") : currentUser.company } as any);
       toast.success("Supplier added");
     }
     setModal(false); setEditSup(null);
-    setForm({ name: "", nationality: "India", mobile: "", whatsapp: "", email: "", notes: "" });
+    setForm({ name: "", nationality: "India", mobile: "", whatsapp: "", email: "", notes: "", company: "", branch: "" });
   };
 
   const handleTemplateChange = (type: "Manpower Request" | "Gift / Greeting" | "Custom") => {
@@ -167,7 +168,7 @@ export default function SuppliersPage() {
               <Sparkles className="w-4 h-4" />
               Offer Mails
             </Button>
-            <Button onClick={() => { setEditSup(null); setForm({ name:"",nationality:"India",mobile:"",whatsapp:"",email:"",notes:"" }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>Add Supplier</Button>
+            <Button onClick={() => { setEditSup(null); setForm({ name:"",nationality:"India",mobile:"",whatsapp:"",email:"",notes:"", company: isSuperAdmin ? "System" : currentUser.company, branch: currentUser.branch }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>Add Supplier</Button>
           </div>
         }
       />
@@ -209,7 +210,7 @@ export default function SuppliersPage() {
                         <Link href={`/suppliers/${s.id}`}>
                             <Button variant="outline" size="sm" className="rounded-xl text-[10px] font-bold border-slate-200 h-8 gap-1">Details</Button>
                         </Link>
-                        <Button variant="outline" size="sm" onClick={() => { setEditSup(s); setForm({ name:s.name,nationality:s.nationality,mobile:s.mobile,whatsapp:s.whatsapp,email:s.email,notes:s.notes }); setModal(true); }} className="rounded-xl text-[10px] font-bold border-slate-200 h-8 px-3">Edit</Button>
+                        <Button variant="outline" size="sm" onClick={() => { setEditSup(s); setForm({ name:s.name,nationality:s.nationality,mobile:s.mobile,whatsapp:s.whatsapp || "",email:s.email || "",notes:s.notes || "", company: (s as any).company || "", branch: (s as any).branch || "" }); setModal(true); }} className="rounded-xl text-[10px] font-bold border-slate-200 h-8 px-3">Edit</Button>
                         <Button variant="ghost" size="sm" onClick={() => setDeleteId(s.id)} className="text-rose-500 hover:bg-rose-50 rounded-xl text-[10px] font-bold h-8 px-3"><Trash2 className="w-3.5 h-3.5"/></Button>
                     </div>
                 </div>
@@ -232,6 +233,15 @@ export default function SuppliersPage() {
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Agency/Supplier Name <span className="text-rose-500">*</span></Label>
                 <Input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
               </div>
+              {isSuperAdmin && (
+                <div className="space-y-1 col-span-2">
+                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Company Assignment</Label>
+                  <select value={form.company} onChange={e => setForm(f => ({...f, company: e.target.value}))} className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3">
+                    <option value="System">System (All)</option>
+                    {allAvailableCompanies.map((c: any) => c !== "System" && <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              )}
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile <span className="text-rose-500">*</span></Label>
                 <Input required value={form.mobile} onChange={e => setForm(f => ({...f, mobile: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />

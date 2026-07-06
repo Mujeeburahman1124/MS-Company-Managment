@@ -372,6 +372,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+
+
   getCurrentRole: (): Role | undefined => {
     const roles = get().roles;
     const currentRole = get().currentRole;
