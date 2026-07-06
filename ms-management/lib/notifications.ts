@@ -489,6 +489,10 @@ export async function sendEmail({
   let htmlContent = "";
   let usedTemplateName: string | null = null;
 
+  // message tracking variables (initialized for all code paths)
+  let sentMessageId: string | null = null;
+  let sendError: string | null = null;
+
   if (templateType && templateData) {
     try {
       // Map templateType to file names we created
@@ -576,11 +580,11 @@ export async function sendEmail({
       realEmailSent = true;
       statusStr = "Sent";
       // capture messageId
-      var sentMessageId = info && (info as any).messageId ? String((info as any).messageId) : null;
+      sentMessageId = info && (info as any).messageId ? String((info as any).messageId) : null;
     } catch (err: any) {
       console.error(`[EMAIL-SERVICE] SMTP error sending to ${to}:`, err);
       statusStr = "Failed";
-      var sendError = err?.toString?.() || JSON.stringify(err);
+      sendError = err?.toString?.() || JSON.stringify(err);
     }
   } else {
     console.warn(`[EMAIL-SERVICE] SMTP credentials not configured. Logged to DB only.`);
