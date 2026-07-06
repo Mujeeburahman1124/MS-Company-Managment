@@ -192,10 +192,14 @@ export async function POST(request: Request) {
         branch: branch,
         templateType: templateType as any,
         templateData: {
-          applicantName: mappedResponse.personName,
+          recipientName: mappedResponse.personName,
           role: mappedResponse.position || mappedResponse.meetingType || "Assessment Sync",
-          date: mappedResponse.dateTime.replace("T", " "),
-          link: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : (mappedResponse.locationLink || ""),
+          dateTime: mappedResponse.dateTime.replace("T", " "),
+          onlinePhysical: mappedResponse.isOnline ? "Online" : "Physical",
+          meetingMode: mappedResponse.mode || "",
+          conductPersonName: mappedResponse.conductPerson || "",
+          meetingLink: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : "",
+          googleMapLink: !mappedResponse.isOnline ? (mappedResponse.locationLink || "") : "",
           notes: mappedResponse.notes || ""
         }
       }).catch(err => console.error("Async interview email error:", err));

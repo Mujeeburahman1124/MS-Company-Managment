@@ -247,7 +247,18 @@ ${mappedResponse.company} Recruitment Team`;
         candidateName: mappedResponse.personName,
         company: mappedResponse.company,
         branch: mappedResponse.branch,
-        templateType: templateType
+        templateType: templateType,
+        templateData: {
+          recipientName: mappedResponse.personName,
+          role: mappedResponse.position || mappedResponse.meetingType || "Discussion",
+          dateTime: mappedResponse.dateTime.replace("T", " "),
+          onlinePhysical: mappedResponse.isOnline ? "Online" : "Physical",
+          meetingMode: mappedResponse.mode || "",
+          conductPersonName: mappedResponse.conductPerson || "",
+          meetingLink: mappedResponse.isOnline ? (mappedResponse.meetingLink || "") : "",
+          googleMapLink: !mappedResponse.isOnline ? (mappedResponse.locationLink || "") : "",
+          notes: updateReason || mappedResponse.notes || ""
+        }
       }).catch(err => console.error("Async PUT interview email error:", err));
     }
 

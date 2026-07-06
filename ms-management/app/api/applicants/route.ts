@@ -285,7 +285,15 @@ export async function POST(request: Request) {
         candidateName: applicant.fullName,
         company: companyName,
         branch: applicant.branch || undefined,
-        templateType: "Registration"
+        templateType: "Registration",
+        templateData: {
+          recipientName: applicant.fullName,
+          trackingCode: applicant.trackingCode || "",
+          applicationDate: new Date().toISOString().split("T")[0],
+          applyingPositions: Array.isArray(applicant.applyingPositions)
+            ? (applicant.applyingPositions as string[]).join(", ")
+            : (applicant.applyingPositions ? String(applicant.applyingPositions) : "")
+        }
       }).catch(err => console.error("Async email sending error:", err));
     }
 

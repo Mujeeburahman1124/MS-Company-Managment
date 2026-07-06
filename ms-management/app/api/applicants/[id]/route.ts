@@ -215,36 +215,28 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // If status has changed, trigger real-time notifications
     if (data.status && data.status !== existing.status && updated.email) {
       if (updated.status === "Selected") {
+        const positionsStr = Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions;
         sendEmail({
           to: updated.email,
-          subject: "Will be replaced by template backend",
-          body: "Will be replaced by template backend",
+          subject: `Job Offer Invitation: ${positionsStr}`,
+          body: "Job Offer Details",
           candidateName: updated.fullName,
           company: updated.company,
           branch: updated.branch,
           type: "Offer",
           templateType: "Offer",
           templateData: {
-            applicantName: updated.fullName,
-            role: Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions,
-            company: updated.company,
-            branch: updated.branch
+            recipientName: updated.fullName,
+            position: positionsStr,
+            salary: updated.salaryExpectation ? String(updated.salaryExpectation) : "As agreed in interviews",
+            joiningDate: "Immediate or as per visa processing",
+            allowances: "Standard accommodation and transport as per UAE Labor Law",
+            offerLetterLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
           }
         }).catch(err => console.error("Async offer letter email error:", err));
       } else {
         const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
-        const emailBody = `Dear ${updated.fullName},
-
-Your application status has been updated to: ${updated.status}.
-
-Registration Details:
-- Tracking Code: ${updated.trackingCode}
-- Position: ${Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions}
-
-You can track your application details anytime at http://localhost:3000/apply.
-
-Best regards,
-${companyName} Recruitment Team`;
+        const emailBody = `Please be informed that your application status has been updated to: **${updated.status}**.\n\n**Registration Summary:**\n- Candidate Name: ${updated.fullName}\n- Tracking Code: ${updated.trackingCode}\n- Position: ${Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions}`;
 
         sendEmail({
           to: updated.email,
@@ -254,24 +246,18 @@ ${companyName} Recruitment Team`;
           company: companyName,
           branch: updated.branch,
           type: "Status Update",
-          templateType: "Registration"
+          templateType: "System",
+          templateData: {
+            recipientName: updated.fullName,
+            body: emailBody,
+            actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+          }
         }).catch(err => console.error("Async status update email error:", err));
       }
     } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
       // General profile update
       const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
-      const emailBody = `Dear ${updated.fullName},
-
-This is to notify you that your application profile details have been updated in our recruitment system.
-
-Profile Details:
-- Tracking Code: ${updated.trackingCode}
-- Position: ${Array.isArray(updated.applyingPositions) ? (updated.applyingPositions as string[]).join(", ") : updated.applyingPositions}
-
-If you did not authorize this change or have questions, please contact our support team.
-
-Best regards,
-${companyName} Recruitment Team`;
+      const emailBody = `This is to notify you that your application profile details have been updated in our recruitment system.\n\n**Profile Summary:**\n- Tracking Code: ${updated.trackingCode}\n- Position: ${Array.isArray(updated.applyingPositions) ? (updated.applyingPositions as string[]).join(", ") : updated.applyingPositions}`;
 
       sendEmail({
         to: updated.email,
@@ -280,7 +266,12 @@ ${companyName} Recruitment Team`;
         candidateName: updated.fullName,
         company: companyName,
         branch: updated.branch,
-        templateType: "Registration"
+        templateType: "System",
+        templateData: {
+          recipientName: updated.fullName,
+          body: emailBody,
+          actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+        }
       }).catch(err => console.error("Async general update email error:", err));
     }
 
