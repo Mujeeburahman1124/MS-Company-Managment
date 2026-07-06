@@ -14,7 +14,11 @@ function buildHtmlEmail(
   company = "MS Human Resource Consultancies",
   templateType?: 
     | "Interview" | "Interview_Initial" | "Interview_Online" | "Interview_Physical" | "Interview_Cancelled" | "Interview_Completed"
-    | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday"
+    | "Offer" | "Visa" | "Registration" | "Placement" | "Leave" | "Payroll" | "Birthday",
+  companyEmail = "hr@safayar-msjobs.com",
+  companyPhone = "+971 58 532 2913",
+  companyAddress = "Industrial Area 2, Ajman, UAE",
+  companyLogo = ""
 ): string {
   // Parse paragraphs and table items
   const lines = body.split("\n");
@@ -133,6 +137,22 @@ function buildHtmlEmail(
     bannerColor = "#c2410c";
   }
 
+  // Break company name dynamically for customized logo badges
+  const nameParts = company.toUpperCase().split(" ");
+  const logoText = companyLogo || (
+    nameParts.length > 1 
+      ? `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}` 
+      : company.slice(0, 2).toUpperCase()
+  );
+
+  const logoLine1 = nameParts.slice(0, 2).join(" ");
+  const logoLine2 = nameParts.slice(2).join(" ") || "MANAGEMENT SYSTEM";
+
+  const domainMatch = companyEmail.match(/@(.+)$/);
+  const webContact = domainMatch && !companyEmail.includes("gmail") && !companyEmail.includes("outlook") && !companyEmail.includes("yahoo")
+    ? `www.${domainMatch[1]}`
+    : "www.msjobs.net";
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,21 +175,21 @@ function buildHtmlEmail(
                     <table cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:24px; padding:8px 12px; border-radius:6px; display:inline-block; margin-right:12px; font-family:'Segoe UI',sans-serif; letter-spacing:1px;">MS</div>
+                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:24px; padding:8px 12px; border-radius:6px; display:inline-block; margin-right:12px; font-family:'Segoe UI',sans-serif; letter-spacing:1px;">${logoText}</div>
                         </td>
                         <td>
-                          <div style="font-size:15px; font-weight:800; color:#1e293b; text-transform:uppercase; letter-spacing:-0.2px; line-height:1.2;">MS HUMAN RESOURCE</div>
-                          <div style="font-size:13px; font-weight:700; color:#2563eb; text-transform:uppercase; line-height:1.2;">CONSULTANCIES</div>
+                          <div style="font-size:15px; font-weight:800; color:#1e293b; text-transform:uppercase; letter-spacing:-0.2px; line-height:1.2;">${logoLine1}</div>
+                          <div style="font-size:13px; font-weight:700; color:#2563eb; text-transform:uppercase; line-height:1.2;">${logoLine2}</div>
                           <div style="font-size:9px; color:#64748b; font-style:italic; margin-top:2px;">Right People. Right Opportunity.</div>
                         </td>
                       </tr>
                     </table>
                   </td>
                   <td width="45%" align="right" style="font-size:11px; color:#475569; line-height:1.5; border-left:1px solid #e2e8f0; padding-left:16px; vertical-align: middle; font-family:'Segoe UI',sans-serif;">
-                    <div style="margin-bottom:2px;">✉ hr@safayar-msjobs.com</div>
-                    <div style="margin-bottom:2px;">📞 +971 58 532 2913</div>
-                    <div style="margin-bottom:2px;">🌐 www.msjobs.net</div>
-                    <div>📍 Industrial Area 2, Ajman, UAE</div>
+                    <div style="margin-bottom:2px;">✉ ${companyEmail}</div>
+                    <div style="margin-bottom:2px;">📞 ${companyPhone}</div>
+                    <div style="margin-bottom:2px;">🌐 ${webContact}</div>
+                    <div>📍 ${companyAddress}</div>
                   </td>
                 </tr>
               </table>
@@ -201,7 +221,7 @@ function buildHtmlEmail(
                   <td width="90%" style="font-family:'Segoe UI',sans-serif; font-size: 11px; color: #991b1b; line-height: 1.4; padding-left: 10px;">
                     <div style="font-weight: 800;">Need Help?</div>
                     <div style="font-weight: 500; margin-top: 2px;">Contact our support team for assistance.</div>
-                    <div style="font-weight: 800; font-size: 12px; margin-top: 2px;">+971 58 532 2913</div>
+                    <div style="font-weight: 800; font-size: 12px; margin-top: 2px;">${companyPhone}</div>
                   </td>
                 </tr>
               </table>` : ""}
@@ -229,11 +249,11 @@ function buildHtmlEmail(
                     <table cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:18px; padding:5px 8px; border-radius:4px; display:inline-block; margin-right:8px;">MS</div>
+                          <div style="background:#1e3a8a; color:#ffffff; font-weight:900; font-size:18px; padding:5px 8px; border-radius:4px; display:inline-block; margin-right:8px;">${logoText}</div>
                         </td>
                         <td>
-                          <div style="font-size:10px; font-weight:800; color:#1e293b; text-transform:uppercase;">MS HUMAN RESOURCE</div>
-                          <div style="font-size:8px; font-weight:700; color:#2563eb; text-transform:uppercase;">CONSULTANCIES</div>
+                          <div style="font-size:10px; font-weight:800; color:#1e293b; text-transform:uppercase;">${logoLine1}</div>
+                          <div style="font-size:8px; font-weight:700; color:#2563eb; text-transform:uppercase;">${logoLine2}</div>
                         </td>
                       </tr>
                     </table>
@@ -243,13 +263,13 @@ function buildHtmlEmail(
                     <div style="margin-top: 6px;">
                       <a href="https://facebook.com" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#1e3a8a; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">FB</a>
                       <a href="https://linkedin.com" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#2563eb; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">LN</a>
-                      <a href="https://wa.me/971585322913" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#166534; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">WA</a>
+                      <a href="https://wa.me/${companyPhone.replace(/[^0-9]/g, '')}" style="text-decoration:none; margin: 0 4px; display:inline-block; background:#166534; color:#ffffff; padding:4px 8px; border-radius:4px; font-size:9px; font-weight:bold;">WA</a>
                     </div>
                   </td>
                   <td width="30%" align="right" style="font-size:10px; color:#64748b; line-height:1.4; border-left:1px solid #e2e8f0; padding-left:12px; vertical-align: middle;">
-                    <div>hr@safayar-msjobs.com</div>
-                    <div>+971 58 532 2913</div>
-                    <div>www.msjobs.net</div>
+                    <div>${companyEmail}</div>
+                    <div>${companyPhone}</div>
+                    <div>${webContact}</div>
                   </td>
                 </tr>
               </table>
@@ -312,6 +332,44 @@ export async function sendEmail({
   let realEmailSent = false;
   let statusStr = deliveryStatus || "Pending";
 
+  // Look up sender company details in DB to keep the template branded (no hardcoded example placeholders)
+  let companyEmail = "hr@safayar-msjobs.com";
+  let companyPhone = "+971 58 532 2913";
+  let companyAddress = "Industrial Area 2, Ajman, UAE";
+  let companyLogo = "";
+
+  if (company && company !== "System" && company !== "Not Placed") {
+    try {
+      // 1. Try finding in Company model
+      const dbComp = await prisma.company.findFirst({
+        where: { name: company }
+      });
+      if (dbComp) {
+        if (dbComp.email) companyEmail = dbComp.email;
+        if (dbComp.telephone || dbComp.whatsapp) {
+          companyPhone = dbComp.telephone || dbComp.whatsapp;
+        }
+        if (dbComp.address) companyAddress = dbComp.address;
+        if (dbComp.logo) companyLogo = dbComp.logo;
+      } else {
+        // 2. Try finding in InternalCompany model
+        const dbIntComp = await prisma.internalCompany.findFirst({
+          where: { name: company }
+        });
+        if (dbIntComp) {
+          if (dbIntComp.email) companyEmail = dbIntComp.email;
+          if (dbIntComp.telephone) companyPhone = dbIntComp.telephone;
+          if (dbIntComp.address) companyAddress = dbIntComp.address;
+          if (dbIntComp.logo) companyLogo = dbIntComp.logo;
+        }
+      }
+    } catch (err) {
+      console.error("Error looking up company info inside sendEmail:", err);
+    }
+  }
+
+  const htmlContent = buildHtmlEmail(subject, body, company, templateType, companyEmail, companyPhone, companyAddress, companyLogo);
+
   if (host && user && pass) {
     try {
       const transporter = nodemailer.createTransport({
@@ -321,8 +379,6 @@ export async function sendEmail({
         auth: { user, pass },
         tls: { rejectUnauthorized: false },
       });
-
-      const htmlContent = buildHtmlEmail(subject, body, company, templateType);
 
       await transporter.sendMail({
         from,
