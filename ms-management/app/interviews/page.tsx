@@ -110,7 +110,12 @@ HR Department`;
   });
 
   const isSuperAdmin = currentRole === "Super Admin";
-  const allowedCompanies = isSuperAdmin ? companies : companies.filter(c => c.name === currentUser.company);
+  const ownCompany = { id: "internal", name: currentUser.company || "Own Company" };
+  const hasOwn = companies.some(c => c.name === ownCompany.name);
+  
+  const allowedCompanies = isSuperAdmin 
+    ? (hasOwn ? companies : [ownCompany, ...companies])
+    : (hasOwn ? companies.filter(c => c.name === ownCompany.name) : [ownCompany]);
   const branchCompany = form.company || (isSuperAdmin ? "" : currentUser.company);
   const allowedBranches = isSuperAdmin
     ? branches.filter(b => branchCompany === "" || b.company === branchCompany)
