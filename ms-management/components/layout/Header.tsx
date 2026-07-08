@@ -66,10 +66,8 @@ export function Header() {
       {/* Hamburger Menu (Mobile) */}
       <div className="md:hidden">
         <Sheet>
-          <SheetTrigger asChild>
-            <button className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0">
-              <Menu className="w-5 h-5" />
-            </button>
+          <SheetTrigger className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0">
+            <Menu className="w-5 h-5" />
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-[260px] bg-[#0A0F1C] border-none">
             <div className="flex h-full [&>div]:flex [&>div]:w-full [&>div]:relative [&>div]:inset-auto [&>div]:border-none [&>div]:shadow-none">
