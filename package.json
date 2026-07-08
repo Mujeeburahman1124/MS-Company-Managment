@@ -6,6 +6,7 @@
     "next": "16.2.7"
   },
   "scripts": {
+    "postinstall": "npm --prefix ms-management install",
     "dev": "npm --prefix ms-management run dev",
     "build": "npm --prefix ms-management run build",
     "start": "npm --prefix ms-management run start"
