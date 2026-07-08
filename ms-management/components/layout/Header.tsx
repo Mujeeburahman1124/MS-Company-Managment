@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { ChevronLeft, Home, Bell, User, LogOut, Settings, Sun, Moon, Laptop } from 'lucide-react';
+import { ChevronLeft, Home, Bell, User, LogOut, Settings, Sun, Moon, Laptop, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import GlobalSearch from './GlobalSearch';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sidebar } from "./Sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,10 +63,26 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 flex items-center h-14 px-3 md:px-5 bg-card/90 backdrop-blur-md border-b border-border/60 shrink-0 gap-2 shadow-sm">
 
+      {/* Hamburger Menu (Mobile) */}
+      <div className="md:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0">
+              <Menu className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-[260px] bg-[#0A0F1C] border-none">
+            <div className="flex h-full [&>div]:flex [&>div]:w-full [&>div]:relative [&>div]:inset-auto [&>div]:border-none [&>div]:shadow-none">
+              <Sidebar />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0"
+        className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0 hidden md:flex"
         title="Go back"
       >
         <ChevronLeft className="w-4 h-4" />

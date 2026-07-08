@@ -69,6 +69,18 @@ export async function POST(request: Request) {
       }
     }
 
+    if (data.assignedToId) {
+      const assignedStaff = await prisma.staff.findUnique({ where: { id: data.assignedToId } });
+      if (assignedStaff) {
+        if (user.role !== "Super Admin" && assignedStaff.company !== data.company) {
+          return NextResponse.json({ error: "Cannot assign task to a staff member in another company" }, { status: 403 });
+        }
+        if (user.role === "Branch Admin" && assignedStaff.branch !== data.branch) {
+          return NextResponse.json({ error: "Cannot assign task to a staff member in another branch" }, { status: 403 });
+        }
+      }
+    }
+
     const task = await prisma.task.create({
       data: {
         id: data.id || undefined,

@@ -41,8 +41,20 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // Tenancy Check — Super Admin and System-company users can update any task
     const isSystemUser = user.company === "System" || user.role === "Super Admin";
-    if (!isSystemUser && existing.company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!isSystemUser) {
+      if (existing.company !== user.company) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      if (user.role === "Branch Admin" && existing.branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      // Prevent changing the company/branch via payload
+      if (data.company && data.company !== user.company) {
+        return NextResponse.json({ error: "Cannot change task's company" }, { status: 403 });
+      }
+      if (user.role === "Branch Admin" && data.branch && data.branch !== user.branch) {
+        return NextResponse.json({ error: "Cannot change task's branch" }, { status: 403 });
+      }
     }
 
     // Authorization & Action checks:
@@ -53,6 +65,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (isStaff && !isAssignedToUser) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Require completion proof in history when marking as Completed
+    if (data.status === "Completed" && existing.status !== "Completed") {
+      const hasProofInHistory = data.history && Array.isArray(data.history) && data.history.some((h: any) => h.note && h.note.includes("Uploaded Proofs:"));
+      if (!hasProofInHistory) {
+        return NextResponse.json({ error: "Proof of completion is required to mark task as completed." }, { status: 400 });
+      }
     }
 
     let updatePayload: any = {};

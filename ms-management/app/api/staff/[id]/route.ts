@@ -34,6 +34,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
       if (user.role === "Branch Admin" && existing.branch !== user.branch) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
+      // Prevent changing the company/branch via payload
+      if (data.company && data.company !== user.company) {
+        return NextResponse.json({ error: "Cannot change staff's company" }, { status: 403 });
+      }
+      if (user.role === "Branch Admin" && data.branch && data.branch !== user.branch) {
+        return NextResponse.json({ error: "Cannot change staff's branch" }, { status: 403 });
+      }
     }
     // Validate email uniqueness in Staff, Applicant, and User tables (excluding current ID/email)
     if (data.email && data.email.trim() !== "") {

@@ -496,3 +496,16 @@ model SentWhatsApp {
   candidateName String?
 }
 
+model VisaReminderLog {
+  id             String   @id @default(cuid())
+  entityId       String
+  entityType     String
+  entityName     String
+  expiryType     String
+  expiryDate     String
+  reminderLevel  String
+  sentAt         String
+  company        String
+  branch         String
+}
+

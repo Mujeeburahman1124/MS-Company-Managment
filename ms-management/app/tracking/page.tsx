@@ -95,9 +95,7 @@ export default function TrackingPage() {
   if (branchFilter !== "all") {
     filteredList = filteredList.filter(a => a.branch === branchFilter);
   }
-  if (clientCompanyFilter !== "all") {
-    filteredList = filteredList.filter(a => a.clientName === clientCompanyFilter);
-  }
+
   if (nationalityFilter !== "all") {
     filteredList = filteredList.filter(a => a.nationality === nationalityFilter);
   }
@@ -569,19 +567,6 @@ export default function TrackingPage() {
               </select>
             </div>
 
-            {/* Client Company Filter */}
-            <div className="space-y-0.5">
-              <select
-                value={clientCompanyFilter}
-                onChange={e => setFilter("tracking", { clientCompany: e.target.value, page: 1 })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
-              >
-                <option value="all">Client Company</option>
-                {companies.map(c => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
-                ))}
-              </select>
-            </div>
 
             {/* Nationality Filter */}
             <div className="space-y-0.5">

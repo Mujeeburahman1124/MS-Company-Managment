@@ -29,7 +29,7 @@ export default function AdvancedFilter({
   showAssignee = false
 }: AdvancedFilterProps) {
   const { filters, setFilter } = useFilterStore();
-  const { currentRole, currentUser, companies, branches, staff } = useAuthStore();
+  const { currentRole, currentUser, ownCompanies, branches, staff } = useAuthStore();
   
   const currentFilters = filters[moduleKey];
 
@@ -39,8 +39,8 @@ export default function AdvancedFilter({
   const userBranch = currentUser.branch;
 
   const allowedCompanies = isSuperAdmin
-    ? companies
-    : companies.filter((c) => c.name === userCompany);
+    ? ownCompanies
+    : ownCompanies.filter((c) => c.name === userCompany);
 
   const selectedCompany = currentFilters?.company || "all";
   

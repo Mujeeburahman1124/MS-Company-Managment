@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, CheckSquare, Clock, CheckCircle2, XCircle, RefreshCw, Trash2, Filter, ArrowRightLeft, History, AlertTriangle, Send } from "lucide-react";
+import { Plus, CheckSquare, Clock, CheckCircle2, XCircle, RefreshCw, Trash2, Filter, ArrowRightLeft, History, AlertTriangle, Send, UploadCloud } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useFilterStore } from "@/store/filterStore";
 import { formatDate, exportToCSV, cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ const isOverdue = (task: Task) => {
 };
 
 export default function TasksPage() {
-  const { currentRole, currentUser, tasks, staff, companies, applicants, addTask, updateTask, deleteTask, hasPermission, addActivityLog } = useAuthStore();
+  const { currentRole, currentUser, tasks, staff, companies, ownCompanies, applicants, addTask, updateTask, deleteTask, hasPermission, addActivityLog } = useAuthStore();
   const { filters } = useFilterStore();
 
   const canViewTasks = hasPermission("tasks", "view");
@@ -60,6 +60,7 @@ export default function TasksPage() {
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [view, setView] = useState<"kanban" | "table">("kanban");
+  const [uploadedProofFiles, setUploadedProofFiles] = useState<File[]>([]);
   // For system-wide users creating tasks, allow selecting target company/branch
   const [formCompany, setFormCompany] = useState("");
   const [formBranch, setFormBranch] = useState("");
@@ -170,7 +171,9 @@ export default function TasksPage() {
   // System-wide users see all staff; company-scoped users see their company's staff only
   const allowedStaffForTasks = isSystemWide
     ? (formCompany ? staff.filter(s => s.company === formCompany) : staff)
-    : staff.filter(s => s.company === currentUser.company);
+    : (currentRole === "Branch Admin" 
+        ? staff.filter(s => s.company === currentUser.company && s.branch === currentUser.branch)
+        : staff.filter(s => s.company === currentUser.company));
 
   const totalItems = list.length;
   const page = f.page || 1;
@@ -247,12 +250,37 @@ export default function TasksPage() {
     const now = new Date().toISOString().replace("T"," ").slice(0,19);
 
     if (editTask) {
+      if (editTask.status === "Completed" && uploadedProofFiles.length === 0) {
+        toast.error("Proof of completion is required to mark this task as Completed.");
+        return;
+      }
+
       const history = editTask.history || [];
       if (editTask.assignedTo !== form.assignedTo) {
          history.push({ action: "Reassigned", date: now, by: currentUser.name, note: `Reassigned from ${editTask.assignedTo} to ${form.assignedTo}` });
          sendMockEmail(form.assignedTo, form.title);
       }
-      updateTask({ ...editTask, ...form, assignedTo: form.assignedTo || "", assignedDate: formattedAssignedDate, deadline: formattedDeadline, assignedToId: assignedStaff?.id || "", applicantId: form.applicantId || undefined, applicantName: form.applicantName || undefined, targetDocument: form.targetDocument || undefined, history });
+      
+      let updatedTask = { 
+        ...editTask, 
+        ...form, 
+        assignedTo: form.assignedTo || "", 
+        assignedDate: formattedAssignedDate, 
+        deadline: formattedDeadline, 
+        assignedToId: assignedStaff?.id || "", 
+        applicantId: form.applicantId || undefined, 
+        applicantName: form.applicantName || undefined, 
+        targetDocument: form.targetDocument || undefined, 
+        history 
+      };
+
+      if (editTask.status === "Completed") {
+         const proofNames = uploadedProofFiles.map(f => f.name).join(", ");
+         updatedTask.history.push({ action: "Status: Completed", date: now, by: currentUser.name, note: `Uploaded Proofs: ${proofNames}` });
+         (updatedTask as any).completedAt = now;
+      }
+
+      updateTask(updatedTask);
       toast.success("Task updated");
     } else {
       const id = `TSK-${Math.floor(100+Math.random()*900)}`;
@@ -620,7 +648,7 @@ export default function TasksPage() {
                     >
                       <SelectTrigger className="bg-white border-blue-200 rounded-xl text-xs h-9"><SelectValue placeholder="Select company"/></SelectTrigger>
                       <SelectContent className="bg-white rounded-xl text-xs max-h-48">
-                        {companies.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+                        {ownCompanies.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
@@ -789,7 +817,10 @@ export default function TasksPage() {
                       const newStatus = v as Task["status"];
                       // Update local editTask state so dropdown shows new value
                       setEditTask(prev => prev ? { ...prev, status: newStatus } : prev);
-                      handleStatusChange(editTask, newStatus, true);
+                      // Only auto-submit if it's not "Completed" (since Completed needs proof upload)
+                      if (newStatus !== "Completed") {
+                        handleStatusChange(editTask, newStatus, true);
+                      }
                     }}
                     disabled={!canEditTasks && currentUser.name !== editTask.assignedTo}
                   >
@@ -810,6 +841,27 @@ export default function TasksPage() {
                   {editTask.status !== "Completed" && editTask.status !== "Cancelled" && (
                     <p className="text-[9px] text-slate-400 mt-1">Changing to <strong>Completed</strong> or <strong>Cancelled</strong> will move this task to the Task Archive.</p>
                   )}
+                </div>
+              )}
+
+              {/* Completion Proof Upload */}
+              {editTask && editTask.status === "Completed" && (
+                <div className="space-y-2 mt-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <Label className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Upload Completion Proof Documents</Label>
+                  <p className="text-[9px] text-emerald-600 mb-2">Attach multiple files as proof of task completion.</p>
+                  <div className="flex items-center justify-center w-full">
+                    <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-emerald-200 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <UploadCloud className="w-6 h-6 text-emerald-500 mb-2" />
+                        <p className="text-xs text-emerald-600"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                      </div>
+                      <input type="file" multiple className="hidden" onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        setUploadedProofFiles(files);
+                        toast.success(`Selected ${files.length} documents for upload.`);
+                      }} />
+                    </label>
+                  </div>
                 </div>
               )}
             </div>
