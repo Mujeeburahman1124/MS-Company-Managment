@@ -437,6 +437,8 @@ export default function PlacementPage() {
     const logDate = formatDate("2026-06-17");
 
     // Check specific workflow logic transitions
+    let historyEntry = `Status changed: [${editModal.status}] -> [${editForm.status}] | Our Company: ${currentUser.company || "N/A"} | Our Branch: ${currentUser.branch || "N/A"} | Changed By: ${currentUser.name} | Date: ${logDate}`;
+
     if (editForm.status === "Placed") {
       if (!editForm.companyId) {
         toast.error("Please select the placement company.");
@@ -458,23 +460,37 @@ export default function PlacementPage() {
         ? `Remaining Placement Fee (AED ${editModal.placementFee}) collected.` 
         : `Remaining Placement Fee collection pending.`;
       
-      history.push(`Placed at ${clientCo?.name} as ${editForm.position} on ${formatDate(editForm.placementDate)}. ${feeNote} Logged by ${currentUser.name} on ${logDate}.`);
+      historyEntry += ` | Client Company: ${updated.companyName} | Reason: Placed as ${editForm.position}. ${feeNote}`;
+      history.push(historyEntry);
     } else if (editForm.status === "Expired") {
       updated.status = "Expired";
       updated.refundStatus = "Eligible";
-      history.push(`Agreement expired without placement. Registration Fee marked as ELIGIBLE for refund by ${currentUser.name} on ${logDate}.`);
+      updated.companyId = "";
+      updated.companyName = "-";
+      historyEntry += ` | Client Company: N/A | Reason: Agreement expired without placement. Registration Fee marked as ELIGIBLE for refund.`;
+      history.push(historyEntry);
     } else if (editForm.status === "Withdrawn") {
       updated.status = "Withdrawn";
       updated.refundStatus = "Forfeited";
+      updated.companyId = "";
+      updated.companyName = "-";
       const forfeitReason = editForm.reason || "Applicant voluntarily withdrew.";
-      history.push(`Candidate withdrew. Reason: ${forfeitReason}. Registration Fee marked as FORFEITED by ${currentUser.name} on ${logDate}.`);
+      historyEntry += ` | Client Company: N/A | Reason: ${forfeitReason}. Registration Fee marked as FORFEITED.`;
+      history.push(historyEntry);
     } else if (editForm.status === "Terminated") {
       updated.status = "Terminated";
       updated.refundStatus = "Forfeited";
+      updated.companyId = "";
+      updated.companyName = "-";
       const forfeitReason = editForm.reason || "Terminated for misconduct or disciplinary reasons.";
-      history.push(`Employment placement terminated. Reason: ${forfeitReason}. Refund marked as FORFEITED (No liability) by ${currentUser.name} on ${logDate}.`);
+      historyEntry += ` | Client Company: N/A | Reason: ${forfeitReason}. Refund marked as FORFEITED (No liability).`;
+      history.push(historyEntry);
     } else {
       updated.status = editForm.status;
+      updated.companyId = "";
+      updated.companyName = "-";
+      historyEntry += ` | Client Company: N/A | Reason: Status updated.`;
+      history.push(historyEntry);
     }
 
     // Handle manual refund modifications
@@ -532,7 +548,7 @@ export default function PlacementPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Placement Agreement - \${p.applicantName}</title>
+        <title>Placement Agreement - ${p.applicantName}</title>
         <style>
           body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
