@@ -174,7 +174,7 @@ export default function ApplicantsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col h-full select-none pb-32">
       <PageHeader
         title="Applicant Management"
         subtitle="Manage recruitments, profile cards, and placement pipelines"

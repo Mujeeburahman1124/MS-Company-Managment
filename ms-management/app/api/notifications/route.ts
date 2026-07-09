@@ -73,7 +73,9 @@ export async function POST(request: Request) {
         userId: data.userId || user.id,
         company: data.company || user.company || null,
         link: data.link || null,
-        branch: data.branch || null
+        branch: data.branch || null,
+        sender: data.sender || user.name || "System",
+        status: data.status || "Delivered",
       }
     });
 

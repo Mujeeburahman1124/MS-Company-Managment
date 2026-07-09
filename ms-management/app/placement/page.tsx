@@ -532,14 +532,35 @@ export default function PlacementPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Placement Agreement - ${p.applicantName}</title>
+        <title>Placement Agreement - \${p.applicantName}</title>
         <style>
           body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: #334155;
-            padding: 40px;
             font-size: 12px;
             line-height: 1.6;
+            margin: 0;
+            padding: 0;
+          }
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+          .master-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+          }
+          .master-table > thead {
+            display: table-header-group;
+          }
+          .master-table > tbody {
+            display: table-row-group;
+          }
+          .master-table > thead > tr > td, 
+          .master-table > tbody > tr > td {
+            border: none;
+            padding: 0;
           }
           .header {
             text-align: center;
@@ -563,7 +584,7 @@ export default function PlacementPage() {
           }
           .stamp {
             position: absolute;
-            right: 10px;
+            right: 0px;
             top: -10px;
             border: 2px dashed rgba(59, 130, 246, 0.4);
             border-radius: 50%;
@@ -580,22 +601,25 @@ export default function PlacementPage() {
             flex-direction: column;
             line-height: 1.2;
           }
-          table {
+          .details-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
           }
-          td {
+          .details-table tr {
+            page-break-inside: avoid;
+          }
+          .details-table td {
             padding: 8px 10px;
             border: 1px solid #e2e8f0;
           }
-          td.label {
+          .details-table td.label {
             font-weight: bold;
             color: #64748b;
             background-color: #f8fafc;
             width: 35%;
           }
-          td.value {
+          .details-table td.value {
             color: #0f172a;
             font-weight: 600;
           }
@@ -608,15 +632,18 @@ export default function PlacementPage() {
             border-radius: 8px;
             white-space: pre-wrap;
             margin-bottom: 25px;
+            page-break-inside: auto;
           }
           .signatures {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
             margin-top: 30px;
+            page-break-inside: avoid;
           }
           .sig-box {
             text-align: center;
+            page-break-inside: avoid;
           }
           .sig-line {
             border: 1px solid #f1f5f9;
@@ -644,76 +671,84 @@ export default function PlacementPage() {
             font-size: 8px;
             color: #94a3b8;
           }
-          @media print {
-            body {
-              padding: 0;
-            }
-          }
         </style>
       </head>
       <body>
-        <div class="header">
-          <h2>Payment & Placement Service Agreement</h2>
-          <p>MS HORIZON F.Z.E  •  Website: msjobs.net</p>
-          <div class="stamp">
-            <span>MS Horizon</span>
-            <span style="font-size: 6px;">F.Z.E</span>
-            <span style="font-size: 5px;">Verified</span>
-          </div>
-        </div>
-        
-        <p>This Payment & Placement Service Agreement is entered into between <strong>MS Horizon F.Z.E</strong> ("Company") and the registered Applicant ("Applicant") detailed below:</p>
+        <table class="master-table">
+          <thead>
+            <tr>
+              <td>
+                <div class="header">
+                  <h2>Payment & Placement Service Agreement</h2>
+                  <p>MS HORIZON F.Z.E  •  Website: msjobs.net</p>
+                  <div class="stamp">
+                    <span>MS Horizon</span>
+                    <span style="font-size: 6px;">F.Z.E</span>
+                    <span style="font-size: 5px;">Verified</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <p>This Payment & Placement Service Agreement is entered into between <strong>MS Horizon F.Z.E</strong> ("Company") and the registered Applicant ("Applicant") detailed below:</p>
 
-        <table>
-          <tr>
-            <td class="label">Applicant Name</td>
-            <td class="value" style="color: #0f172a; font-size: 13px;">${p.applicantName}</td>
-          </tr>
-          <tr>
-            <td class="label">Passport / Emirates ID No.</td>
-            <td class="value">${p.passportNumber || "-"}</td>
-          </tr>
-          <tr>
-            <td class="label">Mobile Number</td>
-            <td class="value">${p.mobileNumber || "-"}</td>
-          </tr>
-          <tr>
-            <td class="label">Registration Date</td>
-            <td class="value">${p.registrationDate ? new Date(p.registrationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
-          </tr>
-          <tr>
-            <td class="label">Placement Deadline</td>
-            <td class="value">${p.placementDeadline ? new Date(p.placementDeadline).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
-          </tr>
-          <tr>
-            <td class="label">Registration Fee Paid</td>
-            <td class="value" style="font-size: 13px;">AED ${p.registrationFee?.toLocaleString() || "0"}</td>
-          </tr>
-          <tr>
-            <td class="label">Agreement Reference ID</td>
-            <td class="value" style="font-family: monospace; font-size: 10px;">${p.id}</td>
-          </tr>
+                <table class="details-table">
+                  <tr>
+                    <td class="label">Applicant Name</td>
+                    <td class="value" style="color: #0f172a; font-size: 13px;">\${p.applicantName}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Passport / Emirates ID No.</td>
+                    <td class="value">\${p.passportNumber || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Mobile Number</td>
+                    <td class="value">\${p.mobileNumber || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Registration Date</td>
+                    <td class="value">\${p.registrationDate ? new Date(p.registrationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Placement Deadline</td>
+                    <td class="value">\${p.placementDeadline ? new Date(p.placementDeadline).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Registration Fee Paid</td>
+                    <td class="value" style="font-size: 13px;">AED \${p.registrationFee?.toLocaleString() || "0"}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Agreement Reference ID</td>
+                    <td class="value" style="font-family: monospace; font-size: 10px;">\${p.id}</td>
+                  </tr>
+                </table>
+
+                <div class="terms">\${p.termsAndConditions || ""}</div>
+
+                <div class="signatures">
+                  <div class="sig-box">
+                    <div class="sig-line">
+                      \${p.applicantSign ? \`<img src="\${p.applicantSign}" alt="Applicant Sign">\` : \`<span style="font-style: italic; color: #cbd5e1; font-size: 10px;">Signature Pending</span>\`}
+                    </div>
+                    <div class="sig-title">Applicant Signature</div>
+                    <div class="sig-subtitle">\${p.applicantName}</div>
+                  </div>
+                  
+                  <div class="sig-box">
+                    <div class="sig-line">
+                      \${p.companySign ? \`<img src="\${p.companySign}" alt="Company Sign">\` : \`<div style="border: 1px solid rgba(59, 130, 246, 0.2); color: rgba(59, 130, 246, 0.3); padding: 5px; font-size: 8px; font-weight: bold; transform: rotate(6deg);">MS HORIZON F.Z.E</div>\`}
+                    </div>
+                    <div class="sig-title">Authorized Representative</div>
+                    <div class="sig-subtitle">MS Horizon F.Z.E Stamp & Sign</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
-
-        <div class="terms">${p.termsAndConditions || ""}</div>
-
-        <div class="signatures">
-          <div class="sig-box">
-            <div class="sig-line">
-              ${p.applicantSign ? `<img src="${p.applicantSign}" alt="Applicant Sign">` : `<span style="font-style: italic; color: #cbd5e1; font-size: 10px;">Signature Pending</span>`}
-            </div>
-            <div class="sig-title">Applicant Signature</div>
-            <div class="sig-subtitle">${p.applicantName}</div>
-          </div>
-          
-          <div class="sig-box">
-            <div class="sig-line">
-              ${p.companySign ? `<img src="${p.companySign}" alt="Company Sign">` : `<div style="border: 1px solid rgba(59, 130, 246, 0.2); color: rgba(59, 130, 246, 0.3); padding: 5px; font-size: 8px; font-weight: bold; transform: rotate(6deg);">MS HORIZON F.Z.E</div>`}
-            </div>
-            <div class="sig-title">Authorized Representative</div>
-            <div class="sig-subtitle">MS Horizon F.Z.E Stamp & Sign</div>
-          </div>
-        </div>
 
         <script>
           window.onload = function() {

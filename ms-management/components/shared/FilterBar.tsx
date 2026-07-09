@@ -75,7 +75,7 @@ export default function FilterBar({
         </div>
 
         {/* Buttons and dropdowns */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-2 pb-1 md:pb-0">
           {/* Advanced toggle */}
           <Button
             variant="outline"

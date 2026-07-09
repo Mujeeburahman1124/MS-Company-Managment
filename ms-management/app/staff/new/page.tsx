@@ -52,7 +52,7 @@ export default function NewStaffPage() {
   });
 
   const selectedCompany = watch("company");
-  const allAvailableCompanies = [...companies, ...ownCompanies];
+  const allAvailableCompanies = [...ownCompanies];
   const selectedRoleName = watch("role");
   const selectedRole = roles.find((r: Role) => r.name === selectedRoleName);
 

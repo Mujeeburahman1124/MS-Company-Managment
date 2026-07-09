@@ -81,7 +81,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#0A0F1C] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="text-slate-400 text-sm font-medium">Loading session...</p>
@@ -92,7 +92,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isFullWidthPage) {
     return (
-      <div className={cn("font-sans", "min-h-screen bg-slate-50 flex flex-col w-full")}>
+      <div className={cn("font-sans", "min-h-[100dvh] bg-slate-50 flex flex-col w-full")}>
         <main className="flex-1 flex flex-col">{children}</main>
         <Toaster position="top-right" closeButton richColors />
         <ReminderEngine />
@@ -157,12 +157,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={cn("font-sans", "min-h-screen bg-background flex text-foreground antialiased overflow-hidden w-full")}>
+    <div className={cn("font-sans", "min-h-[100dvh] bg-background flex text-foreground antialiased overflow-hidden w-full")}>
       {/* Sidebar - Desktop / Tablet */}
       <Sidebar />
 
       {/* Main Panel Wrapper */}
-      <div className="flex-1 flex flex-col md:pl-[70px] lg:pl-[260px] h-screen overflow-hidden relative transition-all duration-300">
+      <div className="flex-1 flex flex-col md:pl-[70px] lg:pl-[260px] h-[100dvh] overflow-hidden relative transition-all duration-300">
         {/* Top Header */}
         <Header />
 
@@ -170,7 +170,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <Breadcrumb />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto pb-20 md:pb-6 bg-transparent">
+        <main className="flex-1 overflow-y-auto pb-32 md:pb-6 bg-transparent">
           {pageContent}
         </main>
 

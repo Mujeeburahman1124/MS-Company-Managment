@@ -32,7 +32,7 @@ export default function PageHeader({
         </div>
       </div>
       {actions && (
-        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto pb-1 sm:pb-0">
           {actions}
         </div>
       )}

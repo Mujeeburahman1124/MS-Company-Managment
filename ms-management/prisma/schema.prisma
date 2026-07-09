@@ -346,6 +346,8 @@ model Notification {
   company   String?
   link      String?
   branch    String?
+  sender    String?  @default("System")
+  status    String?  @default("Sent")
 }
 
 model ActivityLog {

@@ -198,7 +198,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="hidden md:flex md:flex-col md:w-[70px] lg:w-[260px] md:fixed md:inset-y-0 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border-r border-white/5 shadow-2xl z-30 transition-all duration-300">
+    <div className="hidden md:flex flex-col md:w-[70px] lg:w-[260px] md:fixed md:inset-y-0 bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 border-r border-white/5 shadow-2xl z-30 transition-all duration-300">
       {/* Logo */}
       <div className="flex items-center h-16 px-4 lg:px-6 shrink-0 border-b border-white/5">
         <Link href="/dashboard" className="flex items-center gap-3 group min-w-0">
