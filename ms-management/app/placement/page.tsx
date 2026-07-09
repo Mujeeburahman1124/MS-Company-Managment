@@ -698,48 +698,48 @@ export default function PlacementPage() {
                 <table class="details-table">
                   <tr>
                     <td class="label">Applicant Name</td>
-                    <td class="value" style="color: #0f172a; font-size: 13px;">\${p.applicantName}</td>
+                    <td class="value" style="color: #0f172a; font-size: 13px;">${p.applicantName}</td>
                   </tr>
                   <tr>
                     <td class="label">Passport / Emirates ID No.</td>
-                    <td class="value">\${p.passportNumber || "-"}</td>
+                    <td class="value">${p.passportNumber || "-"}</td>
                   </tr>
                   <tr>
                     <td class="label">Mobile Number</td>
-                    <td class="value">\${p.mobileNumber || "-"}</td>
+                    <td class="value">${p.mobileNumber || "-"}</td>
                   </tr>
                   <tr>
                     <td class="label">Registration Date</td>
-                    <td class="value">\${p.registrationDate ? new Date(p.registrationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
+                    <td class="value">${p.registrationDate ? new Date(p.registrationDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
                   </tr>
                   <tr>
                     <td class="label">Placement Deadline</td>
-                    <td class="value">\${p.placementDeadline ? new Date(p.placementDeadline).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
+                    <td class="value">${p.placementDeadline ? new Date(p.placementDeadline).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "-"}</td>
                   </tr>
                   <tr>
                     <td class="label">Registration Fee Paid</td>
-                    <td class="value" style="font-size: 13px;">AED \${p.registrationFee?.toLocaleString() || "0"}</td>
+                    <td class="value" style="font-size: 13px;">AED ${p.registrationFee?.toLocaleString() || "0"}</td>
                   </tr>
                   <tr>
                     <td class="label">Agreement Reference ID</td>
-                    <td class="value" style="font-family: monospace; font-size: 10px;">\${p.id}</td>
+                    <td class="value" style="font-family: monospace; font-size: 10px;">${p.id}</td>
                   </tr>
                 </table>
 
-                <div class="terms">\${p.termsAndConditions || ""}</div>
+                <div class="terms">${p.termsAndConditions || ""}</div>
 
                 <div class="signatures">
                   <div class="sig-box">
                     <div class="sig-line">
-                      \${p.applicantSign ? \`<img src="\${p.applicantSign}" alt="Applicant Sign">\` : \`<span style="font-style: italic; color: #cbd5e1; font-size: 10px;">Signature Pending</span>\`}
+                      ${p.applicantSign ? `<img src="${p.applicantSign}" alt="Applicant Sign">` : `<span style="font-style: italic; color: #cbd5e1; font-size: 10px;">Signature Pending</span>`}
                     </div>
                     <div class="sig-title">Applicant Signature</div>
-                    <div class="sig-subtitle">\${p.applicantName}</div>
+                    <div class="sig-subtitle">${p.applicantName}</div>
                   </div>
                   
                   <div class="sig-box">
                     <div class="sig-line">
-                      \${p.companySign ? \`<img src="\${p.companySign}" alt="Company Sign">\` : \`<div style="border: 1px solid rgba(59, 130, 246, 0.2); color: rgba(59, 130, 246, 0.3); padding: 5px; font-size: 8px; font-weight: bold; transform: rotate(6deg);">MS HORIZON F.Z.E</div>\`}
+                      ${p.companySign ? `<img src="${p.companySign}" alt="Company Sign">` : `<div style="border: 1px solid rgba(59, 130, 246, 0.2); color: rgba(59, 130, 246, 0.3); padding: 5px; font-size: 8px; font-weight: bold; transform: rotate(6deg);">MS HORIZON F.Z.E</div>`}
                     </div>
                     <div class="sig-title">Authorized Representative</div>
                     <div class="sig-subtitle">MS Horizon F.Z.E Stamp & Sign</div>
