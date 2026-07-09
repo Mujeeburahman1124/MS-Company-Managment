@@ -152,7 +152,7 @@ export default function OwnCompaniesPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-center mt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center mt-1">
                   {[{ label: "Max Users", value: c.maxUsers, icon: Users }, { label: "Storage", value: c.maxStorage + ' GB', icon: Database }].map(s => (
                     <div key={s.label} className="bg-slate-50 rounded-xl p-2 border border-slate-100 flex items-center justify-center gap-2">
                       <s.icon className="w-4 h-4 text-slate-400" />
@@ -197,7 +197,7 @@ export default function OwnCompaniesPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={addModal} onOpenChange={setAddModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">{editCompany ? "Edit SaaS Tenant" : "Add New SaaS Tenant"}</DialogTitle>

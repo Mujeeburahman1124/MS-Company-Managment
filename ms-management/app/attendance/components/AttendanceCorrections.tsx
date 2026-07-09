@@ -106,7 +106,7 @@ export default function AttendanceCorrections() {
       )}
 
       <Dialog open={!!approveModal} onOpenChange={open => !open && setApproveModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">{approveModal?.action === "Approved" ? "Approve Correction?" : "Reject Correction?"}</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">{approveModal?.req.staffName} requested correction for {approveModal?.req.date}.</DialogDescription>

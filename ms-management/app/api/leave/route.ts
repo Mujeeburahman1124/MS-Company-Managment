@@ -114,8 +114,13 @@ export async function POST(request: Request) {
     let company = data.company || user.company;
     let branch = data.branch || user.branch;
 
-    if (user.role !== "Super Admin" && company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (user.role !== "Super Admin") {
+      if (company !== user.company) {
+        return NextResponse.json({ error: "Forbidden: Cannot access other company" }, { status: 403 });
+      }
+      if (user.role !== "Company Admin" && branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden: Cannot access other branch" }, { status: 403 });
+      }
     }
 
     const newRequest = await prisma.leaveRequest.create({
@@ -185,6 +190,23 @@ ${newRequest.company} HR Department`;
         company: newRequest.company,
         branch: newRequest.branch
       }).catch(err => console.error("Async leave submit email error:", err));
+
+      try {
+        await prisma.notification.create({
+          data: {
+            title: "New Leave Request",
+            message: `${staffMember.name} has applied for ${newRequest.type} leave (${newRequest.days} days).`,
+            type: "Leave",
+            userId: "admin", // Matches Admins via GET route OR logic
+            company: newRequest.company,
+            branch: newRequest.branch,
+            link: "/leave",
+            createdAt: new Date().toISOString()
+          }
+        });
+      } catch (err) {
+        console.error("Failed to send leave admin notification:", err);
+      }
     }
 
     return NextResponse.json(mappedResponse);

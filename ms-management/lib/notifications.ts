@@ -13,18 +13,51 @@ const cleanEnvVar = (val: string | undefined) => {
 // ─── HTML Email Template ──────────────────────────────────────────────────────
 
 // Helper: load template by name
-function loadTemplate(templateName: string): string {
-  const templatesDir = path.join(process.cwd(), "templates");
-  const templatePath = path.join(templatesDir, `${templateName}.html`);
-  if (!fs.existsSync(templatePath)) {
-    // Check if it exists with fallback path
-    const fallbackPath = path.join(process.cwd(), "templates", "system-notification.html");
-    if (fs.existsSync(fallbackPath)) {
-      return fs.readFileSync(fallbackPath, "utf8");
+async function loadTemplateAsync(templateName: string): Promise<string> {
+  const dbTemplate = await prisma.emailTemplate.findUnique({
+    where: { templateName }
+  });
+
+  if (dbTemplate) {
+    if (!dbTemplate.isEnabled) {
+      throw new Error(`Template ${templateName} is disabled.`);
     }
-    throw new Error(`Template not found: ${templateName}`);
+    return dbTemplate.body;
   }
-  return fs.readFileSync(templatePath, "utf8");
+
+  // Fallback to filesystem
+  const templatesDir = path.join(process.cwd(), "templates");
+  let templatePath = path.join(templatesDir, `${templateName}.html`);
+  
+  if (!fs.existsSync(templatePath)) {
+    templatePath = path.join(templatesDir, "system-notification.html");
+    if (!fs.existsSync(templatePath)) {
+      throw new Error(`Template not found: ${templateName}`);
+    }
+  }
+
+  const htmlContent = fs.readFileSync(templatePath, "utf8");
+
+  // Seed DB automatically for future edits
+  try {
+    const titleMatch = htmlContent.match(/<title>(.*?)<\/title>/i);
+    const subject = titleMatch && titleMatch[1] ? titleMatch[1] : `${templateName.replace(/-/g, " ").toUpperCase()} Notification`;
+    await prisma.emailTemplate.create({
+      data: {
+        templateName,
+        subject,
+        body: htmlContent,
+        type: templateName,
+        isEnabled: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    });
+  } catch (err) {
+    // Ignore seeding error, it might be a race condition
+  }
+
+  return htmlContent;
 }
 
 // Register partials (header/footer/components)
@@ -177,7 +210,7 @@ export async function sendEmail({
     if (isPrecompiledHtml) {
       htmlContent = body;
     } else {
-      const tpl = loadTemplate(selectedTemplate);
+      const tpl = await loadTemplateAsync(selectedTemplate);
       const compiled = Handlebars.compile(tpl);
 
     const recipientName = templateData?.recipientName || candidateName || templateData?.applicantName || "Recipient";
@@ -318,7 +351,7 @@ export async function previewEmail({
   const selectedTemplate = templateType ? (map[templateType] || templateType) : "system-notification";
 
   try {
-    const tpl = loadTemplate(selectedTemplate);
+    const tpl = await loadTemplateAsync(selectedTemplate);
     const compiled = Handlebars.compile(tpl);
 
     const recipientName = templateData?.recipientName || templateData?.applicantName || "Recipient";

@@ -167,13 +167,13 @@ export default function AdvancedFilter({
         <Select
           value={currentFilters.branch || "all"}
           onValueChange={(val) => setFilter(moduleKey, { branch: val || "", page: 1 })}
-          disabled={userBranch !== "All" && !isSuperAdmin}
+          disabled={!isSuperAdmin && currentRole !== "Company Admin"}
         >
           <SelectTrigger className="bg-white border-slate-200 rounded-xl text-xs h-9 disabled:opacity-75 disabled:bg-slate-100">
             <SelectValue placeholder="All Branches" />
           </SelectTrigger>
           <SelectContent className="bg-white border-slate-100 rounded-xl text-xs">
-            {(userBranch === "All" || isSuperAdmin) && <SelectItem value="all">All Branches</SelectItem>}
+            {isSuperAdmin && <SelectItem value="all">All Branches</SelectItem>}
             {allowedBranches.map((b) => (
               <SelectItem key={b.id} value={b.name}>
                 {b.name}

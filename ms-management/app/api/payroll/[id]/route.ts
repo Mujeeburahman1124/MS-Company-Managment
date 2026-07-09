@@ -54,6 +54,50 @@ export async function PUT(request: Request, { params }: RouteParams) {
       }
     });
 
+    // Handle Notifications for Status Changes
+    if (data.status && data.status !== existing.status) {
+      try {
+        const staffMember = await prisma.staff.findUnique({
+          where: { id: updated.staffId }
+        });
+
+        if (staffMember) {
+          const userMember = await prisma.user.findFirst({
+            where: { name: staffMember.name }
+          });
+          
+          if (userMember) {
+            await prisma.notification.create({
+              data: {
+                title: `Payslip ${data.status}`,
+                message: `Your payslip for ${updated.month} ${updated.year} is now ${data.status}.`,
+                type: data.status === "Paid" ? "Payment" : "Info",
+                userId: userMember.id,
+                company: updated.company,
+                branch: updated.branch,
+                link: "/profile",
+                createdAt: new Date().toISOString()
+              }
+            });
+          }
+
+          if (staffMember.email) {
+            const { sendEmail } = await import("@/lib/notifications");
+            await sendEmail({
+              to: staffMember.email,
+              subject: `Payslip Update: ${updated.month} ${updated.year} - ${data.status}`,
+              body: `Dear ${staffMember.name},\n\nYour payslip for ${updated.month} ${updated.year} is now marked as ${data.status}.\nNet Salary: ${updated.netSalary}\n\nPlease check your dashboard for full details.\n\nBest regards,\n${updated.company} HR & Finance`,
+              candidateName: staffMember.name,
+              company: updated.company,
+              branch: updated.branch
+            }).catch(e => console.error(e));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to send payslip update notification:", err);
+      }
+    }
+
     return NextResponse.json(updated);
   } catch (error: any) {
     console.error("PUT payroll error:", error);

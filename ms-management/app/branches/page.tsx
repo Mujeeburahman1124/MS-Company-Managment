@@ -105,7 +105,7 @@ export default function BranchesPage() {
                   </div>
                   <StatusBadge status={b.status} />
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center">
                   <div className="bg-slate-50 rounded-xl p-2 border border-slate-100">
                     <div className="text-sm font-extrabold text-slate-800">{b.staff}</div>
                     <div className="text-[9px] text-slate-400 font-bold">Staff</div>
@@ -135,7 +135,7 @@ export default function BranchesPage() {
       <Pagination moduleKey="branches" totalItems={totalItems} />
 
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">{editBranch ? "Edit Branch" : "Add New Branch"}</DialogTitle>

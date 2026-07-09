@@ -40,7 +40,10 @@ export default function StaffPage() {
   let list = staff;
   if (currentRole !== "Super Admin" && currentUser.company !== "System") {
     list = list.filter(s => s.company === currentUser.company);
-    if (currentUser.branch !== "All") list = list.filter(s => s.branch === currentUser.branch);
+    // Strict Branch Validation: If not a Company Admin, restrict to own branch.
+    if (currentRole !== "Company Admin" && currentUser.branch && currentUser.branch !== "All") {
+      list = list.filter(s => s.branch === currentUser.branch);
+    }
   }
 
   if (f.search) {

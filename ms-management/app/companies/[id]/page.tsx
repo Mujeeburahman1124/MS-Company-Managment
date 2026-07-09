@@ -834,7 +834,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Quick Admin Create Dialog */}
       <Dialog open={showQuickCreate} onOpenChange={setShowQuickCreate}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={handleQuickCreateSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Create Admin User</DialogTitle>
@@ -874,7 +874,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                   onChange={e => setQuickForm(f => ({ ...f, branch: e.target.value }))}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 font-semibold text-slate-700 outline-none"
                 >
-                  <option value="All">All Branches (Global)</option>
+                  {currentUser?.role === "Super Admin" && <option value="All">All Branches (Global)</option>}
                   {companyBranches.map(b => (
                     <option key={b.id} value={b.name}>{b.name}</option>
                   ))}
@@ -892,7 +892,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Create Job Demand Dialog */}
       <Dialog open={showDemandModal} onOpenChange={setShowDemandModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={handleDemandSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Create Job Demand</DialogTitle>

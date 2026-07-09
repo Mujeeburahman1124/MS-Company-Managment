@@ -19,7 +19,7 @@ export default function AttendanceReports() {
   };
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
+    <div className="space-y-4 w-[95vw] sm:w-full max-w-3xl mx-auto">
       <Card className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function AttendanceReports() {
                 <Select defaultValue="all">
                   <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl h-10 text-xs"><SelectValue placeholder="All Branches" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Branches</SelectItem>
+                    {currentRole === "Super Admin" && <SelectItem value="all">All Branches</SelectItem>}
                     {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                   </SelectContent>
                 </Select>

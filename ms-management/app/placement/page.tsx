@@ -879,7 +879,7 @@ export default function PlacementPage() {
                   </div>
 
                   {/* Info grid */}
-                  <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600 border-t border-b border-slate-100 py-3 my-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600 border-t border-b border-slate-100 py-3 my-1">
                     <div className="space-y-0.5">
                       <span className="text-slate-400 uppercase text-[8px] tracking-wider">Passport / ID</span>
                       <div className="text-slate-800 font-bold">{p.passportNumber || "-"}</div>
@@ -910,7 +910,7 @@ export default function PlacementPage() {
                   {p.status === "Placed" && (
                     <div className="bg-emerald-50/40 border border-emerald-100/50 rounded-xl p-2.5 space-y-1 text-[10px] font-semibold text-emerald-800">
                       <div className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5 text-emerald-500" /> Placed Company: <span className="font-bold text-slate-800">{p.companyName}</span></div>
-                      <div className="grid grid-cols-2 pt-1 border-t border-emerald-100/30 text-[9px]">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 pt-1 border-t border-emerald-100/30 text-[9px]">
                         <div>Date: <span className="font-bold text-slate-800">{formatDate(p.placementDate)}</span></div>
                         <div>Salary: <span className="font-bold text-slate-800">AED {p.salary?.toLocaleString() || 0}</span></div>
                       </div>
@@ -971,7 +971,7 @@ export default function PlacementPage() {
 
       {/* REGISTRATION WIZARD DIALOG */}
       <Dialog open={registerModal} onOpenChange={setRegisterModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-2xl max-h-[90vh] overflow-y-auto print:hidden">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto print:hidden">
           <DialogHeader className="border-b border-slate-100 pb-3">
             <DialogTitle className="text-base font-extrabold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
               <Sparkles className="w-5 h-5 text-blue-600" /> MS Horizon F.Z.E Registration
@@ -1204,7 +1204,7 @@ export default function PlacementPage() {
 
       {/* UPDATE STATUS DIALOG */}
       <Dialog open={!!editModal} onOpenChange={open => !open && setEditModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[90vh] overflow-y-auto print:hidden">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[90vh] overflow-y-auto print:hidden">
           {editModal && (
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <DialogHeader className="border-b border-slate-100 pb-3">
@@ -1242,7 +1242,7 @@ export default function PlacementPage() {
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3">
                   <h4 className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider border-b pb-1.5 flex items-center gap-1"><Building2 className="w-3.5 h-3.5" /> Successful Placement Details</h4>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1 col-span-2">
                       <Label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Placement Client Company <span className="text-rose-500">*</span></Label>
                       <Select 
@@ -1422,7 +1422,7 @@ export default function PlacementPage() {
 
       {/* AGREEMENT DOCUMENT PREVIEW & PDF PRINT MODAL */}
       <Dialog open={!!agreementModal} onOpenChange={open => !open && setAgreementModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-4xl max-h-[90vh] overflow-y-auto print:max-w-none print:shadow-none print:border-0 print:p-0 print:overflow-visible">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-4xl max-h-[90vh] overflow-y-auto print:max-w-none print:shadow-none print:border-0 print:p-0 print:overflow-visible">
           {agreementModal && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start print:grid-cols-1">
               
@@ -1495,7 +1495,7 @@ export default function PlacementPage() {
                   </div>
 
                   {/* Render Signatures */}
-                  <div className="grid grid-cols-2 gap-6 pt-6 border-t border-slate-200 mt-6 print:pt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-slate-200 mt-6 print:pt-4">
                     <div className="text-center space-y-1.5">
                       <div className="border border-slate-100 bg-slate-50/30 rounded-xl h-14 flex items-center justify-center overflow-hidden">
                         {agreementModal.applicantSign ? (

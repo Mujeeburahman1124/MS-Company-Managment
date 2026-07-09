@@ -152,7 +152,7 @@ export default function ShiftManagement() {
             </DialogHeader>
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
               {isSuperAdmin && (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Company *</Label>
                     <select
@@ -183,7 +183,7 @@ export default function ShiftManagement() {
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Shift Name *</Label>
                 <Input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="bg-white border-slate-200 rounded-xl text-xs h-9" placeholder="e.g. Morning Shift" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Start Time *</Label>
                   <Input type="time" required value={form.startTime} onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))} className="bg-white border-slate-200 rounded-xl text-xs h-9" />
@@ -201,7 +201,7 @@ export default function ShiftManagement() {
                   <Input type="number" min="0" value={form.breakDuration} onChange={e => setForm(f => ({ ...f, breakDuration: parseInt(e.target.value) || 0 }))} className="bg-white border-slate-200 rounded-xl text-xs h-9" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Overtime Eligible</Label>
                   <select

@@ -41,10 +41,12 @@ export default function ApplicantsPage() {
  
   // 1. Role-based filtering
   let allowedApplicants: Applicant[] = applicants;
-  const isClientCompany = companies.some(c => c.name === currentUser.company);
-  if (currentRole !== "Super Admin" && isClientCompany) {
-    allowedApplicants = applicants.filter(a => a.company === currentUser.company || a.clientName === currentUser.company);
-    if (currentUser.branch !== "All") {
+  
+  if (currentRole !== "Super Admin") {
+    allowedApplicants = applicants.filter(a => a.company === currentUser.company);
+    
+    // Strict Branch Validation: If not a Company Admin, restrict to own branch.
+    if (currentRole !== "Company Admin" && currentUser.branch && currentUser.branch !== "All") {
       allowedApplicants = allowedApplicants.filter(a => a.branch === currentUser.branch);
     }
   }

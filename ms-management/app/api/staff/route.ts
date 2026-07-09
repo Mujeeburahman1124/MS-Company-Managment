@@ -42,12 +42,12 @@ export async function POST(request: Request) {
     }
     const branch = data.branch || user.branch || "Main Branch";
 
-    // Tenancy Check: Company Admin / Branch Admin can only create staff for their company/branch
+    // Tenancy Check: Company Admin can create for any branch in their company. Others only their own.
     if (user.role !== "Super Admin") {
       if (data.company !== user.company) {
         return NextResponse.json({ error: "Cannot create staff for another company" }, { status: 403 });
       }
-      if (user.role === "Branch Admin" && branch !== user.branch) {
+      if (user.role !== "Company Admin" && branch !== user.branch) {
         return NextResponse.json({ error: "Cannot create staff for another branch" }, { status: 403 });
       }
     }

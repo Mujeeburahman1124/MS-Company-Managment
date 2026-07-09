@@ -215,7 +215,7 @@ export default function PayrollReports() {
                 <Select value={selectedBranch} onValueChange={v => setSelectedBranch(v || "all")}>
                   <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl h-10 text-xs"><SelectValue placeholder="All Branches" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Branches</SelectItem>
+                    {currentRole === "Super Admin" && <SelectItem value="all">All Branches</SelectItem>}
                     {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                   </SelectContent>
                 </Select>

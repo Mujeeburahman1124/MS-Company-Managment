@@ -247,7 +247,7 @@ export default function Payslips() {
       <Pagination moduleKey="payroll" totalItems={totalItems} />
 
       <Dialog open={!!viewPayslip} onOpenChange={(o) => !o && setViewPayslip(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 w-[95vw] sm:w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
           {viewPayslip && (
             <>
               <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -275,7 +275,7 @@ export default function Payslips() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                   <div>
                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Employee Details</div>
                     <div className="text-sm font-bold text-slate-800">{viewPayslip.staffName}</div>

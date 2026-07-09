@@ -391,12 +391,12 @@ function ApplyContent() {
 
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 text-white py-12 px-6 text-center select-none">
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="w-[95vw] sm:w-full max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400">
             <Sparkles className="w-3.5 h-3.5"/> Join Our Professional Ecosystem
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Submit Your Professional Application</h2>
-          <p className="text-sm text-slate-300 max-w-xl mx-auto font-medium">
+          <p className="text-sm text-slate-300 w-[95vw] sm:w-full max-w-xl mx-auto font-medium">
             Register your profile or instantly track your visa approvals, interview schedules, and final placements.
           </p>
 
@@ -427,11 +427,11 @@ function ApplyContent() {
       </div>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-4xl mx-auto w-full p-4 md:p-6 pb-24">
+      <main className="flex-1 w-[95vw] sm:w-full max-w-4xl mx-auto w-full p-4 md:p-6 pb-24">
         {activeTab === "apply" ? (
           <Card className="rounded-3xl border-slate-200 shadow-xl bg-white p-6 md:p-8 space-y-6">
             {generatedCode ? (
-              <div className="text-center py-10 space-y-6 max-w-md mx-auto">
+              <div className="text-center py-10 space-y-6 w-[95vw] sm:w-full max-w-md mx-auto">
                 <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto text-emerald-600 shadow-sm">
                   <CheckCircle className="w-8 h-8"/>
                 </div>

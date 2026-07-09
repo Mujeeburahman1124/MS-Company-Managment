@@ -317,7 +317,7 @@ export default function MembersPage() {
 
       {/* Member History Modal */}
       <Dialog open={!!historyMember} onOpenChange={open => !open && setHistoryMember(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Member Status History</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">
@@ -366,7 +366,7 @@ export default function MembersPage() {
 
       {/* Email broadcasting / Promotion Center Modal */}
       <Dialog open={isEmailModalOpen} onOpenChange={setIsEmailModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-xl max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSendBroadcast} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">

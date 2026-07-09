@@ -175,7 +175,7 @@ export default function VisaExpiryPage() {
       
       <div className="p-4 md:p-6 pb-0">
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-          <div className="relative w-full sm:max-w-md">
+          <div className="relative w-full sm:w-[95vw] sm:w-full max-w-md">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input 
               placeholder="Search by name, ID, or company..." 
@@ -225,7 +225,7 @@ export default function VisaExpiryPage() {
                     </span>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3 text-[11px] text-slate-600 font-semibold mb-4">
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-slate-600 font-semibold mb-4">
                     <div className="rounded-xl border border-slate-100 bg-slate-50 p-2.5">
                       <div className="text-slate-400 uppercase tracking-[0.2em] text-[9px]">Company</div>
                       <div className="mt-1 text-slate-800 truncate">{item.company}</div>

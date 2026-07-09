@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       if (data.company !== user.company) {
         return NextResponse.json({ error: "Cannot create task for another company" }, { status: 403 });
       }
-      if (user.role === "Branch Admin" && data.branch !== user.branch) {
+      if (user.role !== "Company Admin" && data.branch !== user.branch) {
         return NextResponse.json({ error: "Cannot create task for another branch" }, { status: 403 });
       }
     }
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         if (user.role !== "Super Admin" && assignedStaff.company !== data.company) {
           return NextResponse.json({ error: "Cannot assign task to a staff member in another company" }, { status: 403 });
         }
-        if (user.role === "Branch Admin" && assignedStaff.branch !== data.branch) {
+        if (user.role !== "Super Admin" && user.role !== "Company Admin" && assignedStaff.branch !== data.branch) {
           return NextResponse.json({ error: "Cannot assign task to a staff member in another branch" }, { status: 403 });
         }
       }
@@ -112,6 +112,7 @@ export async function POST(request: Request) {
     try {
       let assigneeEmail: string | null = null;
       let assigneeName = task.assignedTo;
+      let userMember: any = null;
 
       // 1. Try finding in Staff (case-insensitive fallback)
       let staffMember = await prisma.staff.findFirst({
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
         assigneeName = staffMember.name;
       } else {
         // 2. Try finding in User (case-insensitive fallback)
-        let userMember = await prisma.user.findFirst({
+        userMember = await prisma.user.findFirst({
           where: { name: task.assignedTo }
         });
         
@@ -174,11 +175,26 @@ ${task.company} HR & Management System`;
           company: task.company,
           branch: task.branch
         }).catch(err => console.error("Async task email error:", err));
+        
+        if (userMember) {
+          await prisma.notification.create({
+            data: {
+              title: "New Task Assigned",
+              message: `You have been assigned a new task: "${task.title}".`,
+              type: "Task",
+              userId: userMember.id,
+              company: task.company,
+              branch: task.branch,
+              link: "/tasks",
+              createdAt: new Date().toISOString()
+            }
+          });
+        }
       } else {
         console.warn(`[EMAIL-SERVICE] Assignee '${task.assignedTo}' email not found in Staff or User tables.`);
       }
     } catch (emailErr) {
-      console.error("Error setting up task email:", emailErr);
+      console.error("Error setting up task notification:", emailErr);
     }
 
     return NextResponse.json(task);

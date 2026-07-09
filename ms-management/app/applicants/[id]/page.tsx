@@ -876,7 +876,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
               {/* Preview Dialog */}
               <Dialog open={!!previewDoc} onOpenChange={(o) => { if (!o) setPreviewDoc(null); }}>
-                <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl overflow-hidden">
+                <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 w-[95vw] sm:w-full max-w-2xl overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
                     <div className="min-w-0">
                       <h3 className="text-sm font-bold text-slate-800 truncate">{previewDoc?.name}</h3>
@@ -1074,7 +1074,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
                     <Card className="rounded-2xl border-slate-100 p-8 bg-white shadow-sm text-center">
                       <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                       <h4 className="text-sm font-bold text-slate-800">No Placement Agreement Yet</h4>
-                      <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
+                      <p className="text-xs text-slate-400 mt-1 w-[95vw] sm:w-full max-w-md mx-auto leading-relaxed">
                         A placement agreement is generated automatically once the candidate's status transitions to "Placed" or a job placement record is registered.
                       </p>
                     </Card>
@@ -1325,7 +1325,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
       {/* DIALOG: SIMULATE HR REPLY */}
       <Dialog open={isSimulateModalOpen} onOpenChange={setIsSimulateModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={async (e) => {
             e.preventDefault();
             if (!simulateBody.trim()) {
@@ -1407,7 +1407,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
       {/* MODAL: CHANGE STATUS */}
       <Dialog open={isStatusModalOpen} onOpenChange={setIsStatusModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={handleStatusChangeSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Update Applicant Status</DialogTitle>
@@ -1521,7 +1521,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
       {/* MODAL: SCHEDULE INTERVIEW */}
       <Dialog open={isInterviewModalOpen} onOpenChange={setIsInterviewModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={handleScheduleInterviewSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Schedule Interview</DialogTitle>

@@ -325,13 +325,13 @@ export default function ProcessPayroll() {
       <Pagination moduleKey="payroll" totalItems={totalItems} />
 
       <Dialog open={generateModal} onOpenChange={setGenerateModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-sm">
           <form onSubmit={handleGeneratePayroll} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Generate Monthly Payroll</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Creates Draft payroll records for all staff who don't yet have one for the selected period.</DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Month</Label>
                 <Select value={genMonth} onValueChange={v => setGenMonth(v || genMonth)}>
@@ -355,7 +355,7 @@ export default function ProcessPayroll() {
       </Dialog>
 
       <Dialog open={rulesModal} onOpenChange={setRulesModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg">
           <form onSubmit={handleSaveRules} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Payroll Calculation Rules</DialogTitle>
@@ -387,7 +387,7 @@ export default function ProcessPayroll() {
                 )}
               </div>
               <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 col-span-1 md:col-span-2">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-[10px] text-slate-500 uppercase">Leave Deduction Rule</Label>
                     <Select value={localRules.leaveDeductionRule} onValueChange={v => setLocalRules(r => ({...r, leaveDeductionRule: v as any}))}>
@@ -408,7 +408,7 @@ export default function ProcessPayroll() {
                 </div>
               </div>
               <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 col-span-1 md:col-span-2">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-[10px] text-slate-500 uppercase">Overtime Base Rate (AED/hr)</Label>
                     <Input type="number" value={localRules.overtimeHourlyRate} onChange={e => setLocalRules(r => ({...r, overtimeHourlyRate: parseFloat(e.target.value)||25}))} className="h-8 text-xs bg-white rounded-lg" />
@@ -430,7 +430,7 @@ export default function ProcessPayroll() {
 
       <Dialog open={modal} onOpenChange={setModal}>
         <DialogContent 
-          className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-5 md:p-6 max-w-2xl overflow-y-auto"
+          className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-5 md:p-6 w-[95vw] sm:w-full max-w-2xl overflow-y-auto"
           style={{ maxHeight: "90vh" }}
         >
           <DialogHeader className="border-b border-slate-100 pb-3">
@@ -458,7 +458,7 @@ export default function ProcessPayroll() {
                 {/* Overtime Details Group */}
                 <div className="col-span-2 bg-slate-50/50 border border-slate-100 p-3 rounded-xl space-y-2">
                   <div className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Overtime Calculations</div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Overtime Hours</Label>
                       <Input type="number" step="0.5" value={form.overtimeHours} onChange={e => {
@@ -486,7 +486,7 @@ export default function ProcessPayroll() {
                 {/* Deductions Group */}
                 <div className="col-span-2 bg-slate-50/50 border border-slate-100 p-3 rounded-xl space-y-2">
                   <div className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Deductions</div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Advance Deduction</Label>
                       <Input type="number" value={form.advanceDeduction} onChange={e => setForm(f => ({...f, advanceDeduction: parseInt(e.target.value)||0}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
@@ -525,7 +525,7 @@ export default function ProcessPayroll() {
 
                     return (
                       <div className="space-y-3">
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                           <div className="bg-emerald-50/50 border border-emerald-100 rounded-lg p-2 text-center">
                             <div className="text-[9px] font-bold text-emerald-600 uppercase">Present</div>
                             <div className="text-xs font-black text-emerald-800">{totalPresent} Days</div>

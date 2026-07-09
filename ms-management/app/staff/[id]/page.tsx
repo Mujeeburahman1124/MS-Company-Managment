@@ -786,7 +786,7 @@ export default function StaffDetailPage({ params }: { params: Promise<{ id: stri
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 text-xs font-semibold text-slate-600">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-600">
                       <div>
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Mileage</span>
                         <span className="text-slate-800 font-bold">{(assignedVehicle.km || 0).toLocaleString()} KM</span>
@@ -913,7 +913,7 @@ export default function StaffDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-1.5">
               <Edit3 className="w-4.5 h-4.5 text-blue-500" /> Edit Staff Profile & System Access
@@ -1165,7 +1165,7 @@ export default function StaffDetailPage({ params }: { params: Promise<{ id: stri
             <div className="space-y-4">
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">System Access & Permissions</h3>
               <div className="space-y-4">
-                <div className="space-y-1 max-w-sm">
+                <div className="space-y-1 w-[95vw] sm:w-full max-w-sm">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">System Role</Label>
                   <select 
                     value={formData.role} 

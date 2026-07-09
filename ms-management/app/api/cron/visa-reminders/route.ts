@@ -18,16 +18,15 @@ export async function GET(request: Request) {
     };
 
     const getReminderLevel = (days: number) => {
-      if (days === 30) return "30_days";
-      if (days === 15) return "15_days";
-      if (days === 7) return "7_days";
-      if (days === 0 || days === -1) return "Expired"; 
+      if (days <= 20 && days > 0) return `daily_reminder_${days}_days`;
+      if (days === 0) return "Expired_Today";
+      if (days < 0 && days >= -30) return `Expired_Overdue_${Math.abs(days)}_days`;
       return null;
     };
 
     const processEntity = async (entity: any, entityType: "Applicant" | "Staff") => {
       const logs: string[] = [];
-      const { id, company, branch, visaExpiry, passportExpiry, email, status, clientCompany } = entity;
+      const { id, company, branch, visaExpiry, passportExpiry, email, status, clientName } = entity;
       const name = entityType === "Applicant" ? entity.fullName : entity.name;
 
       const checkExpiry = async (expiryDateStr: string, expiryType: "Visa" | "Passport") => {
@@ -37,6 +36,7 @@ export async function GET(request: Request) {
         const reminderLevel = getReminderLevel(daysDiff);
         if (!reminderLevel) return;
 
+        // Check existing log
         const existingLog = await prisma.visaReminderLog.findFirst({
           where: {
             entityId: id,
@@ -111,15 +111,15 @@ export async function GET(request: Request) {
           }
 
           // 3. Send email to Client Company if Placed (For Applicants only)
-          if (entityType === "Applicant" && status === "Placed" && clientCompany) {
+          if (entityType === "Applicant" && status === "Placed" && clientName) {
             const cCompany = await prisma.company.findFirst({
-              where: { name: clientCompany }
+              where: { name: clientName }
             });
             if (cCompany && cCompany.email) {
               await sendEmail({
                 to: cCompany.email,
                 subject: `Action Required: ${expiryType} Expiry for Placed Applicant ${name}`,
-                body: `<p>Dear ${clientCompany} Management,</p><p>This is a notification that your placed applicant, ${name}, has a ${expiryType} that ${reminderLevel === "Expired" ? "has EXPIRED on " + expiryDateStr : "will expire in " + daysDiff + " days on " + expiryDateStr}. Please coordinate with the applicant.</p>`
+                body: `<p>Dear ${clientName} Management,</p><p>This is a notification that your placed applicant, ${name}, has a ${expiryType} that ${reminderLevel === "Expired" ? "has EXPIRED on " + expiryDateStr : "will expire in " + daysDiff + " days on " + expiryDateStr}. Please coordinate with the applicant.</p>`
               });
             }
           }
@@ -141,7 +141,7 @@ export async function GET(request: Request) {
           { status: "Visa Processing" }
         ]
       },
-      select: { id: true, fullName: true, visaExpiry: true, passportExpiry: true, company: true, branch: true, email: true, status: true }
+      select: { id: true, fullName: true, visaExpiry: true, passportExpiry: true, company: true, branch: true, email: true, status: true, clientName: true }
     });
 
     const staff = await prisma.staff.findMany({

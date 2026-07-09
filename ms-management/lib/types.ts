@@ -402,6 +402,8 @@ export interface Placement {
   agreementHistory?: string[];
   createdBy: string;
   createdAt: string;
+  company?: string;
+  branch?: string;
   
   // MS Horizon F.Z.E Extensions
   passportNumber?: string;

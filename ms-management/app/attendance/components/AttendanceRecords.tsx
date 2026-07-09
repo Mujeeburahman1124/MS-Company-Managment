@@ -135,7 +135,7 @@ function MobileStaffCard({
       {expanded && (
         <div className="px-3 pb-3 space-y-2 border-t border-white/50">
           {!noTime && (
-            <div className="grid grid-cols-4 gap-2 mt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-2">
               <div>
                 <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Check In</div>
                 <Input
@@ -433,7 +433,7 @@ export default function AttendanceRecords() {
                     <SelectValue placeholder="All Branches" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Branches</SelectItem>
+                    {currentRole === "Super Admin" && <SelectItem value="all">All Branches</SelectItem>}
                     {branches
                       .filter(b => {
                         if (currentRole === "Super Admin" || isSystemUser) {

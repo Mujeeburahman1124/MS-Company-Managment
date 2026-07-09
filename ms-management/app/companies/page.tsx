@@ -245,7 +245,7 @@ export default function CompaniesPage() {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-center">
                         {[{ label: "Branches", value: branches.filter(b => b.companyId === c.id || b.company === c.name).length }, { label: "Staff", value: c.staff }, { label: "Applicants", value: c.applicants }].map(s => (
                           <div key={s.label} className="bg-slate-50 rounded-xl p-2 border border-slate-100">
                             <div className="text-sm font-extrabold text-slate-800">{s.value}</div>
@@ -258,7 +258,7 @@ export default function CompaniesPage() {
                         <div className="flex items-center gap-1.5 truncate"><Mail className="w-3.5 h-3.5 text-slate-400 flex-shrink-0"/>{c.email}</div>
                         <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400 flex-shrink-0"/>{c.telephone}</div>
                         
-                        <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-50">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-50">
                           <div className="flex flex-col gap-1">
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Owner Name</span>
                             <span className="font-semibold text-slate-700 truncate">{c.ownerName || "N/A"}</span>
@@ -399,7 +399,7 @@ export default function CompaniesPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={addModal} onOpenChange={setAddModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">{editCompany ? "Edit Client Company" : "Add New Client Company"}</DialogTitle>

@@ -80,7 +80,7 @@ export default function AttendanceCalendar() {
               </Select>
               <Select value={branchFilter} onValueChange={v => setBranchFilter(v || "all")}>
                 <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9"><SelectValue placeholder="All Branches" /></SelectTrigger>
-                <SelectContent><SelectItem value="all">All Branches</SelectItem>{branches.filter(b => companyFilter === "all" || b.company === companyFilter).map(b => <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>)}</SelectContent>
+                <SelectContent>{currentRole === "Super Admin" && <SelectItem value="all">All Branches</SelectItem>}{branches.filter(b => companyFilter === "all" || b.company === companyFilter).map(b => <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           )}

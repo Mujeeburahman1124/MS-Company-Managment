@@ -252,7 +252,7 @@ export default function LeavePage() {
                   <SelectContent className="bg-white rounded-xl text-xs">{LEAVE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">From Date <span className="text-rose-500">*</span></Label>
                   <Input required type="date" value={form.fromDate} onChange={e => setForm(f => ({...f, fromDate: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
@@ -286,7 +286,7 @@ export default function LeavePage() {
 
       {/* Approve/Reject Confirmation */}
       <Dialog open={!!approveModal} onOpenChange={open => !open && setApproveModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">{approveModal?.action === "Approved" ? "Approve Leave Request?" : "Reject Leave Request?"}</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Leave request for {approveModal?.req.staffName} — {approveModal?.req.leaveType} ({approveModal?.req.days} days)</DialogDescription>

@@ -486,6 +486,17 @@ model SentEmail {
   type           String?  @default("Email")
 }
 
+model EmailTemplate {
+  id            String   @id @default(cuid())
+  templateName  String   @unique
+  subject       String
+  body          String
+  type          String?
+  isEnabled     Boolean  @default(true)
+  createdAt     String
+  updatedAt     String
+}
+
 model SentWhatsApp {
   id            String   @id @default(cuid())
   to            String

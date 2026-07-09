@@ -228,7 +228,7 @@ export default function SuppliersPage() {
               <DialogTitle className="text-base font-bold text-slate-800">{editSup ? "Edit Supplier" : "Add New Supplier"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Register details of manpower agencies or independent suppliers.</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 py-4 grid grid-cols-2 gap-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1 col-span-2">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Agency/Supplier Name <span className="text-rose-500">*</span></Label>
                 <Input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
@@ -276,7 +276,7 @@ export default function SuppliersPage() {
 
       {/* Offer Mails Broadcaster Modal */}
       <Dialog open={isEmailModalOpen} onOpenChange={setIsEmailModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-xl max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSendBroadcast} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
@@ -292,7 +292,7 @@ export default function SuppliersPage() {
               {/* Recipient Targeting Mode */}
               <div className="space-y-1.5">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target Recipient Group</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
                     { key: "all", label: "All Suppliers" },
                     { key: "specific", label: "Select Specific" }

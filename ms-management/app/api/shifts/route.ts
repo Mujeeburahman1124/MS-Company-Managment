@@ -66,8 +66,13 @@ export async function POST(request: Request) {
     }
 
     // Tenancy Check
-    if (user.role !== "Super Admin" && data.company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (user.role !== "Super Admin") {
+      if (data.company !== user.company) {
+        return NextResponse.json({ error: "Forbidden: Cannot access other company" }, { status: 403 });
+      }
+      if (user.role !== "Company Admin" && data.branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden: Cannot access other branch" }, { status: 403 });
+      }
     }
 
     const shift = await prisma.shift.create({

@@ -227,7 +227,7 @@ export default function StaffRequestsPage() {
       <Pagination moduleKey="requests" totalItems={totalItems} />
 
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[92vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[92vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Submit Staff Request</DialogTitle>
@@ -241,7 +241,7 @@ export default function StaffRequestsPage() {
                   <SelectContent className="bg-white rounded-xl text-xs max-h-48">{filteredStaff.map(s => <SelectItem key={s.id} value={s.id}>{s.name} · {s.position}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Full Name <span className="text-rose-500">*</span></Label>
                   <Input value={form.staffName} onChange={e => setForm(f => ({...f, staffName: e.target.value}))} placeholder="Full name" className="bg-white border-slate-200 rounded-xl text-xs h-9" required />
@@ -259,7 +259,7 @@ export default function StaffRequestsPage() {
                   <Input type="email" value={form.staffEmail} onChange={e => setForm(f => ({...f, staffEmail: e.target.value}))} placeholder="Email" className="bg-white border-slate-200 rounded-xl text-xs h-9" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Request Type <span className="text-rose-500">*</span></Label>
                   <Select value={form.requestType} onValueChange={v => setForm(f => ({...f, requestType: v as StaffRequest["requestType"]}))}>
@@ -308,7 +308,7 @@ export default function StaffRequestsPage() {
       </Dialog>
 
       <Dialog open={!!actionModal} onOpenChange={open => !open && setActionModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">{actionModal?.action} Request?</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Request from {actionModal?.req.staffName} for {actionModal?.req.requestType}</DialogDescription>
@@ -328,7 +328,7 @@ export default function StaffRequestsPage() {
       </Dialog>
 
       <Dialog open={!!historyReq} onOpenChange={open => !open && setHistoryReq(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Request History</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">{historyReq?.staffName} · {historyReq?.requestType}</DialogDescription>

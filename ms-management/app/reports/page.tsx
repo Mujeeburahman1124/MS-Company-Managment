@@ -47,17 +47,22 @@ export default function ReportsPage() {
   const userCompany = currentUser.company;
 
   // Scoped data
-  const appList = isSuperAdmin ? applicants : applicants.filter(a => a.company === userCompany);
-  const staffList = isSuperAdmin ? staff : staff.filter(s => s.company === userCompany);
+  const applyBranchFilter = (list: any[]) => {
+    if (isSuperAdmin || currentRole === "Company Admin" || currentUser.branch === "All") return list;
+    return list.filter(item => !item.branch || item.branch === currentUser.branch);
+  };
+
+  const appList = applyBranchFilter(isSuperAdmin ? applicants : applicants.filter(a => a.company === userCompany || a.clientName === userCompany));
+  const staffList = applyBranchFilter(isSuperAdmin ? staff : staff.filter(s => s.company === userCompany));
   const companyList = isSuperAdmin ? companies : companies.filter(c => c.name === userCompany);
-  const taskList = isSuperAdmin ? tasks : tasks.filter(t => t.company === userCompany);
-  const interviewList = isSuperAdmin ? interviews : interviews.filter(i => i.company === userCompany);
-  const vehicleList = isSuperAdmin ? vehicles : vehicles.filter(v => v.company === userCompany);
-  const supplierList = isSuperAdmin ? suppliers : suppliers;
-  const payrollList = isSuperAdmin ? payroll : payroll.filter(p => p.company === userCompany);
-  const logList = isSuperAdmin ? activityLogs : activityLogs.filter(l => l.company === userCompany);
-  const leaveList = isSuperAdmin ? leaveRequests : leaveRequests.filter(l => l.company === userCompany);
-  const placementList = isSuperAdmin ? placements : placements.filter(p => p.companyName === userCompany);
+  const taskList = applyBranchFilter(isSuperAdmin ? tasks : tasks.filter(t => t.company === userCompany));
+  const interviewList = applyBranchFilter(isSuperAdmin ? interviews : interviews.filter(i => i.company === userCompany));
+  const vehicleList = applyBranchFilter(isSuperAdmin ? vehicles : vehicles.filter(v => v.company === userCompany));
+  const supplierList = isSuperAdmin ? suppliers : suppliers.filter(s => s.company === userCompany);
+  const payrollList = applyBranchFilter(isSuperAdmin ? payroll : payroll.filter(p => p.company === userCompany));
+  const logList = applyBranchFilter(isSuperAdmin ? activityLogs : activityLogs.filter(l => l.company === userCompany));
+  const leaveList = applyBranchFilter(isSuperAdmin ? leaveRequests : leaveRequests.filter(l => l.company === userCompany));
+  const placementList = applyBranchFilter(isSuperAdmin ? placements : placements.filter(p => p.companyName === userCompany || p.company === userCompany));
 
   // Applicant Stats
   const appByStatus = {
@@ -507,7 +512,7 @@ export default function ReportsPage() {
               <h2 className="text-base font-bold text-slate-800">Staff Report</h2>
               <Button size="sm" variant="outline" onClick={() => handleExport(staffList.map(s => ({ ID: s.id, Name: s.name, Position: s.position, Nationality: s.nationality, Email: s.email, Mobile: s.mobile, Company: s.company, Branch: s.branch, "Joining Date": s.joiningDate, "Visa Expiry": s.visaExpiry, Status: s.status })), "staff-report")} className="rounded-xl text-xs border-slate-200 font-bold gap-1.5 h-8"><Download className="w-3.5 h-3.5" />Export</Button>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {Object.entries(staffByStatus).map(([status, count]) => (
                 <Card key={status} className="rounded-2xl border-slate-100 p-4 bg-white shadow-sm text-center">
                   <div className="text-2xl font-extrabold text-slate-800">{count}</div>
@@ -694,7 +699,7 @@ export default function ReportsPage() {
               <h2 className="text-base font-bold text-slate-800">Visa & Passport Expiry Report</h2>
               <Button size="sm" variant="outline" onClick={() => handleExport(visaAlerts.map((p: any) => ({ ID: p.id, Name: (p as any).fullName || (p as any).name, "Visa Expiry": (p as any).visaExpiry, Company: p.company })), "visa-expiry-report")} className="rounded-xl text-xs border-slate-200 font-bold gap-1.5 h-8"><Download className="w-3.5 h-3.5" />Export</Button>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Card className="rounded-2xl p-4 bg-rose-50 border-rose-200 shadow-sm text-center"><div className="text-2xl font-extrabold text-rose-700">{visaAlerts.length}</div><div className="text-[10px] font-bold text-rose-500 uppercase mt-1">Visa Expiring ≤30 Days</div></Card>
               <Card className="rounded-2xl p-4 bg-amber-50 border-amber-200 shadow-sm text-center"><div className="text-2xl font-extrabold text-amber-700">{passportAlerts.length}</div><div className="text-[10px] font-bold text-amber-500 uppercase mt-1">Passport Expiring ≤30 Days</div></Card>
             </div>

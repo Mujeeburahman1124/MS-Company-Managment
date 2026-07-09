@@ -43,7 +43,6 @@ export default function TrackingPage() {
   const search = f.search || "";
   const companyFilter = f.company || "all";
   const branchFilter = f.branch || "all";
-  const clientCompanyFilter = f.clientCompany || "all";
   const nationalityFilter = f.nationality || "all";
   const statusFilter = f.status || "all";
   const startDate = f.fromDate || "";
@@ -63,7 +62,6 @@ export default function TrackingPage() {
     f.search,
     f.company,
     f.branch,
-    f.clientCompany,
     f.nationality,
     f.status,
     f.fromDate,
@@ -82,9 +80,13 @@ export default function TrackingPage() {
   const isCompanyAdmin = currentRole === "Company Admin";
 
   // Base list depending on role and soft delete / visibility
-  let baseApplicants = isSuperAdmin
-    ? applicants
-    : applicants.filter(a => a.company === currentUser.company);
+  let baseApplicants = applicants;
+  if (!isSuperAdmin) {
+    baseApplicants = baseApplicants.filter(a => a.company === currentUser.company);
+    if (!isCompanyAdmin && currentUser.branch && currentUser.branch !== "All") {
+      baseApplicants = baseApplicants.filter(a => a.branch === currentUser.branch);
+    }
+  }
 
   // Apply filters
   let filteredList = [...baseApplicants];
@@ -555,9 +557,10 @@ export default function TrackingPage() {
               <select
                 value={branchFilter}
                 onChange={e => setFilter("tracking", { branch: e.target.value, page: 1 })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+                disabled={!isSuperAdmin && !isCompanyAdmin}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700 disabled:opacity-50"
               >
-                <option value="all">All Branches</option>
+                {isSuperAdmin && <option value="all">All Branches</option>}
                 {branches
                   .filter(b => companyFilter === "all" || b.company === companyFilter)
                   .map(b => (
@@ -892,7 +895,7 @@ export default function TrackingPage() {
 
       {/* Enhanced Linked Info Tracking Dialog (Applicant Tracker Core Feature) */}
       <Dialog open={!!selectedApp} onOpenChange={open => !open && setSelectedApp(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Application Progress Tracker</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">
@@ -924,7 +927,7 @@ export default function TrackingPage() {
                 <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
                   <CalendarRange className="w-4 h-4 text-blue-500" /> Visa Status & Remaining Date
                 </h4>
-                <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span className="text-[9px] text-slate-400 font-bold uppercase block">Visa Category</span>
                     <strong className="text-slate-800 font-bold text-xs">{selectedApp.visaType} Visa</strong>
@@ -1025,7 +1028,7 @@ export default function TrackingPage() {
                   <ShieldCheck className="w-4 h-4 text-emerald-500" /> Placement & Agreement Updates
                 </h4>
                 {selectedAppPlacement ? (
-                  <div className="grid grid-cols-2 gap-3 pt-3 text-xs font-semibold text-slate-600 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 text-xs font-semibold text-slate-600 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
                     <div>
                       <span className="text-[10px] text-slate-400">Hired Company:</span>
                       <p className="text-slate-800 font-bold mt-0.5">{selectedAppPlacement.companyName}</p>
@@ -1123,7 +1126,7 @@ export default function TrackingPage() {
 
       {/* Validation Dialog for Kanban Drag & Drop Status Transition */}
       <Dialog open={isStatusDialogOpen} onOpenChange={open => !open && setIsStatusDialogOpen(false)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={handleStatusSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">

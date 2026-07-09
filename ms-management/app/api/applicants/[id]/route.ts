@@ -245,7 +245,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         } catch (err) {
           console.error("Async offer letter email error:", err);
         }
-      } else {
+      } else if (!["Interview Scheduled", "Placed", "Selected", "Visa Processing"].includes(updated.status)) {
         const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
         const positions = Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions;
         const emailBody = `

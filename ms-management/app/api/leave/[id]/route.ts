@@ -195,6 +195,28 @@ ${updated.company} HR Department`;
           company: updated.company,
           branch: updated.branch
         }).catch(err => console.error("Async leave status update email error:", err));
+        
+        try {
+          const userMember = await prisma.user.findFirst({
+            where: { name: staffMember.name }
+          });
+          if (userMember) {
+            await prisma.notification.create({
+              data: {
+                title: `Leave Status: ${updated.status}`,
+                message: `Your leave request for ${updated.startDate} has been marked as ${updated.status}.`,
+                type: updated.status === "Approved" ? "Success" : (updated.status === "Rejected" ? "Alert" : "Info"),
+                userId: userMember.id,
+                company: updated.company,
+                branch: updated.branch,
+                link: "/leave",
+                createdAt: new Date().toISOString()
+              }
+            });
+          }
+        } catch (err) {
+          console.error("Failed to send leave status notification:", err);
+        }
       }
     }
 

@@ -121,6 +121,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       try {
         let assigneeEmail: string | null = null;
         let assigneeName = updated.assignedTo;
+        let userMember: any = null;
 
         // 1. Try finding in Staff (case-insensitive fallback)
         let staffMember = await prisma.staff.findFirst({
@@ -139,7 +140,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
           assigneeName = staffMember.name;
         } else {
           // 2. Try finding in User (case-insensitive fallback)
-          let userMember = await prisma.user.findFirst({
+          userMember = await prisma.user.findFirst({
             where: { name: updated.assignedTo }
           });
           
@@ -183,11 +184,51 @@ ${updated.company} HR & Management System`;
             company: updated.company,
             branch: updated.branch
           }).catch(err => console.error("Async task reassign email error:", err));
+          
+          if (userMember) {
+            await prisma.notification.create({
+              data: {
+                title: "Task Reassigned",
+                message: `Task "${updated.title}" has been assigned to you.`,
+                type: "Task",
+                userId: userMember.id,
+                company: updated.company,
+                branch: updated.branch,
+                link: "/tasks",
+                createdAt: new Date().toISOString()
+              }
+            });
+          }
         } else {
           console.warn(`[EMAIL-SERVICE] Reassignee '${updated.assignedTo}' email not found in Staff or User tables.`);
         }
       } catch (emailErr) {
         console.error("Error setting up task reassign email:", emailErr);
+      }
+    }
+
+    // Check for status update to notify the task creator
+    if (data.status && data.status !== existing.status && updated.createdBy) {
+      try {
+        const creator = await prisma.user.findFirst({
+          where: { name: updated.createdBy }
+        });
+        if (creator) {
+          await prisma.notification.create({
+            data: {
+              title: data.status === "Completed" ? "Task Completed" : "Task Status Updated",
+              message: `Task "${updated.title}" was marked as ${data.status} by ${user.name}.`,
+              type: data.status === "Completed" ? "Success" : "Task",
+              userId: creator.id,
+              company: updated.company,
+              branch: updated.branch,
+              link: "/tasks",
+              createdAt: new Date().toISOString()
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Error setting up task creator notification:", err);
       }
     }
 

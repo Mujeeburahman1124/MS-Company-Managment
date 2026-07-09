@@ -111,7 +111,7 @@ export default function SettingsPage() {
     return (
       <div className="flex flex-col h-full">
         <PageHeader title="Site Settings" />
-        <div className="p-12 max-w-2xl mx-auto w-full">
+        <div className="p-12 w-[95vw] sm:w-full max-w-2xl mx-auto w-full">
           <Card className="rounded-2xl border-amber-200 bg-amber-50 p-8 text-center flex flex-col items-center shadow-sm">
             <ShieldAlert className="w-12 h-12 text-amber-500 mb-4"/>
             <h2 className="text-lg font-bold text-amber-800 mb-2">Access Restricted</h2>
@@ -128,7 +128,7 @@ export default function SettingsPage() {
         actions={<Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Save className="w-4 h-4"/>Save Configuration</Button>}
       />
 
-      <div className="p-4 md:p-6 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-4 md:p-6 w-[95vw] sm:w-full max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sticky nav sidebar */}
         <div className="hidden lg:block space-y-1.5 sticky top-24">
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Settings Menu</div>

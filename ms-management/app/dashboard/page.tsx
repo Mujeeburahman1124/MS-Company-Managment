@@ -117,6 +117,65 @@ function SectionHeader({ icon: Icon, title, href, linkLabel }: {
   );
 }
 
+function ApplicantAnalyticsWidget({ applicants, isSuperAdmin, isCompanyAdmin }: { applicants: any[], isSuperAdmin: boolean, isCompanyAdmin: boolean }) {
+  const companyCounts = applicants.reduce((acc, curr) => {
+    const comp = curr.company || "Unknown";
+    acc[comp] = (acc[comp] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const branchCounts = applicants.reduce((acc, curr) => {
+    const branch = curr.branch || "Unknown";
+    acc[branch] = (acc[branch] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const pending = applicants.filter(a => a.status === "Pending").length;
+  const processing = applicants.filter(a => a.status === "Processing" || a.status === "Interview Scheduled" || a.status === "Selected" || a.status === "Visa Processing").length;
+  const placed = applicants.filter(a => a.status === "Placed").length;
+  const rejected = applicants.filter(a => a.status === "Rejected" || a.status === "Returned").length;
+
+  return (
+    <div className="mt-8 mb-4">
+      <SectionHeader icon={Users} title="Applicant Analytics" href="/tracking" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <StatCard title="Pending" value={pending} icon={Clock} theme="slate" />
+        <StatCard title="Processing" value={processing} icon={Activity} theme="blue" />
+        <StatCard title="Placed" value={placed} icon={CheckSquare} theme="emerald" />
+        <StatCard title="Rejected" value={rejected} icon={AlertTriangle} theme="rose" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {isSuperAdmin && (
+          <Card className="p-4 rounded-2xl shadow-sm border-slate-100">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Applicants by Company</h3>
+            <div className="space-y-2">
+              {Object.entries(companyCounts).map(([name, count]) => (
+                <div key={name} className="flex justify-between items-center p-2 hover:bg-slate-50 rounded-lg border border-transparent hover:border-slate-100 transition-colors">
+                  <span className="text-sm font-medium text-slate-700">{name}</span>
+                  <span className="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{count as number}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+        {(isSuperAdmin || isCompanyAdmin) && (
+          <Card className="p-4 rounded-2xl shadow-sm border-slate-100">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Applicants by Branch</h3>
+            <div className="space-y-2">
+              {Object.entries(branchCounts).map(([name, count]) => (
+                <div key={name} className="flex justify-between items-center p-2 hover:bg-slate-50 rounded-lg border border-transparent hover:border-slate-100 transition-colors">
+                  <span className="text-sm font-medium text-slate-700">{name}</span>
+                  <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{count as number}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ════════════════════════════════════════════
    ROLE-SPECIFIC DASHBOARD SECTIONS
    ════════════════════════════════════════════ */
@@ -312,7 +371,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
       {/* Payslip Modal Dialog */}
       {selectedPayslip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
-          <Card className="w-full max-w-lg bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 flex flex-col animate-in fade-in zoom-in-95 duration-150">
+          <Card className="w-full w-[95vw] sm:w-full max-w-lg bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 flex flex-col animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div>
                 <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">MS HORIZON F.Z.E</h3>
@@ -326,7 +385,7 @@ function StaffDashboard({ currentUser, now, tasks, leaveRequests, notifications,
               </button>
             </div>
             
-            <div className="grid grid-cols-2 gap-3 text-[11px] mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
               <div>
                 <span className="text-slate-400 font-medium">Employee Name:</span>
                 <p className="font-bold text-slate-800">{selectedPayslip.staffName}</p>
@@ -806,7 +865,7 @@ function CompanyDashboard({ fApplicants, fStaff, fTasks, fInterviews, leaveReque
                 <span className="text-[10px] font-black text-slate-600">{completedTasks}/{totalTasks}</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-center text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center text-xs">
               <div className="bg-amber-50/50 p-2.5 rounded-xl border border-amber-100">
                 <div className="font-extrabold text-amber-700">{pendingTasks + processingTasks}</div>
                 <div className="text-[9px] text-amber-600 font-semibold uppercase tracking-wider mt-0.5">Open</div>
@@ -1606,20 +1665,25 @@ export default function DashboardPage() {
   const isSystemWide = isSuperAdmin || currentUser.company === "System";
 
   // Scoped data based on role
-  const fApplicants = isSystemWide ? applicants : applicants.filter(a => a.company === userCompany);
-  const fStaff = isSystemWide ? staff : isBranchAdmin
-    ? staff.filter(s => s.company === userCompany && s.branch === userBranch)
-    : staff.filter(s => s.company === userCompany);
+  const applyBranchFilter = (list: any[]) => {
+    if (isSystemWide || isCompanyAdmin || userBranch === "All") return list;
+    return list.filter(item => !item.branch || item.branch === userBranch);
+  };
+
+  const fApplicants = applyBranchFilter(isSystemWide ? applicants : applicants.filter(a => a.company === userCompany));
+  const fStaff = applyBranchFilter(isSystemWide ? staff : staff.filter(s => s.company === userCompany));
+  
   const fTasks = isSystemWide ? tasks : isCompanyAdmin
     ? tasks.filter(t => t.company === userCompany)
-    : isBranchAdmin
-      ? tasks.filter(t => t.company === userCompany && t.branch === userBranch)
-      : tasks.filter(t => t.company === userCompany && (
+    : isStaff
+      ? tasks.filter(t => t.company === userCompany && (
           t.assignedToId === currentUser.id ||
           t.assignedTo.toLowerCase() === currentUser.name.toLowerCase() ||
           t.createdBy === currentUser.name
-        ));
-  const fInterviews = isSystemWide ? interviews : interviews.filter(i => i.company === userCompany);
+        ))
+      : tasks.filter(t => t.company === userCompany && t.branch === userBranch);
+
+  const fInterviews = applyBranchFilter(isSystemWide ? interviews : interviews.filter(i => i.company === userCompany));
 
   const visaAlerts = [...fApplicants, ...fStaff].filter((p: any) => {
     if (!p.visaExpiry) return false;
@@ -1740,6 +1804,10 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {(!isStaff && !isAccountant) && (
+          <ApplicantAnalyticsWidget applicants={fApplicants} isSuperAdmin={isSuperAdmin} isCompanyAdmin={isCompanyAdmin} />
+        )}
 
         {/* Daily Attendance widget globally for all dashboards */}
         <div className="mb-2">

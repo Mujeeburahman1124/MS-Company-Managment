@@ -650,7 +650,7 @@ export default function EmailsPage() {
         <Card className="rounded-2xl border-rose-200 bg-rose-50/50 p-8 text-center space-y-4">
           <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto" />
           <h3 className="text-lg font-bold text-slate-800">Access Denied</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto">
+          <p className="text-sm text-slate-500 w-[95vw] sm:w-full max-w-md mx-auto">
             You do not have the required permissions to view or dispatch email templates. Please contact your system administrator.
           </p>
         </Card>
@@ -972,7 +972,7 @@ export default function EmailsPage() {
       {/* Preview Modal before Sending */}
       {showPreviewModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4">
-          <Card className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+          <Card className="w-full w-[95vw] sm:w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div>
                 <h3 className="text-sm font-black uppercase text-slate-800 tracking-wider">
@@ -1057,7 +1057,7 @@ export default function EmailsPage() {
       {/* Historical Record details Modal */}
       {viewingEmailRecord && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4">
-          <Card className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+          <Card className="w-full w-[95vw] sm:w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <div>
                 <h3 className="text-sm font-black uppercase text-slate-800 tracking-wider">

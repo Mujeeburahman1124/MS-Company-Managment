@@ -10,30 +10,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Determine if the user's company is a Client Company
-    const clientCompany = await prisma.company.findFirst({
-      where: { name: user.company }
-    });
-    const isClient = !!clientCompany;
-
-    let filter: any = {};
-    if (user.role !== "Super Admin" && isClient) {
-      filter = {
-        OR: [
-          { company: user.company },
-          { clientName: user.company }
-        ]
-      };
-      if (user.role === "Branch Admin" && user.branch && user.branch !== "All") {
-        filter.branch = user.branch;
-      }
-    } else {
-      // Internal recruitment agency users (e.g. MS Company Management Solutions) can see all applicants.
-      // Filter by branch only if they are a Branch Admin.
-      if (user.role === "Branch Admin" && user.branch && user.branch !== "All") {
-        filter.branch = user.branch;
-      }
-    }
+    const filter = getTenantScopeFilter(user, "company", "branch");
 
     const applicants = await prisma.applicant.findMany({
       where: filter,
@@ -82,7 +59,7 @@ export async function POST(request: Request) {
         if (data.company !== user.company) {
           return NextResponse.json({ error: "Cannot create applicant for another company" }, { status: 403 });
         }
-        if (user.role === "Branch Admin" && data.branch !== user.branch) {
+        if (user.role !== "Company Admin" && data.branch !== user.branch) {
           return NextResponse.json({ error: "Cannot create applicant for another branch" }, { status: 403 });
         }
       }
@@ -229,7 +206,6 @@ export async function POST(request: Request) {
         memberActive: data.memberActive || false
       }
     });
-    const targetClientCompany = applicant.clientName || data.clientName;
     // 1. Notify Agency (Own Company) admins
     try {
       await prisma.notification.create({
@@ -238,7 +214,8 @@ export async function POST(request: Request) {
           message: `Applicant ${applicant.fullName} has registered online. Next step: Click here to review details, documents, and schedule an interview.`,
           type: "Info",
           userId: "admin",
-          company: "MS Company Management Solutions",
+          company: applicant.company || "MS Company Management Solutions",
+          branch: applicant.branch,
           link: `/applicants/${applicant.id}`,
           createdAt: new Date().toISOString()
         }
@@ -247,24 +224,6 @@ export async function POST(request: Request) {
       console.error("Failed to create agency notification:", err);
     }
 
-    // 2. Also notify the target Client Company admins if selected
-    if (targetClientCompany && targetClientCompany !== "Not Placed" && targetClientCompany !== "System") {
-      try {
-        await prisma.notification.create({
-          data: {
-            title: "New Online Application Received",
-            message: `Applicant ${applicant.fullName} has applied to your company. Next step: Review profile and schedule interview.`,
-            type: "Info",
-            userId: "admin",
-            company: targetClientCompany,
-            link: `/applicants/${applicant.id}`,
-            createdAt: new Date().toISOString()
-          }
-        });
-      } catch (err) {
-        console.error("Failed to create client company notification:", err);
-      }
-    }
     // Trigger real-time notifications asynchronously
     if (applicant.email && applicant.email.trim() !== "") {
       const companyName = applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Human Resource Consultancies";
@@ -298,105 +257,6 @@ export async function POST(request: Request) {
         });
       } catch (err) {
         console.error("Async email sending error:", err);
-      }
-    }
-
-    // Link applicant with Client Company, create Placement + Agreement, and dispatch email alerts
-    if (targetClientCompany && targetClientCompany !== "Not Placed" && targetClientCompany !== "System") {
-      try {
-        const clientCompany = await prisma.company.findFirst({
-          where: { name: targetClientCompany }
-        });
-
-        if (clientCompany) {
-          // 1. Sync the applicant profile's client fields to ensure they match clientCompany details
-          await prisma.applicant.update({
-            where: { id: applicant.id },
-            data: {
-              clientName: clientCompany.name,
-              clientEmail: clientCompany.email,
-              clientMobile: clientCompany.telephone || "",
-              clientWhatsapp: clientCompany.whatsapp || "",
-            }
-          });
-
-          // 2. Automatically create a Placement & Agreement record for this applicant and Client Company
-          const placementId = `PLM-${Math.floor(100 + Math.random() * 900)}-${Date.now().toString().slice(-4)}`;
-          
-          await prisma.placement.create({
-            data: {
-              id: placementId,
-              applicantId: applicant.id,
-              applicantName: applicant.fullName,
-              companyId: clientCompany.id,
-              companyName: clientCompany.name,
-              position: (() => {
-                const pos = applicant.applyingPositions;
-                if (Array.isArray(pos) && pos.length > 0) {
-                  return String(pos[0]);
-                }
-                if (pos && typeof pos === "string") {
-                  return pos;
-                }
-                return "General Staff";
-              })(),
-              salary: Number(applicant.salaryExpectation) || 4000,
-              placementDate: applicant.applicationDate || new Date().toISOString().slice(0, 10),
-              status: "Trial", // Initial status
-              company: applicant.company && applicant.company !== "Not Placed" ? applicant.company : "MS Company Management Solutions",
-              branch: applicant.branch && applicant.branch !== "Not Placed" ? applicant.branch : "Dubai Main Branch",
-              createdAt: applicant.createdAt || new Date().toISOString().slice(0, 10),
-              agreementStatus: "Pending",
-              termsAndConditions: `Standard Recruitment and Placement Agreement terms apply for ${clientCompany.name}.\n\nRegistration fee: AED 500, Placement fee: AED 1000.\nAll invoices are payable within 14 business days of candidates placement date.`,
-              registrationFee: 500,
-              placementFee: 1000,
-              refundStatus: "Not Applicable",
-              agreementAccepted: false,
-              notes: `Auto-linked placement and agreement for client ${clientCompany.name}`,
-              agreementHistory: [
-                `Placement and Payment Agreement automatically initialized for candidate ${applicant.fullName} under hiring client ${clientCompany.name} on ${new Date().toISOString().slice(0, 10)}.`
-              ],
-              passportNumber: applicant.passportNumber || "",
-              mobileNumber: applicant.mobile || "",
-              registrationDate: applicant.applicationDate || "",
-              placementDeadline: ""
-            }
-          });
-
-          // 3. Prepare and send notification emails to Company Email & HR Email
-          const recipients: string[] = [];
-          if (clientCompany.email) {
-            recipients.push(clientCompany.email.trim());
-          }
-          if (clientCompany.hrMobile && clientCompany.hrMobile.includes("@")) {
-            recipients.push(clientCompany.hrMobile.trim());
-          }
-
-          const docsText = applicant.documents && Array.isArray(applicant.documents) && applicant.documents.length > 0
-            ? applicant.documents.map((d: any) => `- ${d.type || 'Doc'}: ${d.name}`).join("\n")
-            : "No documents uploaded.";
-
-          const hrEmailBody = `Dear Team at ${clientCompany.name},\n\nA new online application has been registered for your company.\n\nCandidate Details:\n- Name: ${applicant.fullName}\n- Position Applied: ${Array.isArray(applicant.applyingPositions) ? applicant.applyingPositions.join(", ") : applicant.applyingPositions}\n- Nationality: ${applicant.nationality || "N/A"}\n- Mobile Number: ${applicant.mobile || "N/A"}\n- WhatsApp Number: ${applicant.whatsapp || "N/A"}\n- Email Address: ${applicant.email || "N/A"}\n- Application Date: ${applicant.applicationDate}\n- Tracking Code: ${applicant.trackingCode}\n\nUploaded Documents:\n${docsText}\n\nYou can view the full applicant details by clicking the link below:\nhttp://localhost:3000/applicants/${applicant.id}\n\nBest regards,\nMS Company Management Solutions Operations Team`;
-
-          for (const recipient of recipients) {
-            try {
-              await sendEmail({
-                to: recipient,
-                subject: `[New Application] ${applicant.fullName} - ${clientCompany.name}`,
-                body: hrEmailBody,
-                candidateName: applicant.fullName,
-                company: clientCompany.name,
-                branch: applicant.branch && applicant.branch !== "Not Placed" ? applicant.branch : "Dubai Main Branch",
-                sentBy: "System",
-                type: "Email"
-              });
-            } catch (err) {
-              console.error(`Error sending email to ${recipient}:`, err);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Error creating linked placement agreement & dispatching notifications:", err);
       }
     }
 

@@ -164,6 +164,25 @@ ${updated.company} HR Department`;
         company: updated.company,
         branch: updated.branch,
       }).catch(err => console.error("Async staff request email error:", err));
+
+      if (existing.staffId) {
+        try {
+          await prisma.notification.create({
+            data: {
+              title: `Request Status: ${data.status}`,
+              message: `Your ${updated.requestType} request has been marked as ${data.status}.`,
+              type: data.status === "Approved" ? "Success" : (data.status === "Rejected" ? "Alert" : "Info"),
+              userId: existing.staffId,
+              company: updated.company,
+              branch: updated.branch,
+              link: "/requests",
+              createdAt: new Date().toISOString()
+            }
+          });
+        } catch (err) {
+          console.error("Failed to send staff request notification:", err);
+        }
+      }
     }
 
     return NextResponse.json(updated);

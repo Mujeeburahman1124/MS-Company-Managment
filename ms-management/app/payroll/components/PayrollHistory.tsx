@@ -426,7 +426,7 @@ export default function PayrollHistory() {
               <p className="text-xs font-medium">No payroll history logs recorded.</p>
             </div>
           ) : (
-            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent pt-4 max-w-3xl mx-auto">
+            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent pt-4 w-[95vw] sm:w-full max-w-3xl mx-auto">
               {logs.map((log) => (
                 <div key={log.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
@@ -454,7 +454,7 @@ export default function PayrollHistory() {
 
       {/* Payslip Modal Dialog */}
       <Dialog open={!!viewPayslip} onOpenChange={(o) => !o && setViewPayslip(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 w-[95vw] sm:w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
           {viewPayslip && (
             <>
               <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -482,7 +482,7 @@ export default function PayrollHistory() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                   <div>
                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Employee Details</div>
                     <div className="text-sm font-bold text-slate-800">{viewPayslip.staffName}</div>

@@ -83,10 +83,9 @@ export function getTenantScopeFilter(user: SessionUser, companyField = "company"
     filter[companyField] = user.company;
   }
   
-  if (user.role === "Branch Admin" || user.role === "Staff") {
-    if (user.branch && user.branch !== "All") {
-      filter[branchField] = user.branch;
-    }
+  if (user.role !== "Company Admin") {
+    // Branch Admin, HR, Staff MUST be restricted to their branch
+    filter[branchField] = (user.branch && user.branch !== "All") ? user.branch : "RESTRICTED_ACCESS";
   }
   
   return filter;

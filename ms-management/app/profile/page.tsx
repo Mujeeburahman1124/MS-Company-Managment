@@ -149,7 +149,7 @@ export default function ProfilePage() {
         subtitle="Manage your personal details and account security settings"
       />
 
-      <div className="flex-1 p-4 md:p-6 max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="flex-1 p-4 md:p-6 w-[95vw] sm:w-full max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Left Card: Summary & Badges */}
         <div className="md:col-span-1 space-y-6">

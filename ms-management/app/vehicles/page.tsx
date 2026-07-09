@@ -186,7 +186,7 @@ export default function VehiclesPage() {
                     <StatusBadge status={v.status} />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600 mt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600 mt-2">
                     <div className="bg-slate-50 rounded-lg px-2.5 py-1.5 border border-slate-100"><span className="text-slate-400">Type: </span>{v.vehicleType}</div>
                     <div className="bg-slate-50 rounded-lg px-2.5 py-1.5 border border-slate-100"><span className="text-slate-400">KM: </span>{v.km.toLocaleString()}</div>
                     <div className="bg-slate-50 rounded-lg px-2.5 py-1.5 border border-slate-100"><span className="text-slate-400">Colour: </span>{v.colour}</div>
@@ -220,7 +220,7 @@ export default function VehiclesPage() {
 
       {/* Add/Edit Vehicle Modal */}
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">{editVehicle ? "Edit Vehicle" : "Add New Vehicle"}</DialogTitle>
@@ -302,7 +302,7 @@ export default function VehiclesPage() {
 
       {/* Assign Modal */}
       <Dialog open={!!assignModal} onOpenChange={open => { if(!open){ setAssignModal(null); setAssignTo(""); setAssignCompany(""); setAssignBranch(""); setAssignCondition(""); setAssignPicture(null); } }}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Assign Vehicle</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Assign {assignModal?.brand} ({assignModal?.plateNumber}) to a staff member.</DialogDescription>
@@ -383,7 +383,7 @@ export default function VehiclesPage() {
 
       {/* Return Modal */}
       <Dialog open={!!returnModal} onOpenChange={open => !open && setReturnModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Return Vehicle</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Record the return of {returnModal?.brand} ({returnModal?.plateNumber}) from {returnModal?.assignedTo}.</DialogDescription>
@@ -397,7 +397,7 @@ export default function VehiclesPage() {
                   <Car className="w-6 h-6" />
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-2 flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1">
                 <div><span className="text-slate-400">Type: </span>{returnModal?.vehicleType}</div>
                 <div><span className="text-slate-400">Brand: </span>{returnModal?.brand}</div>
                 <div><span className="text-slate-400">Plate: </span>{returnModal?.plateCode} {returnModal?.plateNumber}</div>
@@ -406,7 +406,7 @@ export default function VehiclesPage() {
                 <div><span className="text-slate-400">Returned By: </span>{returnModal?.assignedTo}</div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Start KM Reading</Label>
                 <Input type="number" value={returnStartKm} onChange={e => {
@@ -516,7 +516,7 @@ export default function VehiclesPage() {
 
       {/* Full Details Sheet */}
       <Sheet open={!!fullViewVehicle} onOpenChange={open => !open && setFullViewVehicle(null)}>
-        <SheetContent side="right" className="w-full sm:max-w-md p-0 border-l-0 bg-slate-50 flex flex-col h-full overflow-hidden">
+        <SheetContent side="right" className="w-full sm:w-[95vw] sm:w-full max-w-md p-0 border-l-0 bg-slate-50 flex flex-col h-full overflow-hidden">
           {fullViewVehicle && (
             <>
               <div className="bg-white px-6 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-10 shrink-0">
@@ -564,7 +564,7 @@ export default function VehiclesPage() {
                             <span className="text-slate-400 whitespace-nowrap">{formatDate(h.assignedDate)}{h.returnDate ? ` to ${formatDate(h.returnDate)}` : " (Present)"}</span>
                           </div>
                           
-                          <div className="mt-2 grid grid-cols-2 gap-3">
+                          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                               <div className="text-[9px] text-slate-400 font-bold uppercase mb-1 tracking-wider">Assigned Condition</div>
                               <div className="text-slate-700 font-semibold mb-2">{h.conditionBefore || "Not specified"}</div>
@@ -580,7 +580,7 @@ export default function VehiclesPage() {
                             )}
                           </div>
 
-                          <div className="mt-2 grid grid-cols-3 gap-2 bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 text-[10px] font-semibold text-slate-600">
+                          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 text-[10px] font-semibold text-slate-600">
                             <div>
                               <span className="text-slate-400 block text-[9px] uppercase tracking-wider mb-0.5">Start KM</span>
                               <span className="font-bold text-slate-800">{(h.startKm || 0).toLocaleString()} KM</span>

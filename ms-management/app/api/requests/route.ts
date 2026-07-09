@@ -109,8 +109,21 @@ export async function POST(request: Request) {
         company: user.company,
         branch: user.branch
       });
+
+      await prisma.notification.create({
+        data: {
+          title: "New Staff Request",
+          message: `${user.name} has submitted a new ${newRequest.requestType} request.`,
+          type: "Request",
+          userId: "admin", // Targets Admins via scope filtering
+          company: user.company,
+          branch: user.branch,
+          link: "/requests",
+          createdAt: new Date().toISOString()
+        }
+      });
     } catch (e) {
-      console.error("Failed to send staff request email notification:", e);
+      console.error("Failed to send staff request notification:", e);
     }
 
     return NextResponse.json(newRequest);

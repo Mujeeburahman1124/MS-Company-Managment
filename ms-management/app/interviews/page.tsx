@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 
 export default function InterviewsPage() {
-  const { currentRole, currentUser, interviews, applicants, companies, branches, addInterview, updateInterview, deleteInterview, addSentEmail, addSentWhatsApp } = useAuthStore();
+  const { currentRole, currentUser, interviews, applicants, ownCompanies, companies, branches, addInterview, updateInterview, deleteInterview, addSentEmail, addSentWhatsApp } = useAuthStore();
   const { filters } = useFilterStore();
   const [modal, setModal] = useState(false);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
@@ -110,12 +110,13 @@ HR Department`;
   });
 
   const isSuperAdmin = currentRole === "Super Admin";
-  const ownCompany = { id: "internal", name: currentUser.company || "Own Company" };
-  const hasOwn = companies.some(c => c.name === ownCompany.name);
   
+  // Strict Internal Company Filter: Interviews are strictly scheduled under internal branches, never Client Companies.
+  // The system uses ownCompanies for internal companies
   const allowedCompanies = isSuperAdmin 
-    ? (hasOwn ? companies : [ownCompany, ...companies])
-    : (hasOwn ? companies.filter(c => c.name === ownCompany.name) : [ownCompany]);
+    ? ownCompanies
+    : ownCompanies.filter(c => c.name === currentUser.company);
+    
   const branchCompany = form.company || (isSuperAdmin ? "" : currentUser.company);
   const allowedBranches = isSuperAdmin
     ? branches.filter(b => branchCompany === "" || b.company === branchCompany)
@@ -340,7 +341,7 @@ HR Department`;
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600">
                     <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"><Calendar className="w-3.5 h-3.5 text-slate-400"/>{int.dateTime.split("T")[0] || int.dateTime.split(" ")[0]}</div>
                     <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"><Clock className="w-3.5 h-3.5 text-slate-400"/>{int.dateTime.split("T")[1] || int.dateTime.split(" ")[1]}</div>
                     <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border col-span-2 ${int.isOnline ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-amber-50 text-amber-600 border-amber-100"}`}>{modeIcon(int.mode)}{int.isOnline ? `Online (${int.mode})` : "Physical Assessment"}</div>
@@ -492,7 +493,7 @@ HR Department`;
                           onChange={e => setForm(f => ({ ...f, branch: e.target.value || "", applicantId: "", personName: "", mobile: "", whatsapp: "", email: "", nationality: "India", position: "", meetingType: "" }))}
                           className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
                         >
-                          <option value="">All Branches</option>
+                          <option value="">Select Branch</option>
                           {allowedBranches.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                         </select>
                       </div>
@@ -530,7 +531,7 @@ HR Department`;
                       <Input required value={form.personName} onChange={e => setForm(f => ({...f, personName: e.target.value}))} placeholder="Enter full name" className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp</Label>
                         <Input value={form.whatsapp} onChange={e => setForm(f => ({...f, whatsapp: e.target.value}))} placeholder="WhatsApp..." className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
@@ -546,7 +547,7 @@ HR Department`;
                       <Input type="email" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} placeholder="email@example.com" className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nationality</Label>
                         <select
@@ -577,7 +578,7 @@ HR Department`;
                   </div>
 
                   <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</Label>
                         <select
@@ -600,7 +601,7 @@ HR Department`;
                       <Input required type="datetime-local" value={form.dateTime} onChange={e => setForm(f => ({...f, dateTime: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400 text-slate-800" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Format</Label>
                         <select
@@ -812,7 +813,7 @@ HR Department`;
 
       {/* Reschedule/Cancel Status Update Modal */}
       <Dialog open={!!statusModal} onOpenChange={open => !open && setStatusModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={(e) => {
             e.preventDefault();
             if (!statusModal) return;

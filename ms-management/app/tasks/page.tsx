@@ -61,6 +61,7 @@ export default function TasksPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [view, setView] = useState<"kanban" | "table">("kanban");
   const [uploadedProofFiles, setUploadedProofFiles] = useState<File[]>([]);
+  const [completionComments, setCompletionComments] = useState("");
   // For system-wide users creating tasks, allow selecting target company/branch
   const [formCompany, setFormCompany] = useState("");
   const [formBranch, setFormBranch] = useState("");
@@ -104,7 +105,7 @@ export default function TasksPage() {
   if (!isSystemWide) {
     if (isAdmin) {
       list = list.filter(t => t.company === currentUser.company);
-      if (currentRole === "Branch Admin") {
+      if (currentRole !== "Company Admin" && currentUser.branch && currentUser.branch !== "All") {
         list = list.filter(t => t.branch === currentUser.branch);
       }
     } else {
@@ -171,7 +172,7 @@ export default function TasksPage() {
   // System-wide users see all staff; company-scoped users see their company's staff only
   const allowedStaffForTasks = isSystemWide
     ? (formCompany ? staff.filter(s => s.company === formCompany) : staff)
-    : (currentRole === "Branch Admin" 
+    : (currentRole !== "Company Admin" && currentUser.branch && currentUser.branch !== "All"
         ? staff.filter(s => s.company === currentUser.company && s.branch === currentUser.branch)
         : staff.filter(s => s.company === currentUser.company));
 
@@ -276,8 +277,11 @@ export default function TasksPage() {
 
       if (editTask.status === "Completed") {
          const proofNames = uploadedProofFiles.map(f => f.name).join(", ");
-         updatedTask.history.push({ action: "Status: Completed", date: now, by: currentUser.name, note: `Uploaded Proofs: ${proofNames}` });
+         const proofData = uploadedProofFiles.map(f => ({ name: f.name, url: `/uploads/${f.name}`, date: now, by: currentUser.name }));
+         const feedbackObj = { comments: completionComments, proofs: proofData };
+         updatedTask.history.push({ action: "Status: Completed", date: now, by: currentUser.name, note: `Uploaded Proofs: ${proofNames}${completionComments ? ` | Comments: ${completionComments}` : ''}` });
          (updatedTask as any).completedAt = now;
+         (updatedTask as any).feedback = JSON.stringify(feedbackObj);
       }
 
       updateTask(updatedTask);
@@ -307,9 +311,11 @@ export default function TasksPage() {
       sendMockEmail(form.assignedTo, form.title);
     }
     setModal(false); setEditTask(null);
-    setFormCompany(""); setFormBranch("");
-    setForm({ title:"", description:"", priority:"Medium", assignedTo:null, assignedDate:"", deadline:"", applicantId: null, applicantName: null, targetDocument: null, notes: "", attachmentName: "" });
-  };
+      setFormCompany(""); setFormBranch("");
+      setUploadedProofFiles([]);
+      setCompletionComments("");
+      setForm({ title:"", description:"", priority:"Medium", assignedTo:null, assignedDate:"", deadline:"", applicantId: null, applicantName: null, targetDocument: null, notes: "", attachmentName: "" });
+    };
 
   const handleStatusChange = (task: Task, status: Task["status"], fromModal = false) => {
     if (!canEditTasks && currentUser.name !== task.assignedTo) {
@@ -616,7 +622,7 @@ export default function TasksPage() {
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Description</Label>
                 <textarea rows={2} value={form.description} onChange={e => setForm(f => ({...f, description: e.target.value}))} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Priority</Label>
                   <Select value={form.priority} onValueChange={v => setForm(f => ({...f, priority: v as Task["priority"]}))}>
@@ -639,7 +645,7 @@ export default function TasksPage() {
 
               {/* Company & Branch selectors — only for System-wide users creating a new task */}
               {isSystemWide && !editTask && (
-                <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
                   <div className="space-y-1">
                     <Label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Target Company <span className="text-rose-500">*</span></Label>
                     <Select
@@ -664,7 +670,7 @@ export default function TasksPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Assign Date <span className="text-rose-500">*</span></Label>
                   <Input required type="datetime-local" value={form.assignedDate} onChange={e => setForm(f => ({...f, assignedDate: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" disabled={editTask ? !canEditTasks : !canCreateTasks} />
@@ -862,6 +868,26 @@ export default function TasksPage() {
                       }} />
                     </label>
                   </div>
+                  {uploadedProofFiles.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {uploadedProofFiles.map((f, i) => (
+                        <div key={i} className="text-[10px] text-emerald-700 bg-emerald-100/50 px-2 py-1 rounded flex justify-between items-center">
+                          <span className="truncate">{f.name}</span>
+                          <button type="button" onClick={() => setUploadedProofFiles(prev => prev.filter((_, idx) => idx !== i))} className="text-emerald-500 hover:text-rose-500 font-bold">✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-3">
+                    <Label className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Comments</Label>
+                    <textarea
+                      rows={2}
+                      value={completionComments}
+                      onChange={e => setCompletionComments(e.target.value)}
+                      placeholder="Add any final notes or comments about this task..."
+                      className="w-full mt-1 bg-white border border-emerald-200 rounded-xl text-xs p-2 outline-none focus:border-emerald-400 resize-none text-slate-700"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -897,7 +923,7 @@ export default function TasksPage() {
 
       {/* Reassign Dialog */}
       <Dialog open={reassignModalOpen} onOpenChange={setReassignModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-sm">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-sm">
           <form onSubmit={handleReassignSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800">Reassign Task</DialogTitle>
@@ -922,7 +948,7 @@ export default function TasksPage() {
 
       {/* History Modal */}
       <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
               <History className="w-5 h-5 text-indigo-600" />

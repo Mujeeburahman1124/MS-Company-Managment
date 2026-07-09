@@ -270,7 +270,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      <div className="flex-1 p-4 md:p-6 max-w-4xl mx-auto w-full overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 w-[95vw] sm:w-full max-w-4xl mx-auto w-full overflow-y-auto">
         
         {/* ─── DASHBOARD ALERTS TAB ─── */}
         {activeTab === "dashboard" && (
@@ -530,7 +530,7 @@ export default function NotificationsPage() {
 
       {shareEmail && (
         <Dialog open={!!shareEmail} onOpenChange={(open) => !open && setShareEmail(null)}>
-          <DialogContent className="max-w-full sm:max-w-md bg-white border border-slate-100 rounded-3xl p-6 shadow-2xl">
+          <DialogContent className="max-w-full sm:w-[95vw] sm:w-full max-w-md bg-white border border-slate-100 rounded-3xl p-6 shadow-2xl">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-blue-600" />

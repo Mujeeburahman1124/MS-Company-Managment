@@ -14,7 +14,7 @@ export default function AttendanceSettings() {
   };
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
+    <div className="space-y-4 w-[95vw] sm:w-full max-w-3xl mx-auto">
       <Card className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center">

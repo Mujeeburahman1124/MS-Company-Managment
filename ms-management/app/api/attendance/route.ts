@@ -61,8 +61,13 @@ export async function POST(request: Request) {
     let company = data.company || user.company;
     let branch = data.branch || user.branch;
 
-    if (user.role !== "Super Admin" && company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (user.role !== "Super Admin") {
+      if (company !== user.company) {
+        return NextResponse.json({ error: "Forbidden: Cannot access other company" }, { status: 403 });
+      }
+      if (user.role !== "Company Admin" && branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden: Cannot access other branch" }, { status: 403 });
+      }
     }
 
     // Find if record already exists for this staff, month and year

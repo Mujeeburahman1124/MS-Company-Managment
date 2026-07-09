@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
 
 export async function GET() {
   try {
@@ -9,15 +9,33 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Retrieve notifications for the user
-    // Scoped by userId, or general notifications for their company
-    const notifications = await prisma.notification.findMany({
-      where: {
+    let whereClause: any = {};
+
+    if (user.role === "Super Admin") {
+      whereClause = {};
+    } else if (user.role === "Company Admin") {
+      whereClause = {
         OR: [
-          { userId: user.id },
-          { company: user.company }
+          { company: user.company },
+          { userId: user.id }
         ]
-      },
+      };
+    } else if (user.role === "Branch Admin" || user.role === "HR Manager" || user.role === "Recruiter") {
+      whereClause = {
+        OR: [
+          { company: user.company, branch: user.branch },
+          { userId: user.id }
+        ]
+      };
+    } else {
+      // Staff, Accountant, etc. should ONLY see notifications specifically addressed to them
+      whereClause = {
+        userId: user.id
+      };
+    }
+
+    const notifications = await prisma.notification.findMany({
+      where: whereClause,
       orderBy: { createdAt: "desc" }
     });
 

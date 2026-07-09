@@ -66,12 +66,12 @@ export default function DocumentsPage() {
   const isSuperAdmin = currentRole === "Super Admin";
   const currentFilter = filters.documents;
 
-  // Role-based Access and Isolation (Branch Admin restricted to own branch)
+  // Role-based Access and Isolation
   const allowedApplicants = useMemo(() => {
     if (isSuperAdmin) return applicants;
     return applicants.filter(a => 
-      a.company === currentUser.company && 
-      (currentRole !== "Branch Admin" || a.branch === currentUser.branch)
+      (a.company === currentUser.company || a.clientName === currentUser.company) && 
+      (currentRole === "Company Admin" || currentUser.branch === "All" || a.branch === currentUser.branch)
     );
   }, [isSuperAdmin, applicants, currentUser, currentRole]);
 
@@ -79,7 +79,7 @@ export default function DocumentsPage() {
     if (isSuperAdmin) return staff;
     return staff.filter(s => 
       s.company === currentUser.company && 
-      (currentRole !== "Branch Admin" || s.branch === currentUser.branch)
+      (currentRole === "Company Admin" || currentUser.branch === "All" || s.branch === currentUser.branch)
     );
   }, [isSuperAdmin, staff, currentUser, currentRole]);
 
@@ -97,7 +97,7 @@ export default function DocumentsPage() {
     if (isSuperAdmin) return vehicles;
     return vehicles.filter(v => 
       v.company === currentUser.company && 
-      (currentRole !== "Branch Admin" || v.branch === currentUser.branch)
+      (currentRole === "Company Admin" || currentUser.branch === "All" || v.branch === currentUser.branch)
     );
   }, [isSuperAdmin, vehicles, currentUser, currentRole]);
 
@@ -269,6 +269,14 @@ export default function DocumentsPage() {
     // Type filter
     if (currentFilter.status !== "all") {
       docs = docs.filter((doc) => doc.type.toLowerCase().includes(currentFilter.status.toLowerCase()));
+    }
+
+    // Date filter
+    if (currentFilter.fromDate) {
+      docs = docs.filter(doc => new Date(doc.uploadedDate) >= new Date(currentFilter.fromDate!));
+    }
+    if (currentFilter.toDate) {
+      docs = docs.filter(doc => new Date(doc.uploadedDate) <= new Date(currentFilter.toDate!));
     }
 
     return docs.sort((a, b) => new Date(b.uploadedDate).getTime() - new Date(a.uploadedDate).getTime());
@@ -748,7 +756,7 @@ export default function DocumentsPage() {
 
       {/* DOCUMENT PREVIEW DIALOG */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Document Preview</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Review file details and version history.</DialogDescription>
@@ -764,7 +772,7 @@ export default function DocumentsPage() {
                   <div className="text-[11px] text-slate-500">{selectedDoc.ownerType} • {selectedDoc.ownerName}</div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 text-[11px] text-slate-600">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-slate-600">
                 <div className="rounded-2xl bg-slate-50 p-3">Uploaded by<br/><span className="font-bold text-slate-800">{selectedDoc.uploadedBy}</span></div>
                 <div className="rounded-2xl bg-slate-50 p-3">Uploaded on<br/><span className="font-bold text-slate-800">{formatDate(selectedDoc.uploadedDate)}</span></div>
                 <div className="rounded-2xl bg-slate-50 p-3">Company<br/><span className="font-bold text-slate-800">{selectedDoc.ownerCompany || "N/A"}</span></div>
@@ -870,7 +878,7 @@ export default function DocumentsPage() {
 
       {/* RENAME DOCUMENT DIALOG */}
       <Dialog open={isRenameOpen} onOpenChange={setIsRenameOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Rename Document</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Update the document title. Previous name will be logged in version history.</DialogDescription>
@@ -890,13 +898,13 @@ export default function DocumentsPage() {
 
       {/* UPLOAD DOCUMENT DIALOG */}
       <Dialog open={isUploadOpen} onOpenChange={(o) => { if (!o) { setIsUploadOpen(false); setUploadEntityType(""); setUploadEntityId(""); } }}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Upload Documents</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Select target profile type and specific record to attach documents to.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label className="text-xs font-bold text-slate-500">Target Type</Label>
                 <Select value={uploadEntityType} onValueChange={(val: any) => { setUploadEntityType(val); setUploadEntityId(""); }}>
@@ -1073,7 +1081,7 @@ export default function DocumentsPage() {
 
       {/* UPLOAD NEW VERSION DIALOG */}
       <Dialog open={isUploadVersionOpen} onOpenChange={setIsUploadVersionOpen}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-slate-800">Upload New Version</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">Replace the current document with a new file. The old file will be archived in the version history.</DialogDescription>

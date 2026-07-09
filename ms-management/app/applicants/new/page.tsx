@@ -120,11 +120,6 @@ export default function NewApplicantPage() {
       ...data,
       id: applicantId,
       photo: applicantPhoto?.url ?? photo,
-      clientName: "",
-      clientPhoto: null,
-      clientMobile: "",
-      clientWhatsapp: "",
-      clientEmail: "",
       applicationDate: new Date().toISOString().slice(0, 10),
       nationalityFlag: NATIONALITIES.find(n => n.name === data.nationality)?.flag || "🏳️",
       applyingPositions: positions,
@@ -193,7 +188,7 @@ export default function NewApplicantPage() {
         showBack={true}
       />
 
-      <div className="p-4 md:p-6 max-w-4xl mx-auto w-full">
+      <div className="p-4 md:p-6 w-[95vw] sm:w-full max-w-4xl mx-auto w-full">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Card className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-slate-800 tracking-wider uppercase border-b border-slate-100 pb-2">

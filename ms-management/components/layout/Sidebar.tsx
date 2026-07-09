@@ -9,7 +9,7 @@ import {
   ShieldCheck, Building2, GitBranch, CheckSquare, UserPlus, ClipboardList,
   Bell, BarChart3, Activity, UserCheck, Cake,
   DollarSign, Clock, FileSpreadsheet, ChevronDown, ChevronRight, LogOut,
-  Shield, Package, Target, MessageCircle
+  Shield, Package, Target, MessageCircle, Mail
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
@@ -97,6 +97,7 @@ const NAV_GROUPS: NavGroup[] = [
       { name: 'Reports',       href: '/reports',       icon: BarChart3,   permissionKey: 'reports',     hiddenFor: ['Staff'] },
       { name: 'Activity Log',  href: '/activity-log',  icon: Activity,    permissionKey: 'activityLog', hiddenFor: ['Staff', 'Recruiter'] },
       { name: 'Site Settings', href: '/settings',      icon: Settings,    permissionKey: 'settings',    hiddenFor: ['Staff', 'HR Manager', 'Recruiter', 'Accountant', 'Branch Admin'] },
+      { name: 'Email Templates', href: '/settings/email-templates', icon: Mail, superAdminOnly: true },
     ]
   },
 ];

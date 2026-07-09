@@ -154,7 +154,7 @@ export default function NewStaffPage() {
   return (
     <div className="flex flex-col h-full pb-24 md:pb-12">
       <PageHeader title="Add New Staff Member" subtitle="Register employee details and upload verification documents" showBack />
-      <div className="p-4 md:p-6 max-w-4xl mx-auto w-full">
+      <div className="p-4 md:p-6 w-[95vw] sm:w-full max-w-4xl mx-auto w-full">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Card className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Personal Information</h3>
@@ -279,7 +279,7 @@ export default function NewStaffPage() {
           <Card className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">System Access & Permissions</h3>
             <div className="space-y-4">
-              <div className="space-y-1 max-w-sm">
+              <div className="space-y-1 w-[95vw] sm:w-full max-w-sm">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">System Role</Label>
                 <select className="w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400" {...register("role")}>
                   <option value="">No System Access</option>

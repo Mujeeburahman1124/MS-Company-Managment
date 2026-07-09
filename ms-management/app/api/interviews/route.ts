@@ -70,8 +70,13 @@ export async function POST(request: Request) {
     let company = data.company || user.company;
     let branch = data.branch || user.branch;
 
-    if (user.role !== "Super Admin" && company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (user.role !== "Super Admin") {
+      if (company !== user.company) {
+        return NextResponse.json({ error: "Forbidden - company mismatch" }, { status: 403 });
+      }
+      if (user.role !== "Company Admin" && branch !== user.branch) {
+        return NextResponse.json({ error: "Forbidden - branch mismatch" }, { status: 403 });
+      }
     }
 
     const conductPersonName = data.conductPerson || data.conductPersonName || user.name;
@@ -228,6 +233,31 @@ export async function POST(request: Request) {
         });
       } catch (err) {
         console.error("Async interview WhatsApp error:", err);
+      }
+    }
+
+    // Add dashboard notification to the assigned HR / conductPerson
+    if (mappedResponse.conductPerson) {
+      try {
+        const assignedUser = await prisma.user.findFirst({
+          where: { name: mappedResponse.conductPerson }
+        });
+        if (assignedUser) {
+          await prisma.notification.create({
+            data: {
+              title: "New Interview Scheduled",
+              message: `You have been assigned to conduct an interview with ${mappedResponse.personName} on ${mappedResponse.dateTime.replace("T", " ")}.`,
+              type: "Interview",
+              userId: assignedUser.id,
+              company: company,
+              branch: branch,
+              link: "/interviews",
+              createdAt: new Date().toISOString()
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Async interview notification error:", err);
       }
     }
 

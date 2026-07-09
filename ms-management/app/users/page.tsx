@@ -403,7 +403,7 @@ export default function UsersPage() {
 
       {/* Add/Edit User Modal — full redesign */}
       <Dialog open={modal} onOpenChange={setModal}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-2xl max-h-[95vh] overflow-hidden flex flex-col"
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 w-[95vw] sm:w-full max-w-2xl max-h-[95vh] overflow-hidden flex flex-col"
           style={{ width: "min(680px, 96vw)" }}>
           {/* Header */}
           <div className={`px-6 py-4 border-b border-slate-100 flex items-center gap-3 ${editUser ? "bg-gradient-to-r from-blue-600 to-violet-600" : "bg-gradient-to-r from-slate-800 to-slate-900"}`}>
@@ -785,7 +785,7 @@ export default function UsersPage() {
 
       {/* Audited Email Change Modal */}
       <Dialog open={!!emailChangeModal} onOpenChange={open => !open && setEmailChangeModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-md">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
           <form onSubmit={handleEmailChangeSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
@@ -819,7 +819,7 @@ export default function UsersPage() {
 
       {/* User Detail & Security History Slide-over */}
       <Dialog open={!!detailUser} onOpenChange={open => !open && setDetailUser(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader className="border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
               <Avatar className="w-12 h-12 rounded-xl border border-slate-100">
@@ -1033,7 +1033,7 @@ export default function UsersPage() {
                             )}
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-[10px] font-bold">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-bold">
                           <div className="bg-slate-100 p-2 rounded-lg text-slate-500"><span className="text-[8px] uppercase text-slate-400 font-extrabold block mb-0.5">Old Email:</span>{rec.oldEmail}</div>
                           <div className="bg-blue-50 p-2 rounded-lg text-blue-700"><span className="text-[8px] uppercase text-blue-400 font-extrabold block mb-0.5">New Email:</span>{rec.newEmail}</div>
                         </div>
