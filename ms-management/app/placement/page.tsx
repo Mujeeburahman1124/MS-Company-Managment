@@ -13,6 +13,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EmptyState from "@/components/shared/EmptyState";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import PrintableAgreement from "@/components/shared/PrintableAgreement";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -207,9 +208,17 @@ export default function PlacementPage() {
   const { placements, applicants, companies, addPlacement, updatePlacement, deletePlacement, currentUser } = useAuthStore();
   
   // Dashboard & Navigation states
-  const [activeTab, setActiveTab] = useState<"all" | "pipeline" | "refunds" | "placed">("all");
+    const [activeTab, setActiveTab] = useState<"all" | "pipeline" | "refunds" | "placed">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [placementTerms, setPlacementTerms] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/placement-terms")
+      .then(res => res.json())
+      .then(data => setPlacementTerms(data))
+      .catch(console.error);
+  }, []);
 
   // Registration Wizard states
   const [registerModal, setRegisterModal] = useState(false);
@@ -1575,10 +1584,10 @@ export default function PlacementPage() {
 
                 {/* Controls */}
                 <div className="flex gap-2 justify-end print:hidden">
-                  <Button variant="outline" onClick={() => printAgreement(agreementModal)} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
+                  <Button variant="outline" onClick={() => window.print()} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
                     <Printer className="w-4 h-4" /> Print Agreement
                   </Button>
-                  <Button variant="outline" onClick={() => printAgreement(agreementModal)} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
+                  <Button variant="outline" onClick={() => window.print()} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
                     <Download className="w-4 h-4" /> Download PDF Copy
                   </Button>
                 </div>

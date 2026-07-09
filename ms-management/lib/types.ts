@@ -398,6 +398,9 @@ export interface Placement {
   agreementStatus: "Pending" | "Sent" | "Signed";
   applicantSign?: string;
   companySign?: string;
+  applicantSignDate?: string;
+  applicantSignIp?: string;
+  applicantSignDevice?: string;
   termsAndConditions?: string;
   agreementHistory?: string[];
   createdBy: string;

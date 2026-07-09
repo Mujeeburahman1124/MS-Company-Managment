@@ -3,8 +3,9 @@
 import { useState } from "react";
 import {
   Save, Building, Paintbrush, Globe, Mail, Phone, MapPin,
-  CheckCircle2, ShieldAlert, Share2, ToggleLeft, ToggleRight
+  CheckCircle2, ShieldAlert, Share2, ToggleLeft, ToggleRight, FileText
 } from "lucide-react";
+import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import { MODULES_LIST } from "@/lib/constants";
 import PageHeader from "@/components/shared/PageHeader";
@@ -137,6 +138,7 @@ export default function SettingsPage() {
             { href: "#appearance", icon: <Paintbrush className="w-4 h-4 inline mr-2"/>, label: "Appearance" },
             { href: "#contact", icon: <Globe className="w-4 h-4 inline mr-2"/>, label: "Contact Info" },
             { href: "#social", icon: <Share2 className="w-4 h-4 inline mr-2"/>, label: "Social Media" },
+            { href: "#legal", icon: <FileText className="w-4 h-4 inline mr-2"/>, label: "Legal Templates" },
             { href: "#modules", icon: <ToggleRight className="w-4 h-4 inline mr-2"/>, label: "Module Toggles" },
           ].map((item, i) => (
             <a key={i} href={item.href}
@@ -283,8 +285,28 @@ export default function SettingsPage() {
                   value={form.privacyPolicy}
                   onChange={e => setForm(f => ({ ...f, privacyPolicy: e.target.value }))}
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 outline-none focus:bg-white focus:border-blue-400 resize-none"
                 />
+              </div>
+            </div>
+          </Card>
+
+          {/* Legal Templates */}
+          <Card id="legal" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-blue-600"/> Legal Templates & Terms
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><FileText className="w-4 h-4"/></div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800">Placement Agreement Terms</h4>
+                    <p className="text-[10px] text-slate-500 font-medium">Manage the dynamic terms and conditions for placement agreements.</p>
+                  </div>
+                </div>
+                <Link href="/settings/placement-terms" className="mt-auto">
+                  <Button variant="outline" className="w-full text-xs h-9 rounded-xl font-bold bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700">Manage Terms</Button>
+                </Link>
               </div>
             </div>
           </Card>
