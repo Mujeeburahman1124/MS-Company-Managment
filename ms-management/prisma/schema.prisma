@@ -542,21 +542,28 @@ model PlacementTerm {
 }
 
 model SiteSettings {
-  id           String  @id @default("SETTINGS")
-  siteName     String
-  email        String
-  phone        String
-  whatsapp     String
-  address      String
-  footerText   String
-  primaryColor String
-  sidebarColor String
-  linkedin     String?
-  twitter      String?
-  facebook     String?
-  instagram    String?
-  logo         String?
-  website      String? @default("www.mshorizon.ae")
+  id              String  @id @default("SETTINGS")
+  siteName        String
+  email           String
+  phone           String
+  whatsapp        String
+  address         String
+  footerText      String
+  primaryColor    String
+  sidebarColor    String
+  linkedin        String?
+  twitter         String?
+  facebook        String?
+  instagram       String?
+  logo            String?
+  website         String? @default("www.mshorizon.ae")
+  fontFamily      String? @default("Inter")
+  backgroundColor String? @default("#f8fafc")
+  cardColor       String? @default("#ffffff")
+  textColor       String? @default("#0f172a")
+  borderColor     String? @default("#e2e8f0")
+  buttonColor     String? @default("#3b82f6")
+  headerColor     String? @default("#ffffff")
 }
 
 model SentEmail {

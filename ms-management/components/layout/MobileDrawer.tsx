@@ -106,8 +106,9 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
       {/* Drawer */}
       <div 
+        style={{ backgroundColor: 'var(--sidebar)', backgroundImage: 'none' }}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[80vw] max-w-[320px] bg-gradient-to-b from-slate-900 via-blue-950 to-slate-900 shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col h-[100dvh]",
+          "fixed inset-y-0 left-0 z-50 w-[80vw] max-w-[320px] shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col h-[100dvh]",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

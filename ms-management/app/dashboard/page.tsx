@@ -1732,7 +1732,7 @@ export default function DashboardPage() {
             : "from-slate-700 via-slate-800 to-slate-900";
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-violet-50/20">
+    <div className="h-full overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50/30 to-violet-50/20 pb-32 md:pb-6">
       <div className="p-4 md:p-6 space-y-6 max-w-[1600px] mx-auto">
 
         {/* Birthday banner */}

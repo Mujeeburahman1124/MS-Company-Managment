@@ -31,8 +31,15 @@ export default function SettingsPage() {
     whatsapp:     siteSettings.whatsapp || "",
     address:      siteSettings.address || "",
     footerText:   siteSettings.footerText || "",
-    primaryColor: siteSettings.primaryColor || "",
-    sidebarColor: siteSettings.sidebarColor || "",
+    primaryColor: siteSettings.primaryColor || "#3B82F6",
+    sidebarColor: siteSettings.sidebarColor || "#0A0F1C",
+    backgroundColor: siteSettings.backgroundColor || "#f8fafc",
+    cardColor:    siteSettings.cardColor || "#ffffff",
+    textColor:    siteSettings.textColor || "#0f172a",
+    borderColor:  siteSettings.borderColor || "#e2e8f0",
+    buttonColor:  siteSettings.buttonColor || "#3b82f6",
+    headerColor:  siteSettings.headerColor || "#ffffff",
+    fontFamily:   siteSettings.fontFamily || "Inter",
     linkedin:     siteSettings.linkedin || "",
     twitter:      siteSettings.twitter || "",
     facebook:     siteSettings.facebook || "",
@@ -85,6 +92,13 @@ export default function SettingsPage() {
       footerText:   form.footerText,
       primaryColor: form.primaryColor,
       sidebarColor: form.sidebarColor,
+      backgroundColor: form.backgroundColor,
+      cardColor:    form.cardColor,
+      textColor:    form.textColor,
+      borderColor:  form.borderColor,
+      buttonColor:  form.buttonColor,
+      headerColor:  form.headerColor,
+      fontFamily:   form.fontFamily,
       linkedin:     form.linkedin,
       twitter:      form.twitter,
       facebook:     form.facebook,
@@ -105,7 +119,7 @@ export default function SettingsPage() {
       newValue: `Site settings updated by ${currentUser.name}`,
       ipAddress: "192.168.1.102",
     });
-    toast.success("Settings saved successfully");
+    toast.success("Settings saved successfully! Refresh page to apply typography.");
   };
 
   if (!isSuperAdmin) {
@@ -129,20 +143,20 @@ export default function SettingsPage() {
         actions={<Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Save className="w-4 h-4"/>Save Configuration</Button>}
       />
 
-      <div className="p-4 md:p-6 w-[95vw] sm:w-full max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex-1 overflow-y-auto min-h-0 p-4 md:p-6 w-[95vw] sm:w-full max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pb-32 md:pb-6">
         {/* Sticky nav sidebar */}
         <div className="hidden lg:block space-y-1.5 sticky top-24">
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Settings Menu</div>
           {[
             { href: "#general", icon: <Building className="w-4 h-4 inline mr-2"/>, label: "General" },
-            { href: "#appearance", icon: <Paintbrush className="w-4 h-4 inline mr-2"/>, label: "Appearance" },
+            { href: "#appearance", icon: <Paintbrush className="w-4 h-4 inline mr-2"/>, label: "Appearance Studio" },
             { href: "#contact", icon: <Globe className="w-4 h-4 inline mr-2"/>, label: "Contact Info" },
             { href: "#social", icon: <Share2 className="w-4 h-4 inline mr-2"/>, label: "Social Media" },
             { href: "#legal", icon: <FileText className="w-4 h-4 inline mr-2"/>, label: "Legal Templates" },
             { href: "#modules", icon: <ToggleRight className="w-4 h-4 inline mr-2"/>, label: "Module Toggles" },
           ].map((item, i) => (
             <a key={i} href={item.href}
-              className={`block px-4 py-2.5 rounded-xl font-bold text-xs transition-colors ${i === 0 ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100"}`}>
+              className={`block px-4 py-2.5 rounded-xl font-bold text-xs transition-colors ${i === 1 ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100"}`}>
               {item.icon}{item.label}
             </a>
           ))}
@@ -170,25 +184,68 @@ export default function SettingsPage() {
           {/* Appearance */}
           <Card id="appearance" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
-              <Paintbrush className="w-4 h-4 text-blue-600"/> Appearance & Branding
+              <Paintbrush className="w-4 h-4 text-blue-600"/> Appearance & Theme Studio
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {[
-                { label: "Primary Color", key: "primaryColor" },
-                { label: "Sidebar Color", key: "sidebarColor" },
-              ].map(({ label, key }) => (
-                <div key={key} className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
-                  <div className="flex gap-2">
-                    <input type="color" value={(form as any)[key]}
-                      onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
-                      className="w-11 h-11 rounded-xl cursor-pointer border-0 p-0" />
-                    <Input value={(form as any)[key]}
-                      onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
-                      className="bg-slate-50 border-slate-200 rounded-xl font-mono text-sm h-11 uppercase flex-1" />
+            
+            <div className="space-y-6 pt-2">
+              {/* Font Selector */}
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Global System Font</Label>
+                <select
+                  value={form.fontFamily}
+                  onChange={e => setForm(f => ({...f, fontFamily: e.target.value}))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 font-semibold text-slate-700 focus:border-blue-400 focus:bg-white transition-all"
+                >
+                  {["Inter", "Roboto", "Poppins", "Outfit", "DM Sans", "Montserrat", "Plus Jakarta Sans", "Nunito"].map(f => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Color Customization Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { label: "Primary Theme Color", key: "primaryColor" },
+                  { label: "Secondary Theme Color", key: "buttonColor" },
+                  { label: "Sidebar Color", key: "sidebarColor" },
+                  { label: "Header Color", key: "headerColor" },
+                  { label: "Background Color", key: "backgroundColor" },
+                  { label: "Card Color", key: "cardColor" },
+                  { label: "Text Color", key: "textColor" },
+                  { label: "Border Color", key: "borderColor" },
+                ].map(({ label, key }) => (
+                  <div key={key} className="space-y-1.5">
+                    <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+                    <div className="flex gap-2">
+                      <input type="color" value={(form as any)[key]}
+                        onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
+                        className="w-11 h-11 rounded-xl cursor-pointer border border-slate-200 p-0 overflow-hidden" />
+                      <Input value={(form as any)[key]}
+                        onChange={e => setForm(f => ({...f, [key]: e.target.value}))}
+                        className="bg-slate-50 border-slate-200 rounded-xl font-mono text-xs h-11 uppercase flex-1" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Interactive Live Preview Component */}
+              <div className="border border-slate-100 rounded-2xl p-4 space-y-3" style={{ background: form.backgroundColor }}>
+                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Live Dynamic Theme Preview</div>
+                <div className="p-4 rounded-xl border space-y-3" style={{ background: form.cardColor, borderColor: form.borderColor }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold" style={{ color: form.textColor, fontFamily: form.fontFamily }}>Theme Preview Card</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold text-white" style={{ background: form.primaryColor }}>Active Accent</span>
+                  </div>
+                  <p className="text-[11px] font-medium leading-relaxed" style={{ color: form.textColor, opacity: 0.8, fontFamily: form.fontFamily }}>
+                    This card previews the background, typography, borders, and cards dynamically as you pick settings.
+                  </p>
+                  <div className="flex gap-2 justify-end">
+                    <button type="button" className="text-[10px] font-bold py-1.5 px-3 rounded-lg text-white transition-all shadow-sm hover:opacity-90" style={{ background: form.buttonColor, fontFamily: form.fontFamily }}>
+                      Button Action
+                    </button>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </Card>
 

@@ -169,7 +169,14 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
   facebook: null,
   instagram: null,
   logo: null,
-  website: "www.mshorizon.ae"
+  website: "www.mshorizon.ae",
+  fontFamily: "Inter",
+  backgroundColor: "#f8fafc",
+  cardColor: "#ffffff",
+  textColor: "#0f172a",
+  borderColor: "#e2e8f0",
+  buttonColor: "#3b82f6",
+  headerColor: "#ffffff"
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({

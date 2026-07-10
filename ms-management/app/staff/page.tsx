@@ -95,7 +95,7 @@ export default function StaffPage() {
       />
       <FilterBar moduleKey="staff" statusOptions={["Active","Inactive","Suspended"]} showNationality onExport={canExportStaff ? handleExport : undefined} viewMode={viewMode} onViewModeChange={setViewMode} />
 
-      <div className="flex-1 p-4 md:p-6">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         {paginated.length === 0 ? (
           <EmptyState title="No staff members found" description="Add your first staff member to get started." action={<Button asChild className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9"><Link href="/staff/new">Add Staff</Link></Button>} />
         ) : viewMode === "grid" ? (

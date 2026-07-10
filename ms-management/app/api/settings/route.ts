@@ -20,7 +20,14 @@ export async function GET() {
         footerText: "© 2026 MS Horizon F.Z.E. All Rights Reserved.",
         primaryColor: "#3B82F6",
         sidebarColor: "#0A0F1C",
-        website: "www.mshorizon.ae"
+        website: "www.mshorizon.ae",
+        fontFamily: "Inter",
+        backgroundColor: "#f8fafc",
+        cardColor: "#ffffff",
+        textColor: "#0f172a",
+        borderColor: "#e2e8f0",
+        buttonColor: "#3b82f6",
+        headerColor: "#ffffff"
       });
     }
 
@@ -61,7 +68,14 @@ export async function PUT(request: Request) {
         facebook: data.facebook !== undefined ? data.facebook : undefined,
         instagram: data.instagram !== undefined ? data.instagram : undefined,
         logo: data.logo !== undefined ? data.logo : undefined,
-        website: data.website !== undefined ? data.website : undefined
+        website: data.website !== undefined ? data.website : undefined,
+        fontFamily: data.fontFamily !== undefined ? data.fontFamily : undefined,
+        backgroundColor: data.backgroundColor !== undefined ? data.backgroundColor : undefined,
+        cardColor: data.cardColor !== undefined ? data.cardColor : undefined,
+        textColor: data.textColor !== undefined ? data.textColor : undefined,
+        borderColor: data.borderColor !== undefined ? data.borderColor : undefined,
+        buttonColor: data.buttonColor !== undefined ? data.buttonColor : undefined,
+        headerColor: data.headerColor !== undefined ? data.headerColor : undefined
       },
       create: {
         id: "SETTINGS",
@@ -78,7 +92,14 @@ export async function PUT(request: Request) {
         facebook: data.facebook || null,
         instagram: data.instagram || null,
         logo: data.logo || null,
-        website: data.website || "www.mshorizon.ae"
+        website: data.website || "www.mshorizon.ae",
+        fontFamily: data.fontFamily || "Inter",
+        backgroundColor: data.backgroundColor || "#f8fafc",
+        cardColor: data.cardColor || "#ffffff",
+        textColor: data.textColor || "#0f172a",
+        borderColor: data.borderColor || "#e2e8f0",
+        buttonColor: data.buttonColor || "#3b82f6",
+        headerColor: data.headerColor || "#ffffff"
       }
     });
 

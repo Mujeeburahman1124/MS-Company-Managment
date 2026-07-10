@@ -175,7 +175,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <Breadcrumb />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-32 md:pb-6 bg-transparent">
+        <main className="flex-1 flex flex-col min-h-0 overflow-hidden bg-transparent">
           {pageContent}
         </main>
 

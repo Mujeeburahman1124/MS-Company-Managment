@@ -658,6 +658,13 @@ export interface SiteSettings {
   facebook?: string | null;
   instagram?: string | null;
   website?: string | null;
+  fontFamily?: string | null;
+  backgroundColor?: string | null;
+  cardColor?: string | null;
+  textColor?: string | null;
+  borderColor?: string | null;
+  buttonColor?: string | null;
+  headerColor?: string | null;
 }
 
 export interface RecentPage {

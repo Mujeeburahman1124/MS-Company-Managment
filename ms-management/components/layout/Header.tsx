@@ -61,7 +61,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center h-14 px-3 md:px-5 bg-card/90 backdrop-blur-md border-b border-border/60 shrink-0 gap-2 shadow-sm">
+    <header style={{ backgroundColor: 'var(--header-color)' }} className="sticky top-0 z-40 flex items-center h-14 px-3 md:px-5 backdrop-blur-md border-b border-border/60 shrink-0 gap-2 shadow-sm">
 
       {/* Hamburger Menu (Mobile) */}
       <div className="md:hidden">
