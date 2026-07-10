@@ -143,7 +143,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col h-full  select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader 
         title="My Profile" 
         subtitle="Manage your personal details and account security settings"

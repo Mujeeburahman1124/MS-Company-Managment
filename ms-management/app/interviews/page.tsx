@@ -274,7 +274,7 @@ HR Department`;
   };
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader title="Interviews & Meetings" subtitle="Schedule and manage all interviews and team meetings"
         actions={<Button onClick={() => { setEditInt(null); setForm({ applicantId:"", type:"Interview", conductPerson:currentUser.name, personName:"", mobile:"", whatsapp:"", email:"", nationality:"India", position:"", meetingType:"", isOnline:true, dateTime:"", mode:"Zoom", meetingLink:"", locationLink:"", notes:"", company: currentUser.company === "System" ? "" : currentUser.company, branch: currentUser.branch === "All" ? "" : currentUser.branch, autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5 shadow-sm"><Plus className="w-4 h-4"/>Schedule</Button>}
       />
@@ -300,7 +300,7 @@ HR Department`;
         }} 
       />
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
+      <div className="flex-1 p-4 md:p-6">
         {paginated.length === 0 ? (
           <EmptyState title="No interviews scheduled" description="Schedule your first interview or meeting." action={<Button onClick={() => setModal(true)} className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9">Schedule Now</Button>} />
         ) : (

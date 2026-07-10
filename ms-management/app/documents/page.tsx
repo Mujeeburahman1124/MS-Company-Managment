@@ -596,7 +596,7 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader 
         title="Document Center" 
         subtitle="Centralized repository of all uploaded documents" 
@@ -712,7 +712,7 @@ export default function DocumentsPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6">
         {allDocs.length === 0 ? (
           <EmptyState title="No documents found" description="Try adjusting your search filters." />
         ) : isGroupedView ? (

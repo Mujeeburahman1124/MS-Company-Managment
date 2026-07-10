@@ -456,7 +456,7 @@ export default function TasksPage() {
 
       <FilterBar moduleKey="tasks" statusOptions={["Pending","Processing","Completed","Incomplete","Reassigned","Cancelled"]} showAssignee onExport={() => { exportToCSV(list.map(t=>({ID:t.id,Title:t.title,Assignee:t.assignedTo,Priority:t.priority,Deadline:t.deadline,Status:t.status})),"tasks"); toast.success("Exported"); }} />
 
-      <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-auto min-h-0">
+      <div className="flex-1 p-4 md:p-6 overflow-x-auto">
         {taskTab === "history" ? (
           /* ── Completed Tasks View ── */
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">

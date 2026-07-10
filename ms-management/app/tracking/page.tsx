@@ -461,7 +461,7 @@ export default function TrackingPage() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader
         title="Applicant Tracking Workflow"
         subtitle="Manage applicant pipeline, visa tracking and final placements"

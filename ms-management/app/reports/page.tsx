@@ -253,7 +253,7 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col min-h-full">
       {/* Print-only Letterhead */}
       <div className="hidden print:block mb-8 border-b-2 border-slate-200 pb-4">
         <div className="flex justify-between items-start">
@@ -324,7 +324,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Report Content */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 min-h-0">
+      <div className="flex-1 p-4 md:p-6">
 
         {/* OVERVIEW TAB */}
         {activeTab === "overview" && (

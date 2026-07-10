@@ -212,7 +212,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader 
         title="Notification Center" 
         subtitle="Automated reminders, email outbox, and WhatsApp API alerts"

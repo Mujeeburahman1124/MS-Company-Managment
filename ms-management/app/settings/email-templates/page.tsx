@@ -119,7 +119,7 @@ export default function EmailTemplatesPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-50/50">
+    <div className="flex flex-col min-h-full bg-slate-50/50">
       <div className="flex-none p-4 md:p-6 border-b bg-white">
         <PageHeader title="Email Templates" />
       </div>

@@ -220,7 +220,7 @@ export default function WhatsAppPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader
         title="WhatsApp Messages"
         subtitle="Send messages to staff, applicants, and contacts"

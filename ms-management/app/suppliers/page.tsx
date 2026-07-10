@@ -148,7 +148,7 @@ export default function SuppliersPage() {
   );
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader 
         title="Supplier Management" 
         subtitle="Manage external manpower suppliers and agencies"

@@ -184,7 +184,7 @@ export default function MembersPage() {
   );
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader 
         title="Member Management" 
         subtitle="List of all registered candidates automatically enrolled as platform members" 

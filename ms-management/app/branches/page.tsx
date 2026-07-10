@@ -82,7 +82,7 @@ export default function BranchesPage() {
   };
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="flex flex-col min-h-full select-none">
       <PageHeader title="Branch Management" subtitle="Manage company branches and locations"
         actions={canCreateBranches ? <Button onClick={() => { setEditBranch(null); setForm({ name:"",company:"",companyId:"",address:"",phone:"",email:"",tradeLicenseNumber:"",location:"",contactPerson:"",status:"Active" }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>Add Branch</Button> : null}
       />

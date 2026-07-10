@@ -138,7 +138,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader title="Global Settings" subtitle="Configure platform-wide settings, branding, and per-company modules"
         actions={<Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Save className="w-4 h-4"/>Save Configuration</Button>}
       />
