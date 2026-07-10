@@ -180,6 +180,10 @@ model Applicant {
   memberActive       Boolean? @default(false)
   gender             String?  @default("")
   currentAddress     String?  @default("")
+  emiratesId         String?  @default("")
+  maritalStatus      String?  @default("")
+  education          String?  @default("")
+  experience         String?  @default("")
 }
 
 model Task {
@@ -413,6 +417,12 @@ model Placement {
   termsAndConditions String?  @db.Text
   agreementHistory   Json?    
   agreementAccepted  Boolean? @default(false)
+  emiratesId         String?  @default("")
+  maritalStatus      String?  @default("")
+  education          String?  @default("")
+  experience         String?  @default("")
+  passportExpiry     String?  @default("")
+  travelStatus       String?  @default("")
 }
 
 model Notification {
@@ -566,6 +576,14 @@ model SiteSettings {
   borderColor     String? @default("#e2e8f0")
   buttonColor     String? @default("#3b82f6")
   headerColor     String? @default("#ffffff")
+  placementTerms        String? @default("") @db.Text
+  refundPolicy          String? @default("") @db.Text
+  replacementPolicy     String? @default("") @db.Text
+  candidateDeclaration  String? @default("") @db.Text
+  consultancyDeclaration String? @default("") @db.Text
+  companyLicense        String? @default("")
+  companyWebsite        String? @default("")
+  printFooter           String? @default("")
 }
 
 model SentEmail {

@@ -62,6 +62,10 @@ export interface Applicant {
   memberActive?: boolean;
   gender?: string | null;
   currentAddress?: string | null;
+  emiratesId?: string | null;
+  maritalStatus?: string | null;
+  education?: string | null;
+  experience?: string | null;
 }
 
 export interface Staff {
@@ -414,6 +418,12 @@ export interface Placement {
   currentAddress?: string;
   currentCountry?: string;
   registrationDate?: string;
+  emiratesId?: string;
+  maritalStatus?: string;
+  education?: string;
+  experience?: string;
+  passportExpiry?: string;
+  travelStatus?: string;
 
   // Client Company Details
   clientTradeLicense?: string;
@@ -667,6 +677,14 @@ export interface SiteSettings {
   borderColor?: string | null;
   buttonColor?: string | null;
   headerColor?: string | null;
+  placementTerms?: string | null;
+  refundPolicy?: string | null;
+  replacementPolicy?: string | null;
+  candidateDeclaration?: string | null;
+  consultancyDeclaration?: string | null;
+  companyLicense?: string | null;
+  companyWebsite?: string | null;
+  printFooter?: string | null;
 }
 
 export interface RecentPage {

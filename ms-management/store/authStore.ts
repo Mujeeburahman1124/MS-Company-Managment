@@ -176,7 +176,15 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
   textColor: "#0f172a",
   borderColor: "#e2e8f0",
   buttonColor: "#3b82f6",
-  headerColor: "#ffffff"
+  headerColor: "#ffffff",
+  placementTerms: "1. The Candidate agrees to register with the Consultancy and submit all required legal documents.\n2. The Consultancy will coordinate recruitment timelines, schedule interviews, and assist with document submission.\n3. The candidate agrees to attend all scheduled interviews and complete medical tests.",
+  refundPolicy: "Registration and service fees are non-refundable once visa processing has been initiated by the Placed Company or in case of candidates presenting falsified documents.",
+  replacementPolicy: "If the placed candidate resigns or is terminated within the probation period (up to 90 days), the Consultancy shall provide a one-time replacement candidate at no extra cost.",
+  candidateDeclaration: "I hereby declare that I accept the offer of employment and the terms set out in this Agreement. I verify that the passport information, address, and credentials provided are correct. I agree to abide by the labour regulations of the United Arab Emirates.",
+  consultancyDeclaration: "We declare that we will act as the authorized placement agent, coordinating the scheduling, interview processing, and document management in compliance with MoHRE policies and UAE Federal Labour Laws.",
+  companyLicense: "2013854/FZE",
+  companyWebsite: "www.mshorizon.ae",
+  printFooter: "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement"
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({

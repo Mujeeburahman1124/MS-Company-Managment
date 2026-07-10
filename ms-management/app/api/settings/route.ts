@@ -27,7 +27,15 @@ export async function GET() {
         textColor: "#0f172a",
         borderColor: "#e2e8f0",
         buttonColor: "#3b82f6",
-        headerColor: "#ffffff"
+        headerColor: "#ffffff",
+        placementTerms: "1. The Candidate agrees to register with the Consultancy and submit all required legal documents.\n2. The Consultancy will coordinate recruitment timelines, schedule interviews, and assist with document submission.\n3. The candidate agrees to attend all scheduled interviews and complete medical tests.",
+        refundPolicy: "Registration and service fees are non-refundable once visa processing has been initiated by the Placed Company or in case of candidates presenting falsified documents.",
+        replacementPolicy: "If the placed candidate resigns or is terminated within the probation period (up to 90 days), the Consultancy shall provide a one-time replacement candidate at no extra cost.",
+        candidateDeclaration: "I hereby declare that I accept the offer of employment and the terms set out in this Agreement. I verify that the passport information, address, and credentials provided are correct. I agree to abide by the labour regulations of the United Arab Emirates.",
+        consultancyDeclaration: "We declare that we will act as the authorized placement agent, coordinating the scheduling, interview processing, and document management in compliance with MoHRE policies and UAE Federal Labour Laws.",
+        companyLicense: "2013854/FZE",
+        companyWebsite: "www.mshorizon.ae",
+        printFooter: "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement"
       });
     }
 
@@ -75,7 +83,15 @@ export async function PUT(request: Request) {
         textColor: data.textColor !== undefined ? data.textColor : undefined,
         borderColor: data.borderColor !== undefined ? data.borderColor : undefined,
         buttonColor: data.buttonColor !== undefined ? data.buttonColor : undefined,
-        headerColor: data.headerColor !== undefined ? data.headerColor : undefined
+        headerColor: data.headerColor !== undefined ? data.headerColor : undefined,
+        placementTerms: data.placementTerms !== undefined ? data.placementTerms : undefined,
+        refundPolicy: data.refundPolicy !== undefined ? data.refundPolicy : undefined,
+        replacementPolicy: data.replacementPolicy !== undefined ? data.replacementPolicy : undefined,
+        candidateDeclaration: data.candidateDeclaration !== undefined ? data.candidateDeclaration : undefined,
+        consultancyDeclaration: data.consultancyDeclaration !== undefined ? data.consultancyDeclaration : undefined,
+        companyLicense: data.companyLicense !== undefined ? data.companyLicense : undefined,
+        companyWebsite: data.companyWebsite !== undefined ? data.companyWebsite : undefined,
+        printFooter: data.printFooter !== undefined ? data.printFooter : undefined
       },
       create: {
         id: "SETTINGS",
@@ -99,7 +115,15 @@ export async function PUT(request: Request) {
         textColor: data.textColor || "#0f172a",
         borderColor: data.borderColor || "#e2e8f0",
         buttonColor: data.buttonColor || "#3b82f6",
-        headerColor: data.headerColor || "#ffffff"
+        headerColor: data.headerColor || "#ffffff",
+        placementTerms: data.placementTerms || "",
+        refundPolicy: data.refundPolicy || "",
+        replacementPolicy: data.replacementPolicy || "",
+        candidateDeclaration: data.candidateDeclaration || "",
+        consultancyDeclaration: data.consultancyDeclaration || "",
+        companyLicense: data.companyLicense || "",
+        companyWebsite: data.companyWebsite || "",
+        printFooter: data.printFooter || ""
       }
     });
 

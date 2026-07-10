@@ -45,7 +45,15 @@ export default function SettingsPage() {
     facebook:     siteSettings.facebook || "",
     instagram:    siteSettings.instagram || "",
     website:      siteSettings.website || "",
-    terms:        "",
+    placementTerms: siteSettings.placementTerms || "",
+    refundPolicy: siteSettings.refundPolicy || "",
+    replacementPolicy: siteSettings.replacementPolicy || "",
+    candidateDeclaration: siteSettings.candidateDeclaration || "",
+    consultancyDeclaration: siteSettings.consultancyDeclaration || "",
+    companyLicense: siteSettings.companyLicense || "",
+    companyWebsite: siteSettings.companyWebsite || "",
+    printFooter: siteSettings.printFooter || "",
+    terms: "",
     privacyPolicy: ""
   });
 
@@ -104,7 +112,15 @@ export default function SettingsPage() {
       facebook:     form.facebook,
       instagram:    form.instagram,
       logo:         siteSettings.logo,
-      website:      form.website
+      website:      form.website,
+      placementTerms: form.placementTerms,
+      refundPolicy: form.refundPolicy,
+      replacementPolicy: form.replacementPolicy,
+      candidateDeclaration: form.candidateDeclaration,
+      consultancyDeclaration: form.consultancyDeclaration,
+      companyLicense: form.companyLicense,
+      companyWebsite: form.companyWebsite,
+      printFooter: form.printFooter
     });
     addActivityLog({
       id: `LOG-${Date.now()}`,
@@ -152,6 +168,7 @@ export default function SettingsPage() {
             { href: "#appearance", icon: <Paintbrush className="w-4 h-4 inline mr-2"/>, label: "Appearance Studio" },
             { href: "#contact", icon: <Globe className="w-4 h-4 inline mr-2"/>, label: "Contact Info" },
             { href: "#social", icon: <Share2 className="w-4 h-4 inline mr-2"/>, label: "Social Media" },
+            { href: "#placement-legal", icon: <FileText className="w-4 h-4 inline mr-2"/>, label: "Placement Agreement settings" },
             { href: "#legal", icon: <FileText className="w-4 h-4 inline mr-2"/>, label: "Legal Templates" },
             { href: "#modules", icon: <ToggleRight className="w-4 h-4 inline mr-2"/>, label: "Module Toggles" },
           ].map((item, i) => (
@@ -319,6 +336,48 @@ export default function SettingsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </Card>
+
+          {/* Placement Agreement Legal settings */}
+          <Card id="placement-legal" className="rounded-2xl border-slate-100 p-6 bg-white shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-blue-600"/> Placement Agreement Settings
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Company License / Trade License</Label>
+                <Input value={form.companyLicense} onChange={e => setForm(f => ({...f, companyLicense: e.target.value}))} placeholder="2013854/FZE" className="bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Company Print Website</Label>
+                <Input value={form.companyWebsite} onChange={e => setForm(f => ({...f, companyWebsite: e.target.value}))} placeholder="www.mshorizon.ae" className="bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Print Footer Text</Label>
+                <Input value={form.printFooter} onChange={e => setForm(f => ({...f, printFooter: e.target.value}))} placeholder="MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement" className="bg-slate-50 border-slate-200 rounded-xl text-sm font-semibold h-11 focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Candidate Declaration</Label>
+                <textarea rows={2} value={form.candidateDeclaration} onChange={e => setForm(f => ({...f, candidateDeclaration: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold p-3 outline-none focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Consultancy Declaration</Label>
+                <textarea rows={2} value={form.consultancyDeclaration} onChange={e => setForm(f => ({...f, consultancyDeclaration: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold p-3 outline-none focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Refund Policy (Agreement Clauses)</Label>
+                <textarea rows={3} value={form.refundPolicy} onChange={e => setForm(f => ({...f, refundPolicy: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold p-3 outline-none focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Replacement Policy (Agreement Clauses)</Label>
+                <textarea rows={3} value={form.replacementPolicy} onChange={e => setForm(f => ({...f, replacementPolicy: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold p-3 outline-none focus:bg-white focus:border-blue-400" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Default Placement Terms & Conditions</Label>
+                <textarea rows={6} value={form.placementTerms} onChange={e => setForm(f => ({...f, placementTerms: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold p-3 outline-none focus:bg-white focus:border-blue-400" />
+              </div>
             </div>
           </Card>
 

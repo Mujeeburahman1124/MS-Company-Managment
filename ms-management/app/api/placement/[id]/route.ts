@@ -105,7 +105,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
         paymentMethod: data.paymentMethod ?? undefined,
         receiptNumber: data.receiptNumber ?? undefined,
         dueAmount: data.dueAmount !== undefined ? Number(data.dueAmount) : undefined,
-        paidAmount: data.paidAmount !== undefined ? Number(data.paidAmount) : undefined
+        paidAmount: data.paidAmount !== undefined ? Number(data.paidAmount) : undefined,
+        emiratesId: data.emiratesId ?? undefined,
+        maritalStatus: data.maritalStatus ?? undefined,
+        education: data.education ?? undefined,
+        experience: data.experience ?? undefined,
+        passportExpiry: data.passportExpiry ?? undefined,
+        travelStatus: data.travelStatus ?? undefined
       }
     });
 
