@@ -70,13 +70,26 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
   }
 
   return (
-    <div className="bg-white w-full h-full text-black printable-agreement relative">
+    <div className="hidden print:block bg-white w-full text-black printable-agreement relative">
       {/* Global CSS for A4 Print */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
-          @page { size: A4 portrait; margin: 15mm 15mm 20mm 15mm; }
+          @page { size: A4 portrait; margin: 10mm 15mm; }
+          html, body, main, div, table, tr, td {
+            background: white !important;
+            background-color: white !important;
+            box-shadow: none !important;
+          }
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; }
-          .printable-agreement { padding: 0 !important; max-width: none !important; box-shadow: none !important; border: none !important; }
+          .printable-agreement { 
+            width: 100% !important; 
+            max-width: none !important; 
+            padding: 0 !important; 
+            margin: 0 !important; 
+            box-shadow: none !important; 
+            border: none !important; 
+            background: white !important; 
+          }
           
           /* Print engine table headers and footers repeating on every page */
           .print-header-spacer { height: 75px; }
@@ -91,9 +104,9 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-b: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
             padding-bottom: 5px;
-            background: white;
+            background: white !important;
           }
           
           .print-footer {
@@ -102,11 +115,11 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
             left: 0;
             right: 0;
             height: 45px;
-            border-t: 1px solid #cbd5e1;
+            border-top: 1px solid #cbd5e1;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: white;
+            background: white !important;
             font-size: 8pt;
             color: #64748b;
           }
@@ -176,23 +189,35 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
         <tbody>
           <tr>
             <td className="p-0">
-              {/* Cover Header (Visible on screen and at start of print) */}
-              <div className="flex justify-between items-end border-b-2 border-slate-800 pb-3 mb-4 print:mt-0">
+              {/* Branded Letterhead Header */}
+              <div className="flex justify-between items-start border-b-2 border-slate-800 pb-3 mb-4 print:mt-0">
                 <div>
                   <img src={siteSettings?.logo || "/logo.png"} alt="Company Logo" className="header-logo" onError={(e) => e.currentTarget.style.display='none'} />
-                  <h2 className="text-xl font-black text-slate-800 mt-1">{companyName}</h2>
-                  <p className="text-xs text-slate-600">Professional Recruitment & Placement Consultancy</p>
-                  <p className="text-[10px] text-slate-500">License No: {companyLicense} • {companyAddress} • {companyEmail}</p>
+                  <h2 className="text-lg font-black text-slate-800 mt-1">{companyName}</h2>
+                  <p className="text-[9px] text-slate-600">Professional Recruitment & Placement Consultancy</p>
+                  <p className="text-[8px] text-slate-500">License No: {companyLicense} • {companyAddress}</p>
                 </div>
-                <div className="text-right">
-                  <h1 className="text-[11pt] font-black uppercase text-slate-800 tracking-tight">PAYMENT & PLACEMENT SERVICE AGREEMENT</h1>
-                  <p className="text-xs font-bold text-slate-600">Ref: MSH-{placement.id?.substring(0, 8).toUpperCase()}</p>
-                  <p className="text-[10px] text-slate-500">Date: {new Date().toLocaleDateString('en-GB')}</p>
+                <div className="text-right text-[8px] text-slate-500 space-y-0.5">
+                  <p>Tel: {companyPhone}</p>
+                  <p>Email: {companyEmail}</p>
+                  <p>Web: {companyWebsite}</p>
+                </div>
+              </div>
+
+              {/* Centered Agreement Title Block */}
+              <div className="text-center my-6 no-break">
+                <h1 className="text-xs font-black uppercase tracking-wider text-slate-900 border-b border-double border-slate-900 pb-1 inline-block">
+                  PAYMENT & PLACEMENT SERVICE AGREEMENT
+                </h1>
+                <div className="flex justify-center gap-12 mt-2 text-[9px] font-semibold text-slate-600">
+                  <span>Agreement No: <strong className="text-slate-900">MSH-PLM-{placement.id?.substring(0, 8).toUpperCase()}</strong></span>
+                  <span>Agreement Date: <strong className="text-slate-900">{placement.placementDate || new Date().toLocaleDateString('en-GB')}</strong></span>
+                  <span>Applicant ID: <strong className="text-slate-900">{placement.applicantId?.substring(0, 8).toUpperCase()}</strong></span>
                 </div>
               </div>
 
               <div className="mb-4 text-justify text-xs">
-                <p>This Professional Placement Agreement (the "Agreement") is entered into on <strong>{new Date().toLocaleDateString('en-GB')}</strong> by and between the recruitment consultancy, candidate, and placed client company under the terms set out below.</p>
+                <p>This Professional Placement Agreement (the "Agreement") is entered into on <strong>{placement.placementDate || new Date().toLocaleDateString('en-GB')}</strong> by and between the recruitment consultancy, candidate, and placed client company under the terms set out below.</p>
               </div>
 
               {/* EMPLOYEE INFORMATION */}
