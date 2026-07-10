@@ -195,11 +195,11 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         <div className="p-4 shrink-0 border-t border-white/5 bg-slate-900/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
-              {currentUser?.firstName?.charAt(0) || <User className="w-5 h-5" />}
+              {currentUser?.name?.charAt(0) || <User className="w-5 h-5" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-semibold truncate">
-                {currentUser?.firstName} {currentUser?.lastName}
+                {currentUser?.name}
               </p>
               <p className="text-white/50 text-xs truncate">v1.0.0</p>
             </div>

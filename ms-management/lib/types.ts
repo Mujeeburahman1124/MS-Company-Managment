@@ -228,6 +228,7 @@ export interface Task {
   priority: "High" | "Medium" | "Low" | "Urgent";
   assignedTo: string;
   assignedToId: string;
+  assignedToRole?: string | null;
   company: string;
   branch: string;
   assignedDate: string;

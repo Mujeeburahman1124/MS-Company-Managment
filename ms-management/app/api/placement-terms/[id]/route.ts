@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+type RouteParams = { params: Promise<{ id: string }> };
+
+export async function PUT(req: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const data = await req.json();
     const { title, content, isActive } = data;
     const term = await prisma.placementTerm.update({
-      where: { id: params.id },
+      where: { id },
       data: { title, content, isActive }
     });
     return NextResponse.json(term);
@@ -16,10 +19,11 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     await prisma.placementTerm.delete({
-      where: { id: params.id }
+      where: { id }
     });
     return NextResponse.json({ success: true });
   } catch (error) {
