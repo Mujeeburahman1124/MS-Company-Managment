@@ -348,7 +348,7 @@ export default function PlacementPage() {
   };
 
   // Form handlers
-  const handleRegisterSubmit = () => {
+  const handleRegisterSubmit = async () => {
     if (!registerForm.applicantId || !registerForm.passportNumber || !registerForm.mobileNumber) {
       toast.error("Applicant information and contact details are required.");
       return;
@@ -363,6 +363,16 @@ export default function PlacementPage() {
     }
 
     const newId = `PLA${Math.floor(100 + Math.random() * 900)}`;
+    const isoDate = new Date().toISOString();
+    let ip = "Unknown";
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipRes.json();
+      ip = ipData.ip;
+    } catch (e) {
+      console.error("Failed to fetch IP", e);
+    }
+
     const newRecord: Placement = {
       id: newId,
       applicantId: registerForm.applicantId,
@@ -383,6 +393,9 @@ export default function PlacementPage() {
       agreementAccepted: true,
       applicantSign: wizardSignatures.applicant,
       companySign: wizardSignatures.company || undefined,
+      applicantSignDate: isoDate,
+      applicantSignIp: ip,
+      applicantSignDevice: navigator.userAgent,
       notes: registerForm.notes,
       termsAndConditions: registerForm.termsAndConditions,
       createdBy: currentUser.name,
@@ -1482,9 +1495,9 @@ export default function PlacementPage() {
 
       {/* AGREEMENT DOCUMENT PREVIEW & PDF PRINT MODAL */}
       <Dialog open={!!agreementModal} onOpenChange={open => !open && setAgreementModal(null)}>
-        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-4xl max-h-[90vh] overflow-y-auto print:max-w-none print:shadow-none print:border-0 print:p-0 print:overflow-visible">
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-4xl max-h-[90vh] overflow-y-auto print:hidden">
           {agreementModal && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start print:grid-cols-1">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               
               {/* Left 2 Columns: Contract Document Template */}
               <div className="lg:col-span-2 space-y-4 print:col-span-1">
@@ -1652,6 +1665,9 @@ export default function PlacementPage() {
         variant="danger" 
       />
 
+      {agreementModal && (
+        <PrintableAgreement placement={agreementModal} terms={placementTerms} />
+      )}
     </div>
   );
 }

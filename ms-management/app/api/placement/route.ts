@@ -71,6 +71,9 @@ export async function POST(request: Request) {
         placementFee: data.placementFee !== undefined ? Number(data.placementFee) : 0,
         refundStatus: data.refundStatus || "Not Applicable",
         agreementAccepted: data.agreementAccepted !== undefined ? Boolean(data.agreementAccepted) : false,
+        applicantSignDate: data.applicantSignDate ? new Date(data.applicantSignDate) : undefined,
+        applicantSignIp: data.applicantSignIp || undefined,
+        applicantSignDevice: data.applicantSignDevice || undefined,
         notes: data.notes || ""
       }
     });
