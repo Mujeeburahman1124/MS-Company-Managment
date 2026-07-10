@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { sendEmail } from "@/lib/notifications";
 
 export async function GET() {
   try {
@@ -32,9 +33,18 @@ export async function POST(request: Request) {
 
     const data = await request.json();
 
-    if (!data.applicantId || !data.applicantName || !data.companyId || !data.companyName || !data.company || !data.branch) {
+    // Required fields — companyId is NOT required for "Registered" status
+    if (!data.applicantId || !data.applicantName || !data.company || !data.branch) {
       return NextResponse.json(
-        { error: "ApplicantId, applicantName, companyId, companyName, company and branch are required" },
+        { error: "applicantId, applicantName, company and branch are required" },
+        { status: 400 }
+      );
+    }
+
+    // For "Placed" status, companyName IS required
+    if ((data.status === "Placed") && (!data.companyId || !data.companyName)) {
+      return NextResponse.json(
+        { error: "companyId and companyName are required when status is Placed" },
         { status: 400 }
       );
     }
@@ -49,12 +59,12 @@ export async function POST(request: Request) {
         id: data.id || undefined,
         applicantId: data.applicantId,
         applicantName: data.applicantName,
-        companyId: data.companyId,
-        companyName: data.companyName,
+        companyId: data.companyId || "",
+        companyName: data.companyName || "Pending",
         position: data.position || "",
         salary: Number(data.salary) || 0,
         placementDate: data.placementDate || new Date().toISOString().slice(0, 10),
-        status: data.status || "Placed",
+        status: data.status || "Registered",
         company: data.company,
         branch: data.branch,
         createdAt: data.createdAt || new Date().toISOString().slice(0, 10),
@@ -75,58 +85,58 @@ export async function POST(request: Request) {
         applicantSignIp: data.applicantSignIp || undefined,
         applicantSignDevice: data.applicantSignDevice || undefined,
         notes: data.notes || "",
-        createdBy: data.createdBy,
-        nationality: data.nationality,
-        whatsappNumber: data.whatsappNumber,
-        emailAddress: data.emailAddress,
-        dateOfBirth: data.dateOfBirth,
-        gender: data.gender,
-        currentAddress: data.currentAddress,
-        currentCountry: data.currentCountry,
-        clientTradeLicense: data.clientTradeLicense,
-        clientAddress: data.clientAddress,
-        clientCountry: data.clientCountry,
-        clientContactPerson: data.clientContactPerson,
-        clientContactNumber: data.clientContactNumber,
-        clientEmail: data.clientEmail,
-        clientLogo: data.clientLogo,
-        department: data.department,
-        workLocation: data.workLocation,
-        city: data.city,
-        joiningDate: data.joiningDate,
-        contractDuration: data.contractDuration,
-        probationPeriod: data.probationPeriod,
-        workingHours: data.workingHours,
-        weeklyOff: data.weeklyOff,
-        shiftDetails: data.shiftDetails,
-        currency: data.currency,
-        paymentFrequency: data.paymentFrequency,
-        foodAllowance: data.foodAllowance,
-        accommodation: data.accommodation,
-        transportation: data.transportation,
-        overtime: data.overtime,
-        medicalInsurance: data.medicalInsurance,
-        airTicket: data.airTicket,
-        annualLeave: data.annualLeave,
-        otherBenefits: data.otherBenefits,
-        visaStatus: data.visaStatus,
-        placementVisaType: data.placementVisaType,
-        visaNumber: data.visaNumber,
-        visaExpiryDate: data.visaExpiryDate,
-        visaProcessingStage: data.visaProcessingStage,
-        medicalStatus: data.medicalStatus,
-        emiratesIdStatus: data.emiratesIdStatus,
-        labourContractStatus: data.labourContractStatus,
-        joiningStatus: data.joiningStatus,
-        paymentStatus: data.paymentStatus,
-        paymentMethod: data.paymentMethod,
-        receiptNumber: data.receiptNumber,
-        dueAmount: data.dueAmount !== undefined ? Number(data.dueAmount) : undefined,
-        paidAmount: data.paidAmount !== undefined ? Number(data.paidAmount) : undefined
-
+        createdBy: data.createdBy || user.name,
+        nationality: data.nationality || "",
+        whatsappNumber: data.whatsappNumber || "",
+        emailAddress: data.emailAddress || "",
+        dateOfBirth: data.dateOfBirth || "",
+        gender: data.gender || "",
+        currentAddress: data.currentAddress || "",
+        currentCountry: data.currentCountry || "",
+        clientTradeLicense: data.clientTradeLicense || "",
+        clientAddress: data.clientAddress || "",
+        clientCountry: data.clientCountry || "",
+        clientContactPerson: data.clientContactPerson || "",
+        clientContactNumber: data.clientContactNumber || "",
+        clientEmail: data.clientEmail || "",
+        clientLogo: data.clientLogo || "",
+        department: data.department || "",
+        workLocation: data.workLocation || "",
+        city: data.city || "",
+        joiningDate: data.joiningDate || "",
+        contractDuration: data.contractDuration || "",
+        probationPeriod: data.probationPeriod || "",
+        workingHours: data.workingHours || "",
+        weeklyOff: data.weeklyOff || "",
+        shiftDetails: data.shiftDetails || "",
+        currency: data.currency || "AED",
+        paymentFrequency: data.paymentFrequency || "Monthly",
+        foodAllowance: data.foodAllowance || "",
+        accommodation: data.accommodation || "",
+        transportation: data.transportation || "",
+        overtime: data.overtime || "",
+        medicalInsurance: data.medicalInsurance || "",
+        airTicket: data.airTicket || "",
+        annualLeave: data.annualLeave || "",
+        otherBenefits: data.otherBenefits || "",
+        visaStatus: data.visaStatus || "",
+        placementVisaType: data.placementVisaType || "",
+        visaNumber: data.visaNumber || "",
+        visaExpiryDate: data.visaExpiryDate || "",
+        visaProcessingStage: data.visaProcessingStage || "",
+        medicalStatus: data.medicalStatus || "",
+        emiratesIdStatus: data.emiratesIdStatus || "",
+        labourContractStatus: data.labourContractStatus || "",
+        joiningStatus: data.joiningStatus || "",
+        paymentStatus: data.paymentStatus || "Unpaid",
+        paymentMethod: data.paymentMethod || "",
+        receiptNumber: data.receiptNumber || "",
+        dueAmount: data.dueAmount !== undefined ? Number(data.dueAmount) : 0,
+        paidAmount: data.paidAmount !== undefined ? Number(data.paidAmount) : 0
       }
     });
 
+    // If status is Placed, update the applicant record
     if (placement.status === "Placed") {
       const applicant = await prisma.applicant.findUnique({
         where: { id: placement.applicantId }
@@ -158,6 +168,76 @@ export async function POST(request: Request) {
           }
         });
       }
+    }
+
+    // Create notification for the placement registration
+    try {
+      const notifMessage = placement.status === "Placed"
+        ? `${placement.applicantName} has been successfully placed with ${placement.companyName}.`
+        : `New placement registration created for ${placement.applicantName}. Agreement signed and registration fee recorded.`;
+
+      await prisma.notification.create({
+        data: {
+          title: placement.status === "Placed" ? "New Placement Confirmed" : "New Placement Registration",
+          message: notifMessage,
+          type: "Success",
+          read: false,
+          createdAt: new Date().toISOString(),
+          userId: user.id,
+          company: placement.company,
+          branch: placement.branch,
+          sender: user.name,
+          link: "/placement",
+          status: "Delivered"
+        }
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification for placement:", notifErr);
+      // Non-blocking — don't fail the request
+    }
+
+    // Send email notification
+    try {
+      if (data.emailAddress && data.emailAddress.trim() !== "") {
+        await sendEmail({
+          to: data.emailAddress,
+          subject: `Placement Registration Confirmed — ${placement.applicantName}`,
+          body: `Dear ${placement.applicantName},\n\nYour placement registration with MS Horizon F.Z.E has been confirmed.\n\nRegistration Date: ${placement.registrationDate}\nRegistration Fee: AED ${placement.registrationFee}\nPlacement Deadline: ${placement.placementDeadline}\n\nPlease contact us for any queries.\n\nBest regards,\n${placement.company}`,
+          candidateName: placement.applicantName,
+          company: placement.company,
+          branch: placement.branch,
+          templateType: "Placement_Agreement",
+          templateData: {
+            applicantName: placement.applicantName,
+            registrationDate: placement.registrationDate,
+            registrationFee: placement.registrationFee,
+            placementDeadline: placement.placementDeadline,
+            position: placement.position,
+            company: placement.company
+          }
+        });
+      }
+    } catch (emailErr) {
+      console.error("Failed to send placement email:", emailErr);
+      // Non-blocking — don't fail the request
+    }
+
+    // Activity log
+    try {
+      await prisma.activityLog.create({
+        data: {
+          dateTime: new Date().toISOString(),
+          userName: user.name,
+          role: user.role,
+          company: user.company,
+          branch: user.branch,
+          action: `Created placement registration for ${placement.applicantName}. Status: ${placement.status}. Agreement: ${placement.agreementStatus}.`,
+          module: "Placement",
+          newValue: JSON.stringify({ id: placement.id, status: placement.status, applicantName: placement.applicantName })
+        }
+      });
+    } catch (logErr) {
+      console.error("Failed to create activity log for placement:", logErr);
     }
 
     return NextResponse.json(placement);

@@ -97,7 +97,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { name: 'Reports',       href: '/reports',       icon: BarChart3,   permissionKey: 'reports',     hiddenFor: ['Staff'] },
       { name: 'Activity Log',  href: '/activity-log',  icon: Activity,    permissionKey: 'activityLog', hiddenFor: ['Staff', 'Recruiter'] },
       { name: 'Site Settings', href: '/settings',      icon: Settings,    permissionKey: 'settings',    hiddenFor: ['Staff', 'HR Manager', 'Recruiter', 'Accountant', 'Branch Admin'] },
-      { name: 'Email Templates', href: '/settings/email-templates', icon: Mail, superAdminOnly: true },
+      { name: 'Email Templates', href: '/templates', icon: Mail, superAdminOnly: true },
     ]
   },
 ];

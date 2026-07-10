@@ -43,8 +43,8 @@ export default function CreatePlacementModal({
     setFormData(prev => ({
       ...prev,
       companyName,
-      clientContactPerson: "" || prev.clientContactPerson,
-      clientContactNumber: "" || prev.clientContactNumber,
+      clientContactPerson: prev.clientContactPerson,
+      clientContactNumber: prev.clientContactNumber,
       clientEmail: company?.email || prev.clientEmail,
     }));
   };

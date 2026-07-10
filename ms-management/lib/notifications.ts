@@ -94,8 +94,8 @@ function registerPartials() {
  */
 export async function sendEmail({
   to,
-  subject,
-  body,
+  subject: subjectParam,
+  body: bodyParam,
   candidateName,
   company,
   branch,
@@ -117,6 +117,9 @@ export async function sendEmail({
   templateType?: string;
   templateData?: any;
 }) {
+  // Use let so DB template can override subject/body
+  let subject = subjectParam;
+  let body = bodyParam;
   const isPrecompiledHtml = body.trim().startsWith("<html") || body.trim().startsWith("<!DOCTYPE");
   const host = cleanEnvVar(process.env.SMTP_HOST);
   const port = Number(cleanEnvVar(process.env.SMTP_PORT)) || 587;

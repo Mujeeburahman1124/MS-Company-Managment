@@ -3,7 +3,7 @@
 import React from "react";
 import { Placement } from "@/lib/types";
 
-export default function PrintableAgreement({ placement }: { placement: Placement }) {
+export default function PrintableAgreement({ placement, terms }: { placement: Placement; terms?: any[] }) {
   // Safe parsing of placement terms if it's stored as JSON
   let termsList: any[] = [];
   try {

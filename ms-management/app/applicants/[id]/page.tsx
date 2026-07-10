@@ -252,7 +252,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
           statusHistoryItem: {
             oldStatus: applicant.status,
             newStatus: "Placed",
-            changedBy: "Admin" || "Unknown",
+            changedBy: "Admin",
             date: new Date().toISOString().replace('T', ' ').slice(0, 19),
             reason: `Placed with company: ${placementData.companyName} on ${placementData.placementDate}`
           }
@@ -267,8 +267,8 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
           applicantId: applicant.id,
           applicantName: applicant.fullName,
           companyId: "temp",
-          company: "MS Horizon F.Z.E" || "MS Horizon F.Z.E",
-          branch: "Dubai" || "Dubai",
+          company: "MS Horizon F.Z.E",
+          branch: "Dubai",
           ...placementData,
           status: "Placed"
         })
@@ -304,7 +304,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
     const updated: typeof applicant = {
       ...applicant,
-      status: targetStatus,
+      status: targetStatus as typeof applicant.status,
       clientName: targetStatus === "Placed" ? placedCompany : applicant.clientName,
       statusHistory: [
         {

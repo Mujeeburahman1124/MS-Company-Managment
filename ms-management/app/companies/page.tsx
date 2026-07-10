@@ -29,10 +29,21 @@ export default function CompaniesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [activeViewTab, setActiveViewTab] = useState("list");
-  const [form, setForm] = useState({ 
-    name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null as string | null, documents: [] as any[],
-    tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active" as "Active" | "Inactive" | "Suspended",
-    separateDatabase: true, databaseStatus: "Ready" as "Not Provisioned" | "Provisioning" | "Ready"
+  const [form, setForm] = useState<{
+    name: string; telephone: string; hrMobile: string; ownerMobile: string;
+    whatsapp: string; email: string; address: string; notes: string;
+    googleMapLink: string; logo: string | null; documents: any[];
+    tradeLicenseNumber: string; licenseIssueDate: string; licenseExpiryDate: string;
+    companyType: string; ownerName: string; emirateLocation: string; trnNumber: string;
+    status: "Active" | "Inactive" | "Suspended";
+    separateDatabase: boolean; databaseStatus: "Not Provisioned" | "Provisioning" | "Ready";
+    branchLogo: string | null; coverImage: string | null; profileImage: string | null;
+    brandColor: string; secondaryColor: string; website: string; description: string;
+  }>({ 
+    name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [],
+    tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active",
+    separateDatabase: true, databaseStatus: "Ready",
+    branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: ""
   });
 
   const f = filters.companies;
@@ -125,7 +136,9 @@ export default function CompaniesPage() {
     setForm({ 
       name: c.name, telephone: c.telephone, hrMobile: c.hrMobile, ownerMobile: c.ownerMobile, whatsapp: c.whatsapp, email: c.email, address: c.address, notes: c.notes || "", googleMapLink: c.googleMapLink || "", logo: c.logo || null, documents: c.documents || [],
       tradeLicenseNumber: c.tradeLicenseNumber || "", licenseIssueDate: c.licenseIssueDate || "", licenseExpiryDate: c.licenseExpiryDate || "", companyType: c.companyType || "", ownerName: c.ownerName || "", emirateLocation: c.emirateLocation || "", trnNumber: c.trnNumber || "", status: c.status || "Active",
-      separateDatabase: c.separateDatabase !== false, databaseStatus: c.databaseStatus || (c.separateDatabase !== false ? "Ready" : "Not Provisioned")
+      separateDatabase: c.separateDatabase !== false, databaseStatus: c.databaseStatus || (c.separateDatabase !== false ? "Ready" : "Not Provisioned"),
+      branchLogo: c.branchLogo || null, coverImage: c.coverImage || null, profileImage: c.profileImage || null,
+      brandColor: c.brandColor || "#1e293b", secondaryColor: c.secondaryColor || "#3b82f6", website: c.website || "", description: c.description || ""
     });
     setAddModal(true);
   };

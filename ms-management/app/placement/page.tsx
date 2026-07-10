@@ -23,8 +23,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Placement } from "@/lib/types";
 import { toast } from "sonner";
 
-// Active context date for timeline calculations
-const CURRENT_DATE = new Date("2026-06-17");
+// Always use the real current date for deadline calculations
+const CURRENT_DATE = new Date();
 
 // HTML5 Canvas Signature Pad
 function SignaturePad({ label, onSave, defaultValue }: { label: string; onSave: (dataUrl: string) => void; defaultValue?: string | null }) {
@@ -205,7 +205,7 @@ If the employer fails to pay salary, refuses visa processing, or violates UAE la
 By registering and making payment, the Applicant confirms that they have read, understood, and accepted all terms and conditions of this Agreement.`;
 
 export default function PlacementPage() {
-  const { placements, applicants, companies, addPlacement, updatePlacement, deletePlacement, currentUser } = useAuthStore();
+  const { placements, applicants, companies, addPlacement, updatePlacement, deletePlacement, currentUser, addNotification, addActivityLog } = useAuthStore();
   
   // Dashboard & Navigation states
     const [activeTab, setActiveTab] = useState<"all" | "pipeline" | "refunds" | "placed">("all");
@@ -226,13 +226,15 @@ export default function PlacementPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [wizardSignatures, setWizardSignatures] = useState({ applicant: "", company: "" });
 
+  const TODAY_ISO = new Date().toISOString().slice(0, 10);
+  const NINETY_DAYS_ISO = (() => { const d = new Date(); d.setDate(d.getDate() + 90); return d.toISOString().slice(0, 10); })();
   const [registerForm, setRegisterForm] = useState({
     applicantId: "",
     applicantName: "",
     passportNumber: "",
     mobileNumber: "",
-    registrationDate: "2026-06-17",
-    placementDeadline: "2026-09-15", // default 90 days after June 17, 2026
+    registrationDate: TODAY_ISO,
+    placementDeadline: NINETY_DAYS_ISO,
     registrationFee: 1000,
     placementFee: 5000,
     position: "",
@@ -348,6 +350,8 @@ export default function PlacementPage() {
   };
 
   // Form handlers
+  const [isSubmittingRegistration, setIsSubmittingRegistration] = useState(false);
+
   const handleRegisterSubmit = async () => {
     if (!registerForm.applicantId || !registerForm.passportNumber || !registerForm.mobileNumber) {
       toast.error("Applicant information and contact details are required.");
@@ -362,7 +366,9 @@ export default function PlacementPage() {
       return;
     }
 
-    const newId = `PLA${Math.floor(100 + Math.random() * 900)}`;
+    if (isSubmittingRegistration) return; // prevent double submission
+    setIsSubmittingRegistration(true);
+
     const isoDate = new Date().toISOString();
     let ip = "Unknown";
     try {
@@ -373,21 +379,29 @@ export default function PlacementPage() {
       console.error("Failed to fetch IP", e);
     }
 
+    // Find applicant email for notification
+    const selectedApplicant = applicants.find(a => a.id === registerForm.applicantId);
+
     const newRecord: Placement = {
-      id: newId,
+      id: `PLA-${Date.now()}`,
       applicantId: registerForm.applicantId,
       applicantName: registerForm.applicantName,
       passportNumber: registerForm.passportNumber,
       mobileNumber: registerForm.mobileNumber,
+      emailAddress: selectedApplicant?.email || "",
+      nationality: selectedApplicant?.nationality || "",
       registrationDate: registerForm.registrationDate,
       placementDeadline: registerForm.placementDeadline,
       registrationFee: registerForm.registrationFee,
       placementFee: registerForm.placementFee,
       position: registerForm.position || "Not Specified",
       salary: 0,
-      companyName: "-",
-      placementDate: "-",
+      companyId: "",
+      companyName: "Pending",
+      placementDate: new Date().toISOString().slice(0, 10),
       status: "Registered",
+      company: currentUser.company,
+      branch: currentUser.branch,
       agreementStatus: "Signed",
       refundStatus: "Not Applicable",
       agreementAccepted: true,
@@ -407,20 +421,68 @@ export default function PlacementPage() {
       ]
     };
 
-    addPlacement(newRecord);
-    toast.success("Applicant registered and payment agreement executed!");
-    setRegisterModal(false);
-    resetRegisterForm();
+    try {
+      await addPlacement(newRecord as any);
+
+      // Fire notification
+      try {
+        await addNotification({
+          id: `notif-${Date.now()}`,
+          title: "New Placement Registration",
+          message: `${registerForm.applicantName} has been registered for placement. Agreement signed. Registration Fee: AED ${registerForm.registrationFee}.`,
+          type: "activity",
+          read: false,
+          time: new Date().toISOString(),
+          company: currentUser.company,
+          branch: currentUser.branch,
+          link: "/placement"
+        });
+      } catch (notifErr) {
+        console.warn("Non-critical: failed to create notification", notifErr);
+      }
+
+      // Fire activity log
+      try {
+        await addActivityLog({
+          id: `log-${Date.now()}`,
+          dateTime: new Date().toISOString(),
+          userName: currentUser.name,
+          role: currentUser.role,
+          company: currentUser.company,
+          branch: currentUser.branch,
+          action: "Created",
+          module: "Placement",
+          oldValue: null,
+          ipAddress: "Browser",
+          newValue: `Placement for ${registerForm.applicantName}. Status: Registered. Fee: AED ${registerForm.registrationFee}. Deadline: ${registerForm.placementDeadline}.`
+        });
+      } catch (logErr) {
+        console.warn("Non-critical: failed to create activity log", logErr);
+      }
+
+      toast.success("Applicant registered and payment agreement executed!");
+      setRegisterModal(false);
+      resetRegisterForm();
+    } catch (err: any) {
+      console.error("Placement registration error:", err);
+      toast.error(err?.message || "Failed to register placement. Please try again.");
+    } finally {
+      setIsSubmittingRegistration(false);
+    }
   };
 
   const resetRegisterForm = () => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const deadlineDate = new Date();
+    deadlineDate.setDate(deadlineDate.getDate() + 90);
+    const deadlineStr = deadlineDate.toISOString().slice(0, 10);
     setRegisterForm({
       applicantId: "",
       applicantName: "",
       passportNumber: "",
       mobileNumber: "",
-      registrationDate: "2026-06-17",
-      placementDeadline: "2026-09-15",
+      registrationDate: todayStr,
+      placementDeadline: deadlineStr,
       registrationFee: 1000,
       placementFee: 5000,
       position: "",
@@ -438,8 +500,8 @@ export default function PlacementPage() {
       status: p.status,
       refundStatus: p.refundStatus || "Not Applicable",
       companyId: p.companyId || "",
-      companyName: p.companyName === "-" ? "" : p.companyName,
-      placementDate: p.placementDate === "-" ? "2026-06-17" : p.placementDate,
+      companyName: (p.companyName === "-" || p.companyName === "Pending") ? "" : p.companyName,
+      placementDate: (p.placementDate === "-" || !p.placementDate) ? new Date().toISOString().slice(0, 10) : p.placementDate,
       salary: p.salary || 0,
       position: p.position || "",
       notes: "",
