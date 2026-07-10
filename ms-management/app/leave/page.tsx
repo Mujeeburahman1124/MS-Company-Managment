@@ -163,7 +163,7 @@ export default function LeavePage() {
       />
       <FilterBar moduleKey="leave" statusOptions={["Pending","Processing","Approved","Rejected"]} onExport={() => { exportToCSV(list.map(r=>({ID:r.id,Staff:r.staffName,Type:r.leaveType,From:r.fromDate,To:r.toDate,Days:r.days,Status:r.status})),"leave-requests"); toast.success("Exported"); }} />
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         {viewType === "grid" ? (
           paginated.length === 0 ? (
             <EmptyState title="No leave requests" description="No leave requests have been submitted yet." action={<Button onClick={handleOpenModal} className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9">Submit Request</Button>} />
@@ -232,12 +232,12 @@ export default function LeavePage() {
       {/* New Request Modal */}
       <Dialog open={modal} onOpenChange={setModal}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">Submit Leave Request</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Complete the leave request on behalf of a staff member.</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 min-h-0">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Staff Member <span className="text-rose-500">*</span></Label>
                 <Select disabled={!isAdmin && !!currentStaff} value={form.staffId} onValueChange={v => { const s = filteredStaff.find(s => s.id === v); setForm(f => ({...f, staffId: v || "", staffName: s?.name || ""})); }}>

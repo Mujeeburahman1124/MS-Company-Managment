@@ -270,7 +270,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      <div className="flex-1 p-4 md:p-6 w-[95vw] sm:w-full max-w-4xl mx-auto w-full overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 w-[95vw] sm:w-full max-w-4xl mx-auto w-full overflow-y-auto min-h-0">
         
         {/* ─── DASHBOARD ALERTS TAB ─── */}
         {activeTab === "dashboard" && (

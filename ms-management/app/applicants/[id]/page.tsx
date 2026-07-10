@@ -392,7 +392,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
-    <div className="flex flex-col h-full select-none pb-32 md:pb-12">
+    <div className="flex flex-col h-full select-none">
       <PageHeader
         title={`Profile: ${applicant.fullName}`}
         subtitle={`Tracking: ${applicant.trackingCode}`}

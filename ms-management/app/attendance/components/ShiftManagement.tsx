@@ -145,12 +145,12 @@ export default function ShiftManagement() {
 
       <Dialog open={modal} onOpenChange={open => { setModal(open); if (!open) resetForm(); }}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">{form.id ? "Edit Shift" : "Create Shift"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Configure standard working hours and grace periods.</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 min-h-0">
               {isSuperAdmin && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">

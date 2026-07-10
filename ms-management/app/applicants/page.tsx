@@ -174,7 +174,7 @@ export default function ApplicantsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full select-none pb-32">
+    <div className="flex flex-col h-full select-none">
       <PageHeader
         title="Applicant Management"
         subtitle="Manage recruitments, profile cards, and placement pipelines"
@@ -200,7 +200,7 @@ export default function ApplicantsPage() {
         onViewModeChange={setViewMode}
       />
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         {paginatedList.length === 0 ? (
           <EmptyState
             title="No applicants found"

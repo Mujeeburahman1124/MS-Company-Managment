@@ -1296,7 +1296,7 @@ function SuperAdminDashboard({ applicants, staff, tasks, interviews, leaveReques
         {/* Pending Payroll Approvals List with Quick Actions */}
         <Card className="rounded-2xl border-0 shadow-md bg-white p-5 lg:col-span-2 flex flex-col">
           <SectionHeader icon={FileSpreadsheet} title="Pending Payroll Approvals" />
-          <div className="flex-1 overflow-y-auto max-h-56 pr-1 mt-2">
+          <div className="flex-1 overflow-y-auto max-h-56 pr-1 mt-2 min-h-0">
             {payroll.filter(p => p.status === "Pending Approval").length === 0 ? (
               <div className="h-full flex items-center justify-center text-xs text-slate-400 font-semibold italic text-center py-6">No pending payroll approvals.</div>
             ) : (

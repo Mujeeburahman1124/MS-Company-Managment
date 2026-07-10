@@ -124,7 +124,7 @@ export default function EmailTemplatesPage() {
         <PageHeader title="Email Templates" />
       </div>
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map(template => (
             <Card key={template.id} className="hover:shadow-md transition-shadow">
@@ -167,7 +167,7 @@ export default function EmailTemplatesPage() {
           </DialogHeader>
 
           {editingTemplate && (
-            <div className="flex-1 overflow-y-auto space-y-4 py-4 pr-2">
+            <div className="flex-1 overflow-y-auto space-y-4 py-4 pr-2 min-h-0">
               <div className="flex items-center space-x-2">
                 <Switch 
                   id="enabled" 

@@ -456,7 +456,7 @@ export default function TasksPage() {
 
       <FilterBar moduleKey="tasks" statusOptions={["Pending","Processing","Completed","Incomplete","Reassigned","Cancelled"]} showAssignee onExport={() => { exportToCSV(list.map(t=>({ID:t.id,Title:t.title,Assignee:t.assignedTo,Priority:t.priority,Deadline:t.deadline,Status:t.status})),"tasks"); toast.success("Exported"); }} />
 
-      <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-auto min-h-0">
         {taskTab === "history" ? (
           /* ── Completed Tasks View ── */
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -629,12 +629,12 @@ export default function TasksPage() {
 
       <Dialog open={modal} onOpenChange={setModal}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">{editTask ? "Edit Task" : "Create New Task"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Assign the task with specific start and deadline dates.</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 min-h-0">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Task Title <span className="text-rose-500">*</span></Label>
                 <Input required value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" placeholder="e.g. Process applicant visa" />
@@ -946,12 +946,12 @@ export default function TasksPage() {
       {/* Incomplete Reason Modal */}
       <Dialog open={incompleteModalOpen} onOpenChange={setIncompleteModalOpen}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-sm w-[95vw] max-h-[80vh] flex flex-col overflow-hidden">
-          <form onSubmit={handleIncompleteSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form onSubmit={handleIncompleteSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">Task Incomplete Reason</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Please provide a reason why this task cannot be completed.</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1 min-h-0">
               <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reason <span className="text-rose-500">*</span></Label>
               <textarea required rows={3} value={incompleteReasonInput} onChange={e => setIncompleteReasonInput(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" placeholder="e.g. Awaiting client signature copy..." />
             </div>

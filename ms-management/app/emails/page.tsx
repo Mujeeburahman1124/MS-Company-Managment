@@ -990,9 +990,9 @@ export default function EmailsPage() {
               </button>
             </div>
 
-            <div className="flex-1 p-6 overflow-y-auto bg-slate-100/50 flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 p-6 overflow-y-auto bg-slate-100/50 flex flex-col lg:flex-row gap-6 min-h-0">
               {/* Sandbox rendered Frame */}
-              <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[50vh] lg:h-auto">
+              <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[50vh] lg:h-auto min-h-0">
                 <div className="bg-slate-50 px-4 py-2 border-b border-slate-100 flex items-center justify-between">
                   <span className="text-[10px] font-bold text-slate-400">PREVIEW PORT</span>
                   {canEditTemplate && (
@@ -1075,7 +1075,7 @@ export default function EmailsPage() {
               </button>
             </div>
 
-            <div className="flex-1 p-6 overflow-y-auto bg-slate-100/50 space-y-6 flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 p-6 overflow-y-auto bg-slate-100/50 space-y-6 flex flex-col lg:flex-row gap-6 min-h-0">
               {/* Meta Panel */}
               <div className="lg:w-80 bg-white rounded-xl border border-slate-100 p-4 space-y-4 shadow-sm flex-shrink-0">
                 <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-wider border-b border-slate-50 pb-2">
@@ -1124,7 +1124,7 @@ export default function EmailsPage() {
               </div>
 
               {/* View Render Frame */}
-              <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[40vh] lg:h-auto">
+              <div className="flex-1 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[40vh] lg:h-auto min-h-0">
                 <div className="bg-slate-50 px-4 py-2 border-b border-slate-100">
                   <span className="text-[10px] font-bold text-slate-400">DISPATCHED CONTENT PORTAL</span>
                 </div>

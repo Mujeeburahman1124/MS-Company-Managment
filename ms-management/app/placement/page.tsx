@@ -918,7 +918,7 @@ export default function PlacementPage() {
       </div>
 
       {/* PLACEMENT DIRECTORY GRID (HIDDEN ON PRINT) */}
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto print:hidden bg-slate-50/20">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto print:hidden bg-slate-50/20 min-h-0">
         {filteredPlacements.length === 0 ? (
           <EmptyState 
             title="No placement agreements match filters. Try updating your search query or register a new applicant." 

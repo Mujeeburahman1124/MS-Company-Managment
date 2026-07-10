@@ -129,7 +129,7 @@ export default function PlacementTermsSettings() {
   }
 
   return (
-    <div className="flex flex-col h-full pb-24 md:pb-12 bg-slate-50/50">
+    <div className="flex flex-col h-full  bg-slate-50/50">
       <PageHeader 
         title="Placement Agreement Terms" 
         subtitle="Manage dynamic terms & conditions for the legal agreement print layout"

@@ -174,7 +174,7 @@ export default function SuppliersPage() {
       />
       <FilterBar moduleKey="suppliers" statusOptions={["Active","Inactive"]} showNationality onExport={() => { exportToCSV(list.map(s=>({ID:s.id,Name:s.name,Nationality:s.nationality,Mobile:s.mobile,Email:s.email,Status:s.status})),"suppliers"); toast.success("Exported"); }} />
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         {paginated.length === 0 ? (
           <EmptyState title="No suppliers found" action={<Button onClick={() => setModal(true)} className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9">Add Supplier</Button>} />
         ) : (
@@ -223,12 +223,12 @@ export default function SuppliersPage() {
 
       <Dialog open={modal} onOpenChange={setModal}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-0 max-w-md w-[95vw] max-h-[92vh] flex flex-col overflow-hidden">
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0">
               <DialogTitle className="text-base font-bold text-slate-800">{editSup ? "Edit Supplier" : "Add New Supplier"}</DialogTitle>
               <DialogDescription className="text-xs text-slate-400">Register details of manpower agencies or independent suppliers.</DialogDescription>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3 min-h-0">
               <div className="space-y-1 col-span-2">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Agency/Supplier Name <span className="text-rose-500">*</span></Label>
                 <Input required value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />

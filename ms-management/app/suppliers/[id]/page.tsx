@@ -113,7 +113,7 @@ export default function SupplierDetailPage({ params }: { params: Promise<{ id: s
   };
 
   return (
-    <div className="flex flex-col h-full select-none pb-24 md:pb-12">
+    <div className="flex flex-col h-full select-none">
       <PageHeader 
         title={`Supplier Profile: ${supplier.name}`} 
         subtitle={`ID: ${supplier.id} · Created By: ${supplier.createdBy}`}

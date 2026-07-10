@@ -300,7 +300,7 @@ HR Department`;
         }} 
       />
 
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         {paginated.length === 0 ? (
           <EmptyState title="No interviews scheduled" description="Schedule your first interview or meeting." action={<Button onClick={() => setModal(true)} className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9">Schedule Now</Button>} />
         ) : (
@@ -457,7 +457,7 @@ HR Department`;
               <DialogDescription className="text-xs text-slate-400">Select type, fill candidate or meeting details, and set date/time.</DialogDescription>
             </DialogHeader>
             
-            <div className="flex-1 p-6 overflow-y-auto space-y-6">
+            <div className="flex-1 p-6 overflow-y-auto space-y-6 min-h-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Column 1: Candidate / Participant Details */}
                 <div className="space-y-4 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/80">
@@ -721,7 +721,7 @@ HR Department`;
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 p-6 overflow-y-auto bg-slate-50 space-y-4 font-sans max-h-[60vh]">
+          <div className="flex-1 p-6 overflow-y-auto bg-slate-50 space-y-4 font-sans max-h-[60vh] min-h-0">
             <div className="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm space-y-3.5 text-xs text-slate-700">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <span className="font-bold text-slate-400 w-16">To:</span>

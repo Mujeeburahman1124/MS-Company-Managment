@@ -427,7 +427,7 @@ function ApplyContent() {
       </div>
 
       {/* Main Container */}
-      <main className="flex-1 w-[95vw] sm:w-full max-w-4xl mx-auto w-full p-4 md:p-6 pb-24">
+      <main className="flex-1 w-[95vw] sm:w-full max-w-4xl mx-auto w-full p-4 md:p-6">
         {activeTab === "apply" ? (
           <Card className="rounded-3xl border-slate-200 shadow-xl bg-white p-6 md:p-8 space-y-6">
             {generatedCode ? (

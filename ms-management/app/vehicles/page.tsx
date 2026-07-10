@@ -531,7 +531,7 @@ export default function VehiclesPage() {
                 </div>
                 <StatusBadge status={fullViewVehicle.status} />
               </div>
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
                 
                 <div className="space-y-3">
                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><FileText className="w-4 h-4"/> Vehicle Info</h3>

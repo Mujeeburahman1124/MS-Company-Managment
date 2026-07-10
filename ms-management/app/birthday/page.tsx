@@ -268,7 +268,7 @@ export default function BirthdayPage() {
                       <div className={`text-[10px] font-bold text-right ${isCurrentDay ? "text-amber-600" : "text-slate-400"}`}>
                         {cell.day}
                       </div>
-                      <div className="flex-1 space-y-1 overflow-y-auto max-h-[50px] scrollbar-none">
+                      <div className="flex-1 space-y-1 overflow-y-auto max-h-[50px] scrollbar-none min-h-0">
                         {birthdays.map(s => (
                           <div 
                             key={s.id} 

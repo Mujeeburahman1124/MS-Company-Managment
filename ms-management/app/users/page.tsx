@@ -448,7 +448,7 @@ export default function UsersPage() {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
             <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5 bg-slate-50/40">
 
               {activeModalTab === "general" ? (

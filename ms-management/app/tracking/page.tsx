@@ -692,7 +692,7 @@ export default function TrackingPage() {
 
       {viewMode === "grid" ? (
         /* Kanban Board Container */
-        <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-auto bg-slate-50/50">
+        <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-auto bg-slate-50/50 min-h-0">
           <div className="flex gap-4 h-full min-w-max pb-4">
             {(statusFilter === "all" ? STAGES : STAGES.filter(s => s === statusFilter)).map(stage => {
               const stageApplicants = filteredList.filter(a => a.status === stage);
@@ -707,7 +707,7 @@ export default function TrackingPage() {
                     <span className="bg-white px-2 py-0.5 rounded text-[10px] shadow-sm font-extrabold">{stageApplicants.length}</span>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                  <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
                     {stageApplicants.map(app => (
                       <Card key={app.id}
                         draggable
@@ -763,7 +763,7 @@ export default function TrackingPage() {
         </div>
       ) : (
         /* Table View Container */
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-slate-50/50 flex flex-col justify-between">
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-slate-50/50 flex flex-col justify-between min-h-0">
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex-1 mb-4 flex flex-col">
             <div className="overflow-x-auto flex-1">
               <table className="w-full text-left border-collapse">

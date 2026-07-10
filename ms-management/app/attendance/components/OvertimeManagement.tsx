@@ -113,7 +113,7 @@ export default function OvertimeManagement() {
             <DialogTitle className="text-base font-bold text-slate-800">{approveModal?.action === "Approved" ? "Approve Overtime?" : "Reject Overtime?"}</DialogTitle>
             <DialogDescription className="text-xs text-slate-400">{approveModal?.req.staffName} requested {approveModal?.req.hours} hours of overtime.</DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
             {approveModal?.action === "Rejected" && (
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Rejection Reason *</label>

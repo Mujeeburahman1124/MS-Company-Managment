@@ -33,7 +33,7 @@ export default function PayrollPage() {
   }, [isStaff, activeTab]);
 
   return (
-    <div className="flex flex-col h-full pb-24 md:pb-12">
+    <div className="flex flex-col h-full">
       <PageHeader
         title="Payroll Management"
         subtitle="Manage salaries, deductions, and issue payslips"
@@ -57,7 +57,7 @@ export default function PayrollPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6 min-h-0">
         {activeTab === "Dashboard" && !isStaff && <PayrollDashboard />}
         {activeTab === "Salary Setup" && !isStaff && <SalarySetup />}
         {activeTab === "Process Payroll" && !isStaff && <ProcessPayroll />}

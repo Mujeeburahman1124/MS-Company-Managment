@@ -712,7 +712,7 @@ export default function DocumentsPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 p-4 md:p-6 pb-24 overflow-y-auto">
+      <div className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto">
         {allDocs.length === 0 ? (
           <EmptyState title="No documents found" description="Try adjusting your search filters." />
         ) : isGroupedView ? (

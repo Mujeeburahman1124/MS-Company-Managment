@@ -199,7 +199,7 @@ export default function VisaExpiryPage() {
         </div>
       </div>
 
-      <div className="p-4 md:p-6 flex-1 overflow-auto">
+      <div className="p-4 md:p-6 flex-1 overflow-auto min-h-0">
         {filteredList.length === 0 ? (
           <EmptyState title="No visa records found" />
         ) : (

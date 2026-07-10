@@ -45,7 +45,7 @@ export function Sidebar() {
                 </Link>
             </div>
  
-            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto ms-stagger">
+            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto ms-stagger min-h-0">
                 {visibleNavigation.map((item) => {
                     const isActive = pathname === item.href;
                     return (

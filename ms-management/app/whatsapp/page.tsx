@@ -220,7 +220,7 @@ export default function WhatsAppPage() {
   };
 
   return (
-    <div className="flex flex-col h-full pb-16">
+    <div className="flex flex-col h-full">
       <PageHeader
         title="WhatsApp Messages"
         subtitle="Send messages to staff, applicants, and contacts"
@@ -250,7 +250,7 @@ export default function WhatsAppPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 max-w-6xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 max-w-6xl mx-auto w-full min-h-0">
         {/* ─── COMPOSE TAB ─── */}
         {tab === "compose" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

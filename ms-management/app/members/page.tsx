@@ -223,7 +223,7 @@ export default function MembersPage() {
       </div>
 
       {/* Card Grid */}
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
         {paginated.length === 0 ? (
           <EmptyState title="No members found" description="Try adjusting your search criteria." />
         ) : (
