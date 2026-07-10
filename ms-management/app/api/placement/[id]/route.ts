@@ -111,7 +111,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
         education: data.education ?? undefined,
         experience: data.experience ?? undefined,
         passportExpiry: data.passportExpiry ?? undefined,
-        travelStatus: data.travelStatus ?? undefined
+        travelStatus: data.travelStatus ?? undefined,
+        photo: data.photo ?? undefined
       }
     });
 

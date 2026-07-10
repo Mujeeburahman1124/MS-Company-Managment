@@ -423,6 +423,7 @@ export interface Placement {
   education?: string;
   experience?: string;
   passportExpiry?: string;
+  photo?: string;
   travelStatus?: string;
 
   // Client Company Details

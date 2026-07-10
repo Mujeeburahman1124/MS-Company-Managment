@@ -159,28 +159,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={cn("font-sans", "min-h-[100dvh] bg-background flex text-foreground antialiased overflow-hidden w-full")}>
+    <div className={cn("font-sans", "min-h-[100dvh] bg-background flex text-foreground antialiased overflow-hidden print:overflow-visible w-full")}>
       {/* Mobile Drawer */}
       <MobileDrawer isOpen={isMobileDrawerOpen} onClose={() => setIsMobileDrawerOpen(false)} />
 
       {/* Sidebar - Desktop / Tablet */}
-      <Sidebar />
+      <div className="print:hidden">
+        <Sidebar />
+      </div>
 
       {/* Main Panel Wrapper */}
-      <div className="flex-1 flex flex-col md:pl-[70px] lg:pl-[260px] h-[100dvh] overflow-hidden relative transition-all duration-300">
+      <div className="flex-1 flex flex-col md:pl-[70px] lg:pl-[260px] print:pl-0 h-[100dvh] print:h-auto overflow-hidden print:overflow-visible relative transition-all duration-300">
         {/* Top Header */}
-        <Header onMenuClick={() => setIsMobileDrawerOpen(true)} />
+        <div className="print:hidden">
+          <Header onMenuClick={() => setIsMobileDrawerOpen(true)} />
+        </div>
 
         {/* Dynamic Breadcrumbs */}
-        <Breadcrumb />
+        <div className="print:hidden">
+          <Breadcrumb />
+        </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-32 md:pb-6 bg-transparent">
+        <main className="flex-1 overflow-y-auto print:overflow-visible overflow-x-hidden pb-32 md:pb-6 bg-transparent">
           {pageContent}
         </main>
 
         {/* Mobile Bottom Navigation */}
-        <BottomNav />
+        <div className="print:hidden">
+          <BottomNav />
+        </div>
       </div>
       <Toaster position="top-right" closeButton richColors />
       <ReminderEngine />

@@ -281,6 +281,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
           education: applicant.education || "",
           experience: applicant.experience || "",
           passportExpiry: applicant.passportExpiry || "",
+          photo: applicant.photo || "",
           companyId: "temp",
           company: "MS Horizon F.Z.E",
           branch: "Dubai",

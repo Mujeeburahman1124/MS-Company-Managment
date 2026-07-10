@@ -118,7 +118,7 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
           
           /* Native CSS page numbering counter */
           .page-number::after {
-            content: "Page " counter(page);
+            content: "Page " counter(page) " of " counter(pages);
           }
         }
         
@@ -185,7 +185,7 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
                   <p className="text-[10px] text-slate-500">License No: {companyLicense} • {companyAddress} • {companyEmail}</p>
                 </div>
                 <div className="text-right">
-                  <h1 className="text-lg font-black uppercase text-slate-800 tracking-tight">Placement Agreement</h1>
+                  <h1 className="text-[11pt] font-black uppercase text-slate-800 tracking-tight">PAYMENT & PLACEMENT SERVICE AGREEMENT</h1>
                   <p className="text-xs font-bold text-slate-600">Ref: MSH-{placement.id?.substring(0, 8).toUpperCase()}</p>
                   <p className="text-[10px] text-slate-500">Date: {new Date().toLocaleDateString('en-GB')}</p>
                 </div>
@@ -197,8 +197,8 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
 
               {/* EMPLOYEE INFORMATION */}
               <h3 className="section-title">1. Employee Information</h3>
-              <div className="info-box bg-slate-50/50 no-break">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
+              <div className="info-box bg-slate-50/50 no-break flex gap-6 items-start">
+                <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
                   <div><div className="info-label">Full Name</div><div className="info-value">{placement.applicantName}</div></div>
                   <div><div className="info-label">Passport Number</div><div className="info-value">{placement.passportNumber || "N/A"}</div></div>
                   <div><div className="info-label">Nationality</div><div className="info-value">{placement.nationality || "N/A"}</div></div>
@@ -216,6 +216,11 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
                   <div><div className="info-label">Registration Date</div><div className="info-value">{placement.registrationDate || "N/A"}</div></div>
                   <div className="col-span-2 md:col-span-3"><div className="info-label">Current Address</div><div className="info-value">{placement.currentAddress || "N/A"}</div></div>
                 </div>
+                {placement.photo && (
+                  <div className="flex-shrink-0 w-24 h-32 border border-slate-200 rounded-md overflow-hidden bg-white p-1 self-center">
+                    <img src={placement.photo} alt="Candidate Photo" className="w-full h-full object-contain" />
+                  </div>
+                )}
               </div>
 
               {/* RECRUITMENT CONSULTANCY DETAILS */}

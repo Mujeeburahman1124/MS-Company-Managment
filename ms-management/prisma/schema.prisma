@@ -423,6 +423,7 @@ model Placement {
   experience         String?  @default("")
   passportExpiry     String?  @default("")
   travelStatus       String?  @default("")
+  photo              String?  @default("")
 }
 
 model Notification {

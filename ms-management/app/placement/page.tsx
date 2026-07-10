@@ -399,6 +399,7 @@ export default function PlacementPage() {
       education: selectedApplicant?.education || "",
       experience: selectedApplicant?.experience || "",
       passportExpiry: selectedApplicant?.passportExpiry || "",
+      photo: selectedApplicant?.photo || "",
       registrationDate: registerForm.registrationDate,
       placementDeadline: registerForm.placementDeadline,
       registrationFee: registerForm.registrationFee,

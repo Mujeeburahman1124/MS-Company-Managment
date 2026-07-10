@@ -99,6 +99,7 @@ export async function POST(request: Request) {
         experience: data.experience || "",
         passportExpiry: data.passportExpiry || "",
         travelStatus: data.travelStatus || "",
+        photo: data.photo || "",
         clientTradeLicense: data.clientTradeLicense || "",
         clientAddress: data.clientAddress || "",
         clientCountry: data.clientCountry || "",
