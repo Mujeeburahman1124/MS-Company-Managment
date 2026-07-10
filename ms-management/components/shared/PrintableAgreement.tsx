@@ -70,9 +70,14 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
   }
 
   return (
-    <div className="hidden print:block bg-white w-full text-black printable-agreement relative">
+    <div className="bg-white w-full text-black printable-agreement relative">
       {/* Global CSS for A4 Print */}
       <style dangerouslySetInnerHTML={{__html: `
+        /* Hide on screen by default */
+        .printable-agreement {
+          display: none !important;
+        }
+
         @media print {
           @page { size: A4 portrait; margin: 10mm 15mm; }
           html, body, main, div, table, tr, td {
@@ -81,7 +86,10 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
             box-shadow: none !important;
           }
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; }
+          
+          /* Display on print */
           .printable-agreement { 
+            display: block !important;
             width: 100% !important; 
             max-width: none !important; 
             padding: 0 !important; 
