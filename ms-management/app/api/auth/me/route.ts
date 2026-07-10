@@ -36,6 +36,23 @@ export async function GET() {
       );
     }
 
+    // Fetch company info for logo
+    let companyLogo = "/logo.png";
+    let companyName = "MS Management";
+    if (user.company && user.company !== "System") {
+      const comp = await prisma.company.findFirst({ where: { name: user.company } });
+      if (comp) {
+        companyLogo = comp.logo || "/logo.png";
+        companyName = comp.name;
+      }
+    } else if (user.company === "System") {
+      const comp = await prisma.company.findFirst({ where: { name: "MS Horizon F.Z.E" } });
+      if (comp) {
+        companyLogo = comp.logo || "/logo.png";
+        companyName = comp.name;
+      }
+    }
+
     return NextResponse.json({
       authenticated: true,
       user: {
@@ -47,7 +64,9 @@ export async function GET() {
         branch: user.branch,
         status: user.status,
         photo: user.photo,
-        theme: user.theme
+        theme: user.theme,
+        companyLogo,
+        companyName
       }
     });
   } catch (error) {

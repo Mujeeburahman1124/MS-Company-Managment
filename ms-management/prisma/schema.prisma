@@ -28,6 +28,13 @@ model Company {
   id                  String   @id @default(cuid())
   name                String
   logo                String?
+  branchLogo          String?
+  coverImage          String?
+  profileImage        String?
+  brandColor          String?  @default("#1e293b")
+  secondaryColor      String?  @default("#3b82f6")
+  website             String?
+  description         String?  @db.Text
   telephone           String
   hrMobile            String
   ownerMobile         String
@@ -573,7 +580,13 @@ model EmailTemplate {
   id            String   @id @default(cuid())
   templateName  String   @unique
   subject       String
-  body          String
+  body          String   @db.Text
+  headerDesign  String?  @db.Text
+  bannerImage   String?
+  icon          String?
+  footerContent String?  @db.Text
+  brandColors   Json?
+  versionHistory Json?
   type          String?
   isEnabled     Boolean  @default(true)
   createdAt     String

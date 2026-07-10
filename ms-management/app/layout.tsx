@@ -3,6 +3,7 @@ import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
 import { ThemeProvider } from "@/components/theme-provider";
 import prisma from "@/lib/prisma";
+import { getSessionUser } from "@/lib/auth-helpers";
 
 export const metadata: Metadata = {
   title: "MS SaaS Management Pro",
@@ -19,15 +20,35 @@ export default async function RootLayout({
   let sidebarColor = "#0A0F1C";
   
   try {
-    const settings = await prisma.siteSettings.findUnique({
-      where: { id: "SETTINGS" }
-    });
-    if (settings) {
-      if (settings.primaryColor) primaryColor = settings.primaryColor;
-      if (settings.sidebarColor) sidebarColor = settings.sidebarColor;
+    const user = await getSessionUser();
+    let companySettings: any = null;
+    
+    if (user && user.company && user.company !== "System") {
+      companySettings = await prisma.company.findFirst({
+        where: { name: user.company }
+      });
+    } else if (user && user.company === "System") {
+      // For Super Admins or users in the root system
+      companySettings = await prisma.company.findFirst({
+        where: { name: "MS Horizon F.Z.E" }
+      });
+    }
+
+    if (companySettings && companySettings.brandColor) {
+      primaryColor = companySettings.brandColor;
+      sidebarColor = companySettings.secondaryColor || sidebarColor;
+    } else {
+      // Fallback to site settings
+      const settings = await prisma.siteSettings.findUnique({
+        where: { id: "SETTINGS" }
+      });
+      if (settings) {
+        if (settings.primaryColor) primaryColor = settings.primaryColor;
+        if (settings.sidebarColor) sidebarColor = settings.sidebarColor;
+      }
     }
   } catch (err) {
-    console.error("Failed to load site settings in RootLayout:", err);
+    console.error("Failed to load dynamic branding in RootLayout:", err);
   }
 
   return (

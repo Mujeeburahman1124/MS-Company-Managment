@@ -86,7 +86,14 @@ export async function POST(request: Request) {
         emirateLocation: data.emirateLocation || null,
         trnNumber: data.trnNumber || null,
         separateDatabase: data.separateDatabase || false,
-        databaseStatus: data.databaseStatus || "Not Provisioned"
+        databaseStatus: data.databaseStatus || "Not Provisioned",
+        branchLogo: data.branchLogo || null,
+        coverImage: data.coverImage || null,
+        profileImage: data.profileImage || null,
+        brandColor: data.brandColor || "#1e293b",
+        secondaryColor: data.secondaryColor || "#3b82f6",
+        website: data.website || null,
+        description: data.description || null
       }
     });
 

@@ -164,7 +164,7 @@ export function Sidebar() {
     if (item.superAdminOnly) return isSuperAdmin;
 
     // Check custom permissions overrides first before role-based hiding
-    if (item.permissionKey && currentUser?.permissions) {
+    if (item.permissionKey && (currentUser as any)?.permissions) {
       const userPermissions = typeof currentUser.permissions === 'string'
         ? (() => { try { return JSON.parse(currentUser.permissions); } catch { return null; } })()
         : currentUser.permissions;
@@ -204,8 +204,8 @@ export function Sidebar() {
         <Link href="/dashboard" className="flex items-center gap-3 group min-w-0">
           <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-105 transition-transform flex-shrink-0 overflow-hidden p-0.5">
             <Image
-              src="/logo.png"
-              alt="MS Management Logo"
+              src={(currentUser as any)?.companyLogo || "/logo.png"}
+              alt={((currentUser as any)?.companyName || "MS Management") + " Logo"}
               width={40}
               height={40}
               className="w-full h-full object-contain"
@@ -327,11 +327,11 @@ export function Sidebar() {
           className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
         >
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 border-2 border-white/20 flex-shrink-0 flex items-center justify-center text-white font-bold text-xs">
-            {currentUser?.name?.charAt(0) ?? 'A'}
+            {(currentUser as any)?.name?.charAt(0) ?? 'A'}
           </div>
           <div className="hidden lg:block overflow-hidden flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{currentUser?.name ?? 'Admin'}</p>
-            <p className="text-[9px] text-white/40 truncate font-medium">{currentUser?.company}</p>
+            <p className="text-xs font-bold text-white truncate">{(currentUser as any)?.name ?? 'Admin'}</p>
+            <p className="text-[9px] text-white/40 truncate font-medium">{(currentUser as any)?.company}</p>
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); logout(); router.push('/login'); }}
@@ -355,14 +355,14 @@ export function Sidebar() {
                 Change Your Password
               </DialogTitle>
               <DialogDescription className="text-xs text-slate-400">
-                Logged in as <strong>{currentUser?.name}</strong> ({currentUser?.role})
+                Logged in as <strong>{(currentUser as any)?.name}</strong> ({(currentUser as any)?.role})
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-3 pt-2">
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email Address</Label>
-                <Input disabled value={currentUser?.email || ""} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 cursor-not-allowed" />
+                <Input disabled value={(currentUser as any)?.email || ""} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 cursor-not-allowed" />
               </div>
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New Password</Label>

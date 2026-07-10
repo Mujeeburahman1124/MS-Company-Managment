@@ -66,7 +66,7 @@ export default function PrintableAgreement({ placement }: { placement: Placement
       {/* HEADER (Appears at top of page 1 naturally, standard A4 layout) */}
       <div className="flex justify-between items-end border-b-2 border-slate-800 pb-4 mb-8">
         <div>
-          <img src="/logo.png" alt="MS Horizon F.Z.E" className="header-logo" onError={(e) => e.currentTarget.style.display='none'} />
+          <img src={(typeof window !== "undefined" && (JSON.parse(localStorage.getItem("auth-storage") || "{}")?.state?.currentUser?.companyLogo)) || "/logo.png"} alt="MS Horizon F.Z.E" className="header-logo" onError={(e) => e.currentTarget.style.display='none'} />
           <h2 className="text-2xl font-black text-slate-800 mt-2">MS HORIZON F.Z.E</h2>
           <p className="text-sm text-slate-600">Professional Recruitment Services</p>
           <p className="text-sm text-slate-600">www.mshorizon.ae | info@mshorizon.ae</p>
