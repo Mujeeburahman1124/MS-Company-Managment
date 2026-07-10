@@ -149,7 +149,7 @@ export default function LeavePage() {
     : staff.filter(s => s.company.trim().toLowerCase() === currentUser.company.trim().toLowerCase());
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader title="Leave Requests" subtitle="Manage and approve staff leave applications"
         actions={
           <div className="flex gap-2">

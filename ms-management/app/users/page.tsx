@@ -318,7 +318,7 @@ export default function UsersPage() {
     : branches.filter(b => b.company === currentUser.company && (currentUser.branch === "All" || b.name === currentUser.branch));
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader title="User Management" subtitle="Manage system users, roles, and access levels"
         actions={canCreateUsers ? (
           <Button onClick={() => { setEditUser(null); setForm({ name:"", email:"", mobile:"", whatsapp:"", role:"Recruiter", company:currentUser.company, branch: currentRole === "Branch Admin" ? currentUser.branch : "", photo: null, status: "Active", department: "", designation: "", shiftId: "", basicSalary: 0, allowances: 0, deductions: 0, permissions: null }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>Add User</Button>

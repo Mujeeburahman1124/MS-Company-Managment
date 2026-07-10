@@ -156,7 +156,7 @@ export default function StaffRequestsPage() {
     : staff.filter(s => s.company.trim().toLowerCase() === currentUser.company.trim().toLowerCase());
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader title="Staff Requests" subtitle="Process advances, complaints, loans, and general requests"
         actions={<Button onClick={handleOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>New Request</Button>}
       />

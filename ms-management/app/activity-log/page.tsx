@@ -57,7 +57,7 @@ export default function ActivityLogPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader title="Activity Logs" subtitle="Audit trail of all system actions and user events"
         actions={
           isSuperAdmin ? (

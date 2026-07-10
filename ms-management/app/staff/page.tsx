@@ -81,7 +81,7 @@ export default function StaffPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       <PageHeader
         title="Staff Management"
         subtitle="Manage all onboarded employees and their profiles"

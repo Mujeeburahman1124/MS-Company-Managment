@@ -692,7 +692,7 @@ export default function TrackingPage() {
 
       {viewMode === "grid" ? (
         /* Kanban Board Container */
-        <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-hidden bg-slate-50/50">
+        <div className="flex-1 p-4 md:p-6 overflow-x-auto overflow-y-auto bg-slate-50/50">
           <div className="flex gap-4 h-full min-w-max pb-4">
             {(statusFilter === "all" ? STAGES : STAGES.filter(s => s === statusFilter)).map(stage => {
               const stageApplicants = filteredList.filter(a => a.status === stage);
