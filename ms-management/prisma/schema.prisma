@@ -310,32 +310,100 @@ model Placement {
   id                 String   @id @default(cuid())
   applicantId        String
   applicantName      String
-  companyId          String
+  companyId          String?
   companyName        String
-  position           String
-  salary             Float
-  placementDate      String
-  status             String   // "Placed" | "Trial" | "Terminated" | "Resigned"
+
+  // Placement Details (Internal mapping)
   company            String
   branch             String
   createdAt          String
+  createdBy          String?
+  status             String   // "Placed" | "Trial" | "Terminated" | "Resigned"
+
+  // Applicant Snapshot Details
+  passportNumber     String?  @default("")
+  nationality        String?  @default("")
+  mobileNumber       String?  @default("")
+  whatsappNumber     String?  @default("")
+  emailAddress       String?  @default("")
+  dateOfBirth        String?  @default("")
+  gender             String?  @default("")
+  currentAddress     String?  @default("")
+  currentCountry     String?  @default("")
+  registrationDate   String?  @default("")
+
+  // Client Company Details
+  clientTradeLicense String?  @default("")
+  clientAddress      String?  @default("")
+  clientCountry      String?  @default("")
+  clientContactPerson String? @default("")
+  clientContactNumber String? @default("")
+  clientEmail        String?  @default("")
+  clientLogo         String?  @default("")
+
+  // Employment Details
+  position           String
+  department         String?  @default("")
+  workLocation       String?  @default("")
+  city               String?  @default("")
+  joiningDate        String?  @default("")
+  contractDuration   String?  @default("")
+  probationPeriod    String?  @default("")
+  workingHours       String?  @default("")
+  weeklyOff          String?  @default("")
+  shiftDetails       String?  @default("")
+
+  // Salary & Benefits
+  salary             Float
+  currency           String?  @default("AED")
+  paymentFrequency   String?  @default("Monthly")
+  foodAllowance      String?  @default("")
+  accommodation      String?  @default("")
+  transportation     String?  @default("")
+  overtime           String?  @default("")
+  medicalInsurance   String?  @default("")
+  airTicket          String?  @default("")
+  annualLeave        String?  @default("")
+  otherBenefits      String?  @default("")
+
+  // Visa Process
+  visaStatus           String?  @default("")
+  placementVisaType    String?  @default("")
+  visaNumber           String?  @default("")
+  visaExpiryDate       String?  @default("")
+  visaProcessingStage  String?  @default("")
+  medicalStatus        String?  @default("")
+  emiratesIdStatus     String?  @default("")
+  labourContractStatus String?  @default("")
+  joiningStatus        String?  @default("")
+
+  // Placement Fee
+  registrationFee    Float?   @default(0)
+  placementFee       Float?   @default(0)
+  paymentStatus      String?  @default("Unpaid")
+  paymentMethod      String?  @default("")
+  receiptNumber      String?  @default("")
+  dueAmount          Float?   @default(0)
+  paidAmount         Float?   @default(0)
+  refundStatus       String?  @default("Not Applicable")
+
+  // Dates and Deadlines
+  placementDate      String
+  placementDeadline  String?  @default("")
+
+  // Notes
+  notes              String?  @db.Text
+
+  // Agreement and Signatures
   agreementStatus    String   @default("Pending")
-  applicantSign      String?  @default("")
-  companySign        String?  @default("")
+  applicantSign      String?  @db.Text
+  companySign        String?  @db.Text
   applicantSignDate  DateTime?
   applicantSignIp    String?
   applicantSignDevice String?
-  termsAndConditions String?  @default("")
+  termsAndConditions String?  @db.Text
   agreementHistory   Json?    
-  passportNumber     String?  @default("")
-  mobileNumber       String?  @default("")
-  registrationDate   String?  @default("")
-  placementDeadline  String?  @default("")
-  registrationFee    Float?   @default(0)
-  placementFee       Float?   @default(0)
-  refundStatus       String?  @default("Not Applicable")
   agreementAccepted  Boolean? @default(false)
-  notes              String?  @default("")
 }
 
 model Notification {

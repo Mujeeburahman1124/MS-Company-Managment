@@ -16,6 +16,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
 import TimelineItem from "@/components/shared/TimelineItem";
 import EmptyState from "@/components/shared/EmptyState";
+import CreatePlacementModal from "@/components/shared/CreatePlacementModal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -46,7 +47,8 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
   // Status transition state
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [targetStatus, setTargetStatus] = useState<Applicant["status"]>("Pending");
+  const [isCreatePlacementModalOpen, setIsCreatePlacementModalOpen] = useState(false);
+  const [targetStatus, setTargetStatus] = useState<string>("Pending");
   const [statusReason, setStatusReason] = useState("");
   const [placedCompany, setPlacedCompany] = useState("");
   const [placedDate, setPlacedDate] = useState("");
@@ -239,6 +241,48 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
   }
 
   // Handle status update change
+  const handleCreatePlacementSubmit = async (placementData: any) => {
+    try {
+      const statusRes = await fetch(`/api/applicants/${applicant.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "Placed",
+          clientName: placementData.companyName,
+          statusHistoryItem: {
+            oldStatus: applicant.status,
+            newStatus: "Placed",
+            changedBy: "Admin" || "Unknown",
+            date: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            reason: `Placed with company: ${placementData.companyName} on ${placementData.placementDate}`
+          }
+        })
+      });
+      if (!statusRes.ok) throw new Error("Failed to update applicant status");
+
+      const placeRes = await fetch("/api/placement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicantId: applicant.id,
+          applicantName: applicant.fullName,
+          companyId: "temp",
+          company: "MS Horizon F.Z.E" || "MS Horizon F.Z.E",
+          branch: "Dubai" || "Dubai",
+          ...placementData,
+          status: "Placed"
+        })
+      });
+      if (!placeRes.ok) throw new Error("Failed to create placement record");
+
+      toast.success("Placement generated successfully!");
+      router.refresh();
+      setIsCreatePlacementModalOpen(false);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to process placement");
+    }
+  };
+
   const handleStatusChangeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -247,8 +291,9 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
       return;
     }
 
-    if (targetStatus === "Placed" && (!placedCompany || !placedDate)) {
-      toast.error("Please specify both the Placed Company and the Placement Date.");
+    if (targetStatus === "Placed") {
+      setIsStatusModalOpen(false);
+      setIsCreatePlacementModalOpen(true);
       return;
     }
 
@@ -1405,6 +1450,13 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
         </DialogContent>
       </Dialog>
 
+      <CreatePlacementModal 
+        isOpen={isCreatePlacementModalOpen} 
+        onClose={() => setIsCreatePlacementModalOpen(false)} 
+        applicant={applicant} 
+        onSubmitSuccess={handleCreatePlacementSubmit} 
+      />
+
       {/* MODAL: CHANGE STATUS */}
       <Dialog open={isStatusModalOpen} onOpenChange={setIsStatusModalOpen}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-md">
@@ -1450,37 +1502,7 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
                 </div>
               )}
 
-              {/* Conditional: Placed */}
-              {targetStatus === "Placed" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <div className="space-y-1">
-                    <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      Placed Company <span className="text-rose-500">*</span>
-                    </Label>
-                    <select
-                      className="w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400"
-                      value={placedCompany}
-                      onChange={(e) => setPlacedCompany(e.target.value)}
-                    >
-                      <option value="">Select Company</option>
-                      {companies.map((c: { id: string; name: string }) => (
-                        <option key={c.id} value={c.name}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      Placement Date <span className="text-rose-500">*</span>
-                    </Label>
-                    <Input
-                      type="date"
-                      value={placedDate}
-                      onChange={(e) => setPlacedDate(e.target.value)}
-                      className="bg-white border-slate-200 rounded-xl text-xs h-10 focus:border-blue-400"
-                    />
-                  </div>
-                </div>
-              )}
+
 
               {/* Conditional: Rejected / Returned */}
               {(targetStatus === "Rejected" || targetStatus === "Returned") && (

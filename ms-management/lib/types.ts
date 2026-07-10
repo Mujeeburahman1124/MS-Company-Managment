@@ -393,10 +393,89 @@ export interface Placement {
   applicantId: string;
   companyName: string;
   companyId?: string;
+  
+  // Placement Details
+  company?: string;
+  branch?: string;
+  createdAt: string;
+  createdBy?: string;
+  status: "Registered" | "Interviews" | "Placed" | "Expired" | "Withdrawn" | "Terminated" | "Active" | "Completed" | "Trial" | "Resigned";
+
+  // Applicant Snapshot Details
+  passportNumber?: string;
+  nationality?: string;
+  mobileNumber?: string;
+  whatsappNumber?: string;
+  emailAddress?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  currentAddress?: string;
+  currentCountry?: string;
+  registrationDate?: string;
+
+  // Client Company Details
+  clientTradeLicense?: string;
+  clientAddress?: string;
+  clientCountry?: string;
+  clientContactPerson?: string;
+  clientContactNumber?: string;
+  clientEmail?: string;
+  clientLogo?: string;
+
+  // Employment Details
   position: string;
-  placementDate: string;
+  department?: string;
+  workLocation?: string;
+  city?: string;
+  joiningDate?: string;
+  contractDuration?: string;
+  probationPeriod?: string;
+  workingHours?: string;
+  weeklyOff?: string;
+  shiftDetails?: string;
+
+  // Salary & Benefits
   salary: number;
-  status: "Registered" | "Interviews" | "Placed" | "Expired" | "Withdrawn" | "Terminated" | "Active" | "Completed";
+  currency?: string;
+  paymentFrequency?: string;
+  foodAllowance?: string;
+  accommodation?: string;
+  transportation?: string;
+  overtime?: string;
+  medicalInsurance?: string;
+  airTicket?: string;
+  annualLeave?: string;
+  otherBenefits?: string;
+
+  // Visa Process
+  visaStatus?: string;
+  placementVisaType?: string;
+  visaNumber?: string;
+  visaExpiryDate?: string;
+  visaProcessingStage?: string;
+  medicalStatus?: string;
+  emiratesIdStatus?: string;
+  labourContractStatus?: string;
+  joiningStatus?: string;
+
+  // Placement Fee
+  registrationFee?: number;
+  placementFee?: number;
+  paymentStatus?: string;
+  paymentMethod?: string;
+  receiptNumber?: string;
+  dueAmount?: number;
+  paidAmount?: number;
+  refundStatus?: "Not Applicable" | "Pending Review" | "Eligible" | "Refunded" | "Forfeited" | string;
+
+  // Dates and Deadlines
+  placementDate: string;
+  placementDeadline?: string;
+
+  // Notes
+  notes?: string;
+
+  // Agreement and Signatures
   agreementStatus: "Pending" | "Sent" | "Signed";
   applicantSign?: string;
   companySign?: string;
@@ -405,21 +484,7 @@ export interface Placement {
   applicantSignDevice?: string;
   termsAndConditions?: string;
   agreementHistory?: string[];
-  createdBy: string;
-  createdAt: string;
-  company?: string;
-  branch?: string;
-  
-  // MS Horizon F.Z.E Extensions
-  passportNumber?: string;
-  mobileNumber?: string;
-  registrationDate?: string;
-  placementDeadline?: string;
-  registrationFee?: number;
-  placementFee?: number;
-  refundStatus?: "Not Applicable" | "Pending Review" | "Eligible" | "Refunded" | "Forfeited";
   agreementAccepted?: boolean;
-  notes?: string;
 }
 
 export interface Notification {
