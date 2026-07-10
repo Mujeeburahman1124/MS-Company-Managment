@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { MobileDrawer } from "./MobileDrawer";
 import Breadcrumb from "./Breadcrumb";
 import BottomNav from "./BottomNav";
 import { Toaster } from "@/components/ui/sonner";
@@ -49,6 +50,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, checkSession, currentRole, currentUser, hasPermission } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const isPublicPage = PUBLIC_PATHS.some(p => pathname === p || pathname?.startsWith(p + "/"));
 
@@ -158,19 +160,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={cn("font-sans", "min-h-[100dvh] bg-background flex text-foreground antialiased overflow-hidden w-full")}>
+      {/* Mobile Drawer */}
+      <MobileDrawer isOpen={isMobileDrawerOpen} onClose={() => setIsMobileDrawerOpen(false)} />
+
       {/* Sidebar - Desktop / Tablet */}
       <Sidebar />
 
       {/* Main Panel Wrapper */}
       <div className="flex-1 flex flex-col md:pl-[70px] lg:pl-[260px] h-[100dvh] overflow-hidden relative transition-all duration-300">
         {/* Top Header */}
-        <Header />
+        <Header onMenuClick={() => setIsMobileDrawerOpen(true)} />
 
         {/* Dynamic Breadcrumbs */}
         <Breadcrumb />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto pb-32 md:pb-6 bg-transparent">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-32 md:pb-6 bg-transparent">
           {pageContent}
         </main>
 

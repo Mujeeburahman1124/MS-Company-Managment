@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
-export function Header() {
+export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const router = useRouter();
   const { currentUser, currentRole, notifications, logout } = useAuthStore();
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -65,16 +65,12 @@ export function Header() {
 
       {/* Hamburger Menu (Mobile) */}
       <div className="md:hidden">
-        <Sheet>
-          <SheetTrigger className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0">
-            <Menu className="w-5 h-5" />
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-[260px] bg-[#0A0F1C] border-none">
-            <div className="flex h-full [&>div]:flex [&>div]:w-full [&>div]:relative [&>div]:inset-auto [&>div]:border-none [&>div]:shadow-none">
-              <Sidebar />
-            </div>
-          </SheetContent>
-        </Sheet>
+        <button 
+          onClick={onMenuClick}
+          className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 flex-shrink-0"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Back button */}

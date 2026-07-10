@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Lock } from 'lucide-react';
 
-type NavItem = {
+export type NavItem = {
   name: string;
   href: string;
   icon: any;
@@ -33,14 +33,14 @@ type NavItem = {
   hiddenFor?: string[];
 };
 
-type NavGroup = {
+export type NavGroup = {
   label: string;
   items: NavItem[];
   /** if set, only these roles see the whole group */
   allowedRoles?: string[];
 };
 
-const NAV_GROUPS: NavGroup[] = [
+export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Core",
     items: [

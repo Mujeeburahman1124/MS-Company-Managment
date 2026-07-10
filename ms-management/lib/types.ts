@@ -243,6 +243,7 @@ export interface Task {
   notes?: string;
   attachmentName?: string;
   attachmentUrl?: string;
+  feedback?: string;
 }
 
 export interface Interview {

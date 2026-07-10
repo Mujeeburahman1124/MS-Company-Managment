@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, CheckSquare, Clock, CheckCircle2, XCircle, RefreshCw, Trash2, Filter, ArrowRightLeft, History, AlertTriangle, Send, UploadCloud } from "lucide-react";
+import { Plus, CheckSquare, Clock, CheckCircle2, XCircle, RefreshCw, Trash2, Filter, ArrowRightLeft, History, AlertTriangle, Send, UploadCloud, Paperclip, FileText } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useFilterStore } from "@/store/filterStore";
 import { formatDate, exportToCSV, cn } from "@/lib/utils";
@@ -275,27 +275,47 @@ export default function TasksPage() {
         history 
       };
 
-      if (editTask.status === "Completed") {
+      let currentFeedback = editTask.feedback ? JSON.parse(editTask.feedback) : { comments: "", proofs: [] };
+      
+      if (uploadedProofFiles.length > 0) {
          const proofNames = uploadedProofFiles.map(f => f.name).join(", ");
          const proofData = uploadedProofFiles.map(f => ({ name: f.name, url: `/uploads/${f.name}`, date: now, by: currentUser.name }));
-         const feedbackObj = { comments: completionComments, proofs: proofData };
-         updatedTask.history.push({ action: "Status: Completed", date: now, by: currentUser.name, note: `Uploaded Proofs: ${proofNames}${completionComments ? ` | Comments: ${completionComments}` : ''}` });
-         (updatedTask as any).completedAt = now;
-         (updatedTask as any).feedback = JSON.stringify(feedbackObj);
+         currentFeedback.proofs = [...(currentFeedback.proofs || []), ...proofData];
+         updatedTask.history.push({ action: "Attached Files", date: now, by: currentUser.name, note: `Uploaded Documents: ${proofNames}` });
       }
+      
+      if (editTask.status === "Completed") {
+         if (completionComments) {
+           currentFeedback.comments = completionComments;
+           updatedTask.history.push({ action: "Status: Completed", date: now, by: currentUser.name, note: `Comments: ${completionComments}` });
+         } else if (editTask.status !== "Completed") {
+           updatedTask.history.push({ action: "Status: Completed", date: now, by: currentUser.name });
+         }
+         (updatedTask as any).completedAt = now;
+      }
+      
+      (updatedTask as any).feedback = JSON.stringify(currentFeedback);
 
       updateTask(updatedTask);
       toast.success("Task updated");
     } else {
       const id = `TSK-${Math.floor(100+Math.random()*900)}`;
-      const history = [{ action: "Created", date: now, by: currentUser.name, note: `Assigned to ${form.assignedTo}` }];
+      const history = [{ action: "Created", date: now, by: currentUser.name, note: `Assigned to ${form.assignedTo}` }];      let newFeedback = { comments: "", proofs: [] as any[] };
+      if (uploadedProofFiles.length > 0) {
+         const proofNames = uploadedProofFiles.map(f => f.name).join(", ");
+         const proofData = uploadedProofFiles.map(f => ({ name: f.name, url: `/uploads/${f.name}`, date: now, by: currentUser.name }));
+         newFeedback.proofs = proofData;
+         history.push({ action: "Attached Files", date: now, by: currentUser.name, note: `Uploaded Documents: ${proofNames}` });
+      }
+
       addTask({ 
         ...form, 
         assignedTo: form.assignedTo ?? "",
         id, 
         deadline: formattedDeadline,
         assignedDate: formattedAssignedDate,
-        assignedToId: assignedStaff?.id || "", 
+        assignedToId: assignedStaff?.id || "",
+        assignedToRole: assignedStaff?.role || null,
         applicantId: form.applicantId || undefined,
         applicantName: form.applicantName || undefined,
         targetDocument: form.targetDocument || undefined,
@@ -304,7 +324,8 @@ export default function TasksPage() {
         company: taskCompany, 
         branch: taskBranch, 
         createdBy: currentUser.name, 
-        createdAt: now 
+        createdAt: now,
+        feedback: JSON.stringify(newFeedback)
       });
       addActivityLog({ id: `LOG-${Date.now()}`, dateTime: now, userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Created", module: "Tasks", oldValue: null, newValue: `Created task: ${form.title} for ${taskCompany}`, ipAddress: "192.168.1.102" });
       toast.success(`Task "${form.title}" created`);
@@ -850,46 +871,67 @@ export default function TasksPage() {
                 </div>
               )}
 
-              {/* Completion Proof Upload */}
-              {editTask && editTask.status === "Completed" && (
-                <div className="space-y-2 mt-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                  <Label className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Upload Completion Proof Documents</Label>
-                  <p className="text-[9px] text-emerald-600 mb-2">Attach multiple files as proof of task completion.</p>
-                  <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-emerald-200 border-dashed rounded-xl cursor-pointer bg-white hover:bg-emerald-50 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <UploadCloud className="w-6 h-6 text-emerald-500 mb-2" />
-                        <p className="text-xs text-emerald-600"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                      </div>
-                      <input type="file" multiple className="hidden" onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        setUploadedProofFiles(files);
-                        toast.success(`Selected ${files.length} documents for upload.`);
-                      }} />
-                    </label>
-                  </div>
-                  {uploadedProofFiles.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {uploadedProofFiles.map((f, i) => (
-                        <div key={i} className="text-[10px] text-emerald-700 bg-emerald-100/50 px-2 py-1 rounded flex justify-between items-center">
-                          <span className="truncate">{f.name}</span>
-                          <button type="button" onClick={() => setUploadedProofFiles(prev => prev.filter((_, idx) => idx !== i))} className="text-emerald-500 hover:text-rose-500 font-bold">✕</button>
+              {/* Universal Attachment / Proof Upload */}
+              <div className="space-y-2 mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <Label className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">Task Attachments & Proofs</Label>
+                <p className="text-[9px] text-slate-500 mb-2">Upload any documents or proofs related to this task.</p>
+                
+                {editTask?.feedback && (() => {
+                  try {
+                    const fb = JSON.parse(editTask.feedback);
+                    if (fb.proofs && fb.proofs.length > 0) {
+                      return (
+                        <div className="mb-3 space-y-1 bg-white p-2 rounded-xl border border-slate-200">
+                          {fb.proofs.map((p: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center text-xs px-2 py-1.5 rounded hover:bg-slate-50">
+                              <span className="truncate flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-blue-500"/> {p.name}</span>
+                              <a href={p.url} download target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:underline">Download</a>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      );
+                    }
+                  } catch(e) {}
+                  return null;
+                })()}
+
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-slate-200 border-dashed rounded-xl cursor-pointer bg-white hover:bg-slate-100 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <UploadCloud className="w-6 h-6 text-slate-400 mb-2" />
+                      <p className="text-xs text-slate-600"><span className="font-semibold">Click to attach files</span> or drag and drop</p>
                     </div>
-                  )}
+                    <input type="file" multiple className="hidden" onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      setUploadedProofFiles(prev => [...prev, ...files]);
+                      toast.success(`Attached ${files.length} document(s).`);
+                    }} />
+                  </label>
+                </div>
+
+                {uploadedProofFiles.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {uploadedProofFiles.map((f, i) => (
+                      <div key={i} className="text-[10px] text-slate-700 bg-white border border-slate-200 px-2 py-1 rounded flex justify-between items-center">
+                        <span className="truncate">{f.name}</span>
+                        <button type="button" onClick={() => setUploadedProofFiles(prev => prev.filter((_, idx) => idx !== i))} className="text-slate-400 hover:text-rose-500 font-bold">✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {editTask?.status === "Completed" && (
                   <div className="mt-3">
-                    <Label className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Comments</Label>
+                    <Label className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">Completion Comments</Label>
                     <textarea
                       rows={2}
                       value={completionComments}
                       onChange={e => setCompletionComments(e.target.value)}
                       placeholder="Add any final notes or comments about this task..."
-                      className="w-full mt-1 bg-white border border-emerald-200 rounded-xl text-xs p-2 outline-none focus:border-emerald-400 resize-none text-slate-700"
+                      className="w-full mt-1 bg-white border border-slate-200 rounded-xl text-xs p-2 outline-none focus:border-blue-400 resize-none text-slate-700"
                     />
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
             <DialogFooter className="flex gap-2 justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <Button type="button" variant="ghost" onClick={() => setModal(false)} className="text-xs rounded-xl px-4">Cancel</Button>
@@ -959,6 +1001,29 @@ export default function TasksPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 space-y-4">
+            {historyTask?.feedback && (() => {
+                 try {
+                   const fb = JSON.parse(historyTask.feedback);
+                   if (fb.proofs && fb.proofs.length > 0) {
+                      return (
+                         <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-4 shadow-sm">
+                           <div className="text-xs font-bold text-slate-800 mb-2 flex items-center gap-2"><Paperclip className="w-4 h-4 text-slate-500"/> Task Attachments</div>
+                           <div className="space-y-1.5">
+                             {fb.proofs.map((p: any, idx: number) => (
+                               <a key={idx} href={p.url} download target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-blue-700 bg-white hover:bg-blue-50 p-2 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                                 <FileText className="w-4 h-4 text-blue-500"/>
+                                 <span className="truncate flex-1 font-semibold">{p.name}</span>
+                                 <span className="text-[9px] text-slate-400 font-medium">by {p.by}</span>
+                               </a>
+                             ))}
+                           </div>
+                         </div>
+                      );
+                   }
+                 } catch(e) {}
+                 return null;
+            })()}
+
             {!historyTask?.history || historyTask.history.length === 0 ? (
               <div className="text-center py-6 text-sm text-slate-400 italic bg-slate-50 rounded-2xl border border-slate-100">
                 No recorded history events yet.
