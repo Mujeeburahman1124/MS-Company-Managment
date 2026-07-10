@@ -178,6 +178,8 @@ model Applicant {
   clientWhatsapp     String?
   clientEmail        String?
   memberActive       Boolean? @default(false)
+  gender             String?  @default("")
+  currentAddress     String?  @default("")
 }
 
 model Task {

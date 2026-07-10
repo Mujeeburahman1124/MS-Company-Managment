@@ -60,6 +60,8 @@ export interface Applicant {
   clientWhatsapp?: string;
   clientEmail?: string;
   memberActive?: boolean;
+  gender?: string | null;
+  currentAddress?: string | null;
 }
 
 export interface Staff {
