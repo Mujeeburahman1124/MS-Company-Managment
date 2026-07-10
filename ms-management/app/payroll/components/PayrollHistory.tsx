@@ -470,7 +470,7 @@ export default function PayrollHistory() {
                 </div>
               </div>
 
-              <div className="p-8 overflow-y-auto" id="printable-payslip">
+              <div className="p-8 overflow-y-auto flex-1 min-h-0" id="printable-payslip">
                 <div className="flex justify-between items-start mb-8">
                   <div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight">{viewPayslip.company}</h1>
