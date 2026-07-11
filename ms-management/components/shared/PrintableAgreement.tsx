@@ -302,6 +302,7 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
                   <div><div className="info-label">Probation Period</div><div className="info-value">{placement.probationPeriod || "N/A"}</div></div>
                   <div><div className="info-label">Working Hours / Days</div><div className="info-value">{placement.workingHours || "N/A"}</div></div>
                   <div><div className="info-label">Weekly Off</div><div className="info-value">{placement.weeklyOff || "N/A"}</div></div>
+                  <div><div className="info-label">Shift Timing</div><div className="info-value">{placement.shiftDetails || "N/A"}</div></div>
                 </div>
               </div>
 

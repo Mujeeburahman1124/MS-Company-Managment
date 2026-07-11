@@ -260,7 +260,8 @@ export default function PlacementPage() {
     termsAndConditions: DEFAULT_TERMS,
     // refund rules
     reason: "",
-    collected: false
+    collected: false,
+    shiftDetails: ""
   });
 
   // Automatically update deadline when registration date changes in wizard
@@ -517,7 +518,8 @@ export default function PlacementPage() {
       notes: "",
       termsAndConditions: p.termsAndConditions || DEFAULT_TERMS,
       reason: "",
-      collected: p.status === "Placed"
+      collected: p.status === "Placed",
+      shiftDetails: p.shiftDetails || ""
     });
   };
 
@@ -548,6 +550,7 @@ export default function PlacementPage() {
       updated.placementDate = editForm.placementDate;
       updated.salary = editForm.salary;
       updated.position = editForm.position;
+      updated.shiftDetails = editForm.shiftDetails;
       updated.status = "Placed";
       
       const feeNote = editForm.collected 
@@ -1430,6 +1433,20 @@ export default function PlacementPage() {
                         onChange={e => setEditForm(f => ({ ...f, placementDate: e.target.value }))}
                         className="bg-white border-slate-200 rounded-xl text-xs h-9" 
                       />
+                    </div>
+
+                    <div className="space-y-1 col-span-2">
+                      <Label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Shift Timing</Label>
+                      <select 
+                        value={editForm.shiftDetails} 
+                        onChange={e => setEditForm(f => ({ ...f, shiftDetails: e.target.value }))}
+                        className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 outline-none focus:border-blue-400 font-semibold text-slate-700"
+                      >
+                        <option value="">Select Shift</option>
+                        <option value="Morning Shift (07:30 AM - 05:30 PM Dubai / 09:00 AM - 07:00 PM Sri Lanka)">Morning Shift (07:30 AM - 05:30 PM Dubai / 09:00 AM - 07:00 PM Sri Lanka)</option>
+                        <option value="Morning Shift (08:30 AM - 06:30 PM Dubai / 10:00 AM - 08:00 PM Sri Lanka)">Morning Shift (08:30 AM - 06:30 PM Dubai / 10:00 AM - 08:00 PM Sri Lanka)</option>
+                        <option value="Night Shift (05:00 PM - 02:00 AM Dubai / 06:30 PM - 03:30 AM Sri Lanka)">Night Shift (05:00 PM - 02:00 AM Dubai / 06:30 PM - 03:30 AM Sri Lanka)</option>
+                      </select>
                     </div>
 
                     {/* Checkbox to record placement fee collection */}
