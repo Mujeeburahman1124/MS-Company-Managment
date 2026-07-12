@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import prisma from "./prisma";
 import { verifyToken } from "./jwt";
+import { getPermissionModuleName } from "./constants";
 
 export interface SessionUser {
   id: string;
@@ -90,3 +91,64 @@ export function getTenantScopeFilter(user: SessionUser, companyField = "company"
   
   return filter;
 }
+
+/**
+ * Validates module permissions for a session user on the backend API
+ */
+export async function hasPermissionBackend(user: SessionUser, moduleKey: string, action: string): Promise<boolean> {
+  // 1. Fetch user custom permissions override from DB
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id }
+  });
+  
+  if (dbUser && dbUser.permissions) {
+    const userPermissions = typeof dbUser.permissions === "string"
+      ? (() => { try { return JSON.parse(dbUser.permissions); } catch { return null; } })()
+      : (dbUser.permissions as any);
+      
+    if (userPermissions) {
+      const permissionModule = getPermissionModuleName(moduleKey);
+      if (permissionModule) {
+        const matrix = userPermissions.matrix || userPermissions;
+        if (matrix[permissionModule] !== undefined && matrix[permissionModule] !== null) {
+          const modulePerms = matrix[permissionModule];
+          if (modulePerms && modulePerms[action] !== undefined) {
+            return Boolean(modulePerms[action]);
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Fetch role permissions from DB
+  const role = await prisma.role.findFirst({
+    where: { name: user.role }
+  });
+
+  const permissionModule = getPermissionModuleName(moduleKey);
+  if (role && permissionModule) {
+    const permissions = role.permissions ? (
+      typeof role.permissions === "string" 
+        ? (() => { try { return JSON.parse(role.permissions); } catch { return null; } })()
+        : (role.permissions as any)
+    ) : null;
+    
+    if (permissions && permissions[permissionModule] !== undefined && permissions[permissionModule] !== null) {
+      const modulePerms = permissions[permissionModule];
+      if (modulePerms && modulePerms[action] !== undefined) {
+        return Boolean(modulePerms[action]);
+      }
+    }
+  }
+
+  // 3. Fallback for Super Admin (general CRUD is allowed, but approve/reject/assign must be explicit)
+  if (user.role === "Super Admin") {
+    if (["approve", "reject", "assign"].includes(action)) {
+      return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+

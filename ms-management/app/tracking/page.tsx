@@ -21,6 +21,7 @@ import { Applicant } from "@/lib/types";
 import { toast } from "sonner";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function TrackingPage() {
   const {
@@ -34,8 +35,14 @@ export default function TrackingPage() {
     ownCompanies,
     companies,
     branches,
-    staff
+    staff,
+    hasPermission
   } = useAuthStore();
+
+  const canView = hasPermission("tracking", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
 
   const { filters, setFilter, clearFilter } = useFilterStore();
   const f = filters.tracking || {};

@@ -14,6 +14,7 @@ import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
 import { SearchIcon, InfoIcon, FileTextIcon, PhoneIcon, MailIcon, MapPinIcon } from "lucide-react";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 type VisaRecord = {
   id: string;
@@ -31,7 +32,12 @@ type VisaRecord = {
 };
 
 export default function VisaExpiryPage() {
-  const { currentRole, currentUser, staff, applicants, addActivityLog, companies, addSentEmail } = useAuthStore();
+  const { currentRole, currentUser, staff, applicants, addActivityLog, companies, addSentEmail, hasPermission } = useAuthStore();
+
+  const canView = hasPermission("visaExpiry", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [reminders, setReminders] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("All");

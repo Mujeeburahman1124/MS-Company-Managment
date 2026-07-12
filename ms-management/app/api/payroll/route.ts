@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend } from "@/lib/auth-helpers";
 
 export async function GET() {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "payroll", "view"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const filter = getTenantScopeFilter(user, "company", "branch");
@@ -35,9 +39,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only Accountant, HR, Company Admin, and Super Admin can manage payroll
-    if (user.role === "Staff" || user.role === "Recruiter") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Permission check
+    if (!(await hasPermissionBackend(user, "payroll", "create"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

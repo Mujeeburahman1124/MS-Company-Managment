@@ -233,6 +233,11 @@ model Interview {
   status            String   // Status of meeting
   company           String   @default("MS COMPANY")
   branch            String   @default("UAE")
+  scheduledBy       String?  @default("")
+  interviewResult   String?  @default("")
+  feedback          String?  @db.Text @default("")
+  remarks           String?  @db.Text @default("")
+  candidateResponse String?  @default("")
 }
 
 model LeaveRequest {

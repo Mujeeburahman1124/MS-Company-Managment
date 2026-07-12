@@ -17,10 +17,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function MembersPage() {
-  const { currentRole, currentUser, applicants, updateApplicant, addActivityLog, companies, branches } = useAuthStore();
+  const { currentRole, currentUser, applicants, updateApplicant, addActivityLog, companies, branches, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canView = hasPermission("members", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [search, setSearch] = useState("");
   const [historyMember, setHistoryMember] = useState<any | null>(null);
 

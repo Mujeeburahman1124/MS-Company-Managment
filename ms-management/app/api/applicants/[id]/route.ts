@@ -248,6 +248,24 @@ export async function PUT(request: Request, { params }: RouteParams) {
       } else if (!["Interview Scheduled", "Placed", "Selected", "Visa Processing"].includes(updated.status)) {
         const companyName = updated.company && updated.company !== "Not Placed" ? updated.company : "MS Human Resource Consultancies";
         const positions = Array.isArray(updated.applyingPositions) ? updated.applyingPositions.join(", ") : updated.applyingPositions;
+        
+        let templateType = "System";
+        let subject = `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`;
+        
+        if (updated.status === "Approved") {
+          templateType = "Applicant_Approved";
+          subject = `Application Approved - Welcome to the Next Step!`;
+        } else if (updated.status === "Rejected") {
+          templateType = "Applicant_Rejected";
+          subject = `Application Update regarding your submission`;
+        } else if (updated.status === "Returned") {
+          templateType = "Applicant_Returned";
+          subject = `Action Required: Application Returned for Modification`;
+        } else if (updated.status === "Processing") {
+          templateType = "Applicant_Processing";
+          subject = `Application under Active Review`;
+        }
+
         const emailBody = `
           <p style="font-size: 14px; color: #334155; margin-bottom: 16px;">
             Please be informed that your application status has been updated to: <strong style="color: #2563eb;">${updated.status}</strong>.
@@ -277,17 +295,20 @@ export async function PUT(request: Request, { params }: RouteParams) {
         try {
           await sendEmail({
             to: updated.email,
-            subject: `Application Status Updated: ${updated.status} - Tracking Code: ${updated.trackingCode}`,
+            subject,
             body: emailBody,
             candidateName: updated.fullName,
             company: companyName,
             branch: updated.branch,
             type: "Status Update",
-            templateType: "System",
+            templateType,
             templateData: {
               recipientName: updated.fullName,
               body: emailBody,
-              actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+              actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`,
+              trackingCode: updated.trackingCode,
+              status: updated.status,
+              positions
             }
           });
         } catch (err) {
@@ -356,6 +377,34 @@ export async function PUT(request: Request, { params }: RouteParams) {
         });
       } catch (err) {
         console.error("Async status update WhatsApp error:", err);
+      }
+    }
+
+    if (data.status && data.status !== existing.status) {
+      try {
+        const notificationUsers = await prisma.user.findMany({
+          where: {
+            company: updated.company,
+            role: { in: ["Super Admin", "Company Admin", "Branch Admin", "HR Manager", "HR", "Recruiter"] }
+          }
+        });
+        
+        for (const targetUser of notificationUsers) {
+          await prisma.notification.create({
+            data: {
+              title: "Applicant Status Updated",
+              message: `Applicant ${updated.fullName}'s status updated to: ${updated.status}. Track code: ${updated.trackingCode}`,
+              type: "Applicant",
+              userId: targetUser.id,
+              company: updated.company,
+              branch: updated.branch,
+              link: "/applicants",
+              createdAt: new Date().toISOString()
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Failed to trigger update notifications:", err);
       }
     }
 

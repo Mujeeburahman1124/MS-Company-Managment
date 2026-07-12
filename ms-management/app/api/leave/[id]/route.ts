@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 type RouteParams = {
@@ -28,6 +28,21 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // Tenancy Check scoping
     if (user.role !== "Super Admin" && existing.company !== user.company) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Permission Check
+    if (data.status === "Approved") {
+      if (!(await hasPermissionBackend(user, "leave", "approve"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
+    } else if (data.status === "Rejected") {
+      if (!(await hasPermissionBackend(user, "leave", "reject"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
+    } else {
+      if (!(await hasPermissionBackend(user, "leave", "edit"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
     }
 
     // Map input fields from frontend keys to DB fields
@@ -247,6 +262,10 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     // Tenancy Check scoping
     if (user.role !== "Super Admin" && existing.company !== user.company) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (!(await hasPermissionBackend(user, "leave", "delete"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     await prisma.leaveRequest.delete({

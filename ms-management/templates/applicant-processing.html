@@ -1,0 +1,48 @@
+{{> header companyPrimaryColor="#3b82f6" bannerBg="#eff6ff" bannerBorder="#dbeafe" bannerColor="#1d4ed8" bannerIcon="⏳" bannerText="APPLICATION UNDER REVIEW"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #1d4ed8; font-size: 16px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Hello {{recipientName}},
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      This email is to notify you that your application profile is now under active review and is currently being processed by <strong>{{companyName}}</strong> recruitment consultants.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #eff6ff; border-radius: 12px; border: 1px solid #dbeafe; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Review Status:</strong><br/>
+            • <strong>Tracking Code:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; color: #1d4ed8;">{{trackingCode}}</span><br/>
+            • <strong>Applied Position:</strong> {{positions}}<br/>
+            • <strong>Current Stage:</strong> Processing (HR Assessment)
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.5; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      We are matching your credentials with active openings in client companies. We will contact you once an interview is lined up.
+    </td>
+  </tr>
+  {{#if actionLink}}
+  <tr>
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+        <tr>
+          <td align="center" style="background-color: #3b82f6; border-radius: 8px;">
+            <a href="{{actionLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
+              Track My Progress
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</table>
+{{> footer}}

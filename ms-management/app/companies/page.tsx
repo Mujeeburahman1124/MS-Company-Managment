@@ -6,6 +6,7 @@ import { Plus, Building2, MapPin, Users, Phone, Mail, Trash2, Eye, FileText, Upl
 import { useAuthStore } from "@/store/authStore";
 import { useFilterStore } from "@/store/filterStore";
 import { getStatusColor, exportToCSV } from "@/lib/utils";
+import AccessDenied from "@/components/shared/AccessDenied";
 import PageHeader from "@/components/shared/PageHeader";
 import FilterBar from "@/components/shared/FilterBar";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -22,8 +23,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 export default function CompaniesPage() {
-  const { currentRole, currentUser, companies, branches, addCompany, updateCompany, deleteCompany, addActivityLog } = useAuthStore();
+  const { currentRole, currentUser, companies, branches, addCompany, updateCompany, deleteCompany, addActivityLog, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canViewCompanies = hasPermission("companies", "view");
+  if (!canViewCompanies) {
+    return <AccessDenied />;
+  }
   const [addModal, setAddModal] = useState(false);
   const [editCompany, setEditCompany] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);

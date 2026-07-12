@@ -277,6 +277,11 @@ export interface Interview {
   branch: string;
   createdBy: string;
   createdAt: string;
+  scheduledBy?: string;
+  interviewResult?: string;
+  feedback?: string;
+  remarks?: string;
+  candidateResponse?: string;
 }
 
 export interface LeaveRequest {

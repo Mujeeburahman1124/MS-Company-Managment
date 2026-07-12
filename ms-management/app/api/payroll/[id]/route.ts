@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -13,8 +13,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role === "Staff" || user.role === "Recruiter") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (data.status === "Approved") {
+      if (!(await hasPermissionBackend(user, "payroll", "approve"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
+    } else {
+      if (!(await hasPermissionBackend(user, "payroll", "edit"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
     }
 
     const { id } = await params;
@@ -112,8 +118,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role === "Staff" || user.role === "Recruiter") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasPermissionBackend(user, "payroll", "delete"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const { id } = await params;

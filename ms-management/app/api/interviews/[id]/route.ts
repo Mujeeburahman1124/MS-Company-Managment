@@ -75,6 +75,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (data.notes !== undefined) updatePayload.notes = data.notes;
     if (data.status !== undefined) updatePayload.status = data.status;
+    if (data.scheduledBy !== undefined) updatePayload.scheduledBy = data.scheduledBy;
+    if (data.interviewResult !== undefined) updatePayload.interviewResult = data.interviewResult;
+    if (data.feedback !== undefined) updatePayload.feedback = data.feedback;
+    if (data.remarks !== undefined) updatePayload.remarks = data.remarks;
+    if (data.candidateResponse !== undefined) updatePayload.candidateResponse = data.candidateResponse;
 
     // Support keeping a manual reason in notes or as part of the notification
     const updateReason = data.reason || "";
@@ -158,7 +163,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
       notes: updated.notes || undefined,
       status: updated.status,
       company: updated.company,
-      branch: updated.branch
+      branch: updated.branch,
+      scheduledBy: updated.scheduledBy || "",
+      interviewResult: updated.interviewResult || "",
+      feedback: updated.feedback || "",
+      remarks: updated.remarks || "",
+      candidateResponse: updated.candidateResponse || ""
     };
 
     // ── Determine what changed and notify ──────────────────────────────────

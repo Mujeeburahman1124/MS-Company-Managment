@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 // Normalize Prisma Task → frontend Task shape
@@ -22,6 +22,10 @@ export async function GET() {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "tasks", "view"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const filter = getTenantScopeFilter(user, "company", "branch");
@@ -48,6 +52,10 @@ export async function POST(request: Request) {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "tasks", "create")) && !(await hasPermissionBackend(user, "tasks", "assign"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

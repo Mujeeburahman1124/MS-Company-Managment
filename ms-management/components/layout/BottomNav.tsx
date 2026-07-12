@@ -127,11 +127,11 @@ export default function BottomNav() {
       )}
 
       {/* Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-40 px-1 shadow-lg safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around z-50 px-1 shadow-lg safe-area-bottom select-none touch-manipulation">
         {/* Back Button */}
         <button
           onClick={() => { setShowMore(false); router.back(); }}
-          className="flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600"
+          className="flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100"
         >
           <ChevronLeft className="w-5 h-5" />
           <span className="text-[9px] font-semibold mt-1 tracking-wide">Back</span>
@@ -142,7 +142,7 @@ export default function BottomNav() {
           href="/dashboard"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
             pathname === "/dashboard" && "text-blue-600"
           )}
         >
@@ -155,7 +155,7 @@ export default function BottomNav() {
           href="/notifications"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all relative text-slate-500 dark:text-slate-400 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all relative text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
             pathname?.startsWith("/notifications") && "text-blue-600"
           )}
         >
@@ -175,7 +175,7 @@ export default function BottomNav() {
           href="/profile"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
             pathname?.startsWith("/profile") && "text-blue-600"
           )}
         >
@@ -187,7 +187,7 @@ export default function BottomNav() {
         <button
           onClick={() => setShowMore(!showMore)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600",
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
             showMore && "text-blue-600"
           )}
         >

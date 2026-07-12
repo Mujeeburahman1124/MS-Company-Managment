@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import PageHeader from "@/components/shared/PageHeader";
+import AccessDenied from "@/components/shared/AccessDenied";
 import AttendanceDashboard from "./components/AttendanceDashboard";
 import AttendanceRecords from "./components/AttendanceRecords";
 import AttendanceCalendar from "./components/AttendanceCalendar";
@@ -25,7 +26,11 @@ const ALL_TABS = [
 ];
 
 function AttendanceContent() {
-  const { currentRole } = useAuthStore();
+  const { currentRole, hasPermission } = useAuthStore();
+  const canView = hasPermission("attendance", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [activeTab, setActiveTab] = useState("Dashboard");
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");

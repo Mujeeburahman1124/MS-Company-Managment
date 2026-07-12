@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { exportToCSV, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line, AreaChart, Area
@@ -39,8 +40,13 @@ const REPORT_TABS = [
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#64748b'];
 
 export default function ReportsPage() {
-  const { currentRole, currentUser, applicants, staff, companies, branches, tasks, interviews, vehicles, suppliers, payroll, activityLogs, leaveRequests, siteSettings, placements, staffAttendance } = useAuthStore();
+  const { currentRole, currentUser, applicants, staff, companies, branches, tasks, interviews, vehicles, suppliers, payroll, activityLogs, leaveRequests, siteSettings, placements, staffAttendance, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canView = hasPermission("reports", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [activeTab, setActiveTab] = useState("overview");
 
   const isSuperAdmin = currentRole === "Super Admin";

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -27,6 +27,18 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // Tenancy Check
     if (user.role !== "Super Admin" && existing.company !== user.company) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Permission Check
+    const isAssignmentChange = data.status === "Assigned" || data.status === "Returned" || data.assignedTo !== undefined;
+    if (isAssignmentChange) {
+      if (!(await hasPermissionBackend(user, "vehicles", "assign"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
+    } else {
+      if (!(await hasPermissionBackend(user, "vehicles", "edit"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
     }
 
     const updated = await prisma.vehicle.update({
@@ -85,6 +97,10 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     // Tenancy Check
     if (user.role !== "Super Admin" && existing.company !== user.company) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (!(await hasPermissionBackend(user, "vehicles", "delete"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     await prisma.vehicle.delete({

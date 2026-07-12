@@ -17,6 +17,7 @@ import {
 import { formatDate, cn } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 import {
   Dialog,
   DialogContent,
@@ -63,8 +64,13 @@ export default function NotificationsPage() {
   const { 
     currentRole, currentUser, notifications, markNotificationRead, 
     markAllNotificationsRead, sentEmails, sentWhatsApp, 
-    whatsappEnabled, toggleWhatsApp 
+    whatsappEnabled, toggleWhatsApp, hasPermission 
   } = useAuthStore();
+
+  const canView = hasPermission("notifications", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
 
   const [activeTab, setActiveTab] = useState<"dashboard" | "emails" | "whatsapp" | "settings">("dashboard");
   const [searchQuery, setSearchQuery] = useState("");

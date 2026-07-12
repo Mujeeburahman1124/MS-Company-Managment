@@ -1,0 +1,34 @@
+{{> header companyPrimaryColor="#0ea5e9" bannerBg="#f0f9ff" bannerBorder="#e0f2fe" bannerColor="#0369a1" bannerIcon="👤" bannerText="STAFF PROFILE UPDATED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #0369a1; font-size: 16px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Dear {{recipientName}},
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      This email is to confirm that your profile details on the <strong>{{companyName}}</strong> management system have been updated.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0f9ff; border-radius: 12px; border: 1px solid #e0f2fe; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Updated Details Info:</strong><br/>
+            • <strong>Name:</strong> {{recipientName}}<br/>
+            • <strong>Update Date:</strong> {{updateDate}}<br/>
+            • <strong>Company/Branch:</strong> {{companyName}} / {{branch}}<br/>
+            • <strong>Status:</strong> Active / Verified
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.5; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      If you did not perform or authorize this update, please contact the IT security support immediately.
+    </td>
+  </tr>
+</table>
+{{> footer}}

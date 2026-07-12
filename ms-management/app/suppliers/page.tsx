@@ -20,10 +20,16 @@ import { Label } from "@/components/ui/label";
 import { Supplier } from "@/lib/types";
 import { NATIONALITIES } from "@/lib/constants";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function SuppliersPage() {
-  const { currentRole, currentUser, suppliers, addSupplier, updateSupplier, deleteSupplier, addActivityLog } = useAuthStore();
+  const { currentRole, currentUser, suppliers, addSupplier, updateSupplier, deleteSupplier, addActivityLog, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canView = hasPermission("suppliers", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [modal, setModal] = useState(false);
   const [editSup, setEditSup] = useState<Supplier | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);

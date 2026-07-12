@@ -5,6 +5,7 @@ import { Plus, MapPin, Users, Phone, Mail, Trash2, Building2, FileText } from "l
 import { useAuthStore } from "@/store/authStore";
 import { useFilterStore } from "@/store/filterStore";
 import { exportToCSV } from "@/lib/utils";
+import AccessDenied from "@/components/shared/AccessDenied";
 import PageHeader from "@/components/shared/PageHeader";
 import FilterBar from "@/components/shared/FilterBar";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -36,7 +37,7 @@ export default function BranchesPage() {
   const canCreateBranches = hasPermission("branches", "create");
 
   if (!canViewBranches) {
-    return <div className="flex flex-col min-h-full"><PageHeader title="Branches" /><div className="p-12"><EmptyState title="Access Denied" description="You do not have permission to view branch information." /></div></div>;
+    return <AccessDenied />;
   }
 
   const allAvailableCompanies = [...companies, ...ownCompanies];

@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Placement } from "@/lib/types";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 // Always use the real current date for deadline calculations
 const CURRENT_DATE = new Date();
@@ -205,7 +206,12 @@ If the employer fails to pay salary, refuses visa processing, or violates UAE la
 By registering and making payment, the Applicant confirms that they have read, understood, and accepted all terms and conditions of this Agreement.`;
 
 export default function PlacementPage() {
-  const { placements, applicants, companies, addPlacement, updatePlacement, deletePlacement, currentUser, addNotification, addActivityLog } = useAuthStore();
+  const { placements, applicants, companies, addPlacement, updatePlacement, deletePlacement, currentUser, addNotification, addActivityLog, hasPermission } = useAuthStore();
+  
+  const canView = hasPermission("placement", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   
   // Dashboard & Navigation states
     const [activeTab, setActiveTab] = useState<"all" | "pipeline" | "refunds" | "placed">("all");

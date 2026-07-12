@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 type RouteParams = {
@@ -37,6 +37,23 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (isStaff && !isOwner) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Permission Check
+    if (!isStaff) {
+      if (data.status === "Approved") {
+        if (!(await hasPermissionBackend(user, "requests", "approve"))) {
+          return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+        }
+      } else if (data.status === "Rejected" || data.status === "Returned") {
+        if (!(await hasPermissionBackend(user, "requests", "reject"))) {
+          return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+        }
+      } else {
+        if (!(await hasPermissionBackend(user, "requests", "edit"))) {
+          return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+        }
+      }
     }
 
     let updatePayload: any = {};
@@ -217,8 +234,13 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       if (!isOwner || existing.status !== "Pending") {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
-    } else if (user.role !== "Super Admin" && existing.company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    } else {
+      if (user.role !== "Super Admin" && existing.company !== user.company) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      if (!(await hasPermissionBackend(user, "requests", "delete"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
     }
 
     await prisma.staffRequest.delete({

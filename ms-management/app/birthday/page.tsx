@@ -11,9 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Gift, Calendar, ChevronLeft, ChevronRight, Cake, Mail, Sparkles, FileText } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function BirthdayPage() {
-  const { currentRole, currentUser, staff } = useAuthStore();
+  const { currentRole, currentUser, staff, hasPermission } = useAuthStore();
+
+  const canView = hasPermission("birthday", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
 
   const today = new Date();

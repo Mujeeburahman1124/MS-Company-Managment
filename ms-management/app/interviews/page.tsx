@@ -22,10 +22,16 @@ import { Interview } from "@/lib/types";
 import { NATIONALITIES, MEETING_MODES } from "@/lib/constants";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function InterviewsPage() {
-  const { currentRole, currentUser, interviews, applicants, ownCompanies, companies, branches, addInterview, updateInterview, deleteInterview, addSentEmail, addSentWhatsApp } = useAuthStore();
+  const { currentRole, currentUser, interviews, applicants, ownCompanies, companies, branches, addInterview, updateInterview, deleteInterview, addSentEmail, addSentWhatsApp, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canView = hasPermission("interviews", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [modal, setModal] = useState(false);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
   const [editInt, setEditInt] = useState<Interview | null>(null);
@@ -107,6 +113,11 @@ HR Department`;
     branch: currentUser.branch === "All" ? "" : currentUser.branch,
     autoEmail: true,
     autoWhatsapp: true,
+    scheduledBy: "",
+    interviewResult: "",
+    feedback: "",
+    remarks: "",
+    candidateResponse: "",
   });
 
   const isSuperAdmin = currentRole === "Super Admin";
@@ -249,6 +260,11 @@ HR Department`;
       branch: currentUser.branch === "All" ? "" : currentUser.branch,
       autoEmail: true,
       autoWhatsapp: true,
+      scheduledBy: "",
+      interviewResult: "",
+      feedback: "",
+      remarks: "",
+      candidateResponse: "",
     });
   };
 
@@ -276,7 +292,7 @@ HR Department`;
   return (
     <div className="flex flex-col min-h-full select-none">
       <PageHeader title="Interviews & Meetings" subtitle="Schedule and manage all interviews and team meetings"
-        actions={<Button onClick={() => { setEditInt(null); setForm({ applicantId:"", type:"Interview", conductPerson:currentUser.name, personName:"", mobile:"", whatsapp:"", email:"", nationality:"India", position:"", meetingType:"", isOnline:true, dateTime:"", mode:"Zoom", meetingLink:"", locationLink:"", notes:"", company: currentUser.company === "System" ? "" : currentUser.company, branch: currentUser.branch === "All" ? "" : currentUser.branch, autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5 shadow-sm"><Plus className="w-4 h-4"/>Schedule</Button>}
+        actions={<Button onClick={() => { setEditInt(null); setForm({ applicantId:"", type:"Interview", conductPerson:currentUser.name, personName:"", mobile:"", whatsapp:"", email:"", nationality:"India", position:"", meetingType:"", isOnline:true, dateTime:"", mode:"Zoom", meetingLink:"", locationLink:"", notes:"", company: currentUser.company === "System" ? "" : currentUser.company, branch: currentUser.branch === "All" ? "" : currentUser.branch, autoEmail: true, autoWhatsapp: true, scheduledBy: "", interviewResult: "", feedback: "", remarks: "", candidateResponse: "" }); setModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5 shadow-sm"><Plus className="w-4 h-4"/>Schedule</Button>}
       />
       <FilterBar 
         moduleKey="interviews" 
@@ -379,6 +395,42 @@ HR Department`;
                     <span>Conductor: <span className="text-slate-800 font-bold">{int.conductPerson}</span></span>
                   </div>
 
+                  {(int.interviewResult || int.feedback || int.remarks || int.candidateResponse || int.scheduledBy) && (
+                    <div className="border-t border-slate-100 pt-2.5 space-y-1.5 bg-slate-50/50 p-2.5 rounded-xl border border-dashed border-slate-200">
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Assessment Status & Feedback</div>
+                      <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600">
+                        {int.scheduledBy && <div>Scheduled By: <span className="font-bold text-slate-800">{int.scheduledBy}</span></div>}
+                        {int.interviewResult && (
+                          <div>Result: <span className={cn(
+                            "font-extrabold px-1.5 py-0.5 rounded text-[9px] uppercase border",
+                            int.interviewResult === "Passed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                            int.interviewResult === "Failed" ? "bg-rose-50 text-rose-700 border-rose-200" :
+                            int.interviewResult === "Shortlisted" ? "bg-indigo-50 text-indigo-700 border-indigo-200" :
+                            "bg-amber-50 text-amber-700 border-amber-200"
+                          )}>{int.interviewResult}</span></div>
+                        )}
+                        {int.candidateResponse && (
+                          <div>Candidate Response: <span className={cn(
+                            "font-extrabold px-1.5 py-0.5 rounded text-[9px] uppercase border",
+                            int.candidateResponse === "Accepted" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                            int.candidateResponse === "Rejected" ? "bg-rose-50 text-rose-700 border-rose-200" :
+                            "bg-slate-50 text-slate-700 border-slate-200"
+                          )}>{int.candidateResponse}</span></div>
+                        )}
+                      </div>
+                      {int.feedback && (
+                        <div className="text-[10px] text-slate-600 leading-normal">
+                          <span className="font-bold">Feedback:</span> {int.feedback}
+                        </div>
+                      )}
+                      {int.remarks && (
+                        <div className="text-[10px] text-slate-500 leading-normal italic">
+                          <span className="font-bold not-italic">Remarks:</span> {int.remarks}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {int.notes && (
                     <div className="text-[10px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100 italic">
                       Notes: {int.notes}
@@ -438,7 +490,7 @@ HR Department`;
                       <button key={s} onClick={() => handleStatusChange(int, s)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">→ {s}</button>
                     ))}
                     <button type="button" onClick={() => { setSelectedGreetingCard(int); setIsGreetingCardOpen(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-indigo-150 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-200 transition-colors flex items-center gap-1 ml-auto">🎴 Card</button>
-                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:int.dateTime.replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors">Edit</button>
+                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:int.dateTime.replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true, scheduledBy: int.scheduledBy || "", interviewResult: int.interviewResult || "", feedback: int.feedback || "", remarks: int.remarks || "", candidateResponse: int.candidateResponse || "" }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors">Edit</button>
                     <button onClick={() => setDeleteId(int.id)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-rose-100 bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
                   </div>
                 </Card>
@@ -679,6 +731,58 @@ HR Department`;
                           checked={form.autoWhatsapp} 
                           onCheckedChange={v => setForm(f => ({ ...f, autoWhatsapp: v }))} 
                         />
+                      </div>
+                    </div>
+                    {/* Assessment Details */}
+                    <div className="border-t border-slate-100 pt-4 space-y-3 col-span-1 sm:col-span-2">
+                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Assessment Status & Results</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Scheduled By</Label>
+                          <Input value={form.scheduledBy || ""} onChange={e => setForm(f => ({...f, scheduledBy: e.target.value}))} placeholder="E.g. HR Manager Name" className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Interview Result</Label>
+                          <select
+                            value={form.interviewResult || ""}
+                            onChange={e => setForm(f => ({...f, interviewResult: e.target.value}))}
+                            className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                          >
+                            <option value="">Select Result...</option>
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Passed">Passed</option>
+                            <option value="Failed">Failed</option>
+                            <option value="No Show">No Show</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Candidate Response</Label>
+                          <select
+                            value={form.candidateResponse || ""}
+                            onChange={e => setForm(f => ({...f, candidateResponse: e.target.value}))}
+                            className="w-full bg-white border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 font-semibold text-slate-700 outline-none"
+                          >
+                            <option value="">Select Response...</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="No Response">No Response</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Feedback</Label>
+                        <textarea rows={2} value={form.feedback || ""} onChange={e => setForm(f => ({...f, feedback: e.target.value}))} placeholder="Enter interviewer feedback..." className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none transition-all" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Remarks</Label>
+                        <textarea rows={2} value={form.remarks || ""} onChange={e => setForm(f => ({...f, remarks: e.target.value}))} placeholder="Enter internal HR remarks..." className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none transition-all" />
                       </div>
                     </div>
                   </div>

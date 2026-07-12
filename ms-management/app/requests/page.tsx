@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, MessageSquare, FileText, CheckCircle, XCircle, Trash2, CornerUpLeft, UploadCloud } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useFilterStore } from "@/store/filterStore";
+import AccessDenied from "@/components/shared/AccessDenied";
 import { formatDate, exportToCSV } from "@/lib/utils";
 import PageHeader from "@/components/shared/PageHeader";
 import FilterBar from "@/components/shared/FilterBar";
@@ -23,8 +24,13 @@ import { toast } from "sonner";
 const REQUEST_TYPES = ["Salary Advance", "Vacation", "Emergency Leave", "Medical Leave", "Cancel", "Resign", "Complaint", "Company Loan", "Other"];
 
 export default function StaffRequestsPage() {
-  const { currentRole, currentUser, staffRequests, staff, addStaffRequest, updateStaffRequest, deleteStaffRequest, addActivityLog } = useAuthStore();
+  const { currentRole, currentUser, staffRequests, staff, addStaffRequest, updateStaffRequest, deleteStaffRequest, addActivityLog, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canViewRequests = hasPermission("requests", "view");
+  if (!canViewRequests) {
+    return <AccessDenied />;
+  }
   const [modal, setModal] = useState(false);
   const [actionModal, setActionModal] = useState<{ req: StaffRequest; action: "Approved"|"Rejected"|"Returned" } | null>(null);
   const [actionReason, setActionReason] = useState("");
@@ -158,7 +164,11 @@ export default function StaffRequestsPage() {
   return (
     <div className="flex flex-col min-h-full">
       <PageHeader title="Staff Requests" subtitle="Process advances, complaints, loans, and general requests"
-        actions={<Button onClick={handleOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>New Request</Button>}
+        actions={
+          hasPermission("requests", "create") && (
+            <Button onClick={handleOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>New Request</Button>
+          )
+        }
       />
       <FilterBar moduleKey="requests" statusOptions={["Pending","Processing","Approved","Rejected","Returned"]} onExport={() => { exportToCSV(list.map(r=>({ID:r.id,Staff:r.staffName,Type:r.requestType,Date:r.date,Status:r.status})),"staff-requests"); toast.success("Exported"); }} />
 
@@ -201,21 +211,27 @@ export default function StaffRequestsPage() {
                   <Button size="sm" variant="outline" onClick={() => setHistoryReq(req)} className="border-slate-200 text-slate-600 font-bold rounded-xl text-[10px] h-8 px-3 gap-1">
                     <FileText className="w-3.5 h-3.5"/>History
                   </Button>
-                  {isAdmin && (req.status === "Pending" || req.status === "Processing") && (
+                  {(req.status === "Pending" || req.status === "Processing") && (
                     <>
-                      {req.status === "Pending" && (
+                      {req.status === "Pending" && hasPermission("requests", "edit") && (
                         <Button size="sm" onClick={() => {
                           updateStaffRequest({ ...req, status: "Processing" });
                           toast.success("Status updated to Processing");
                         }} className="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold rounded-xl text-[10px] h-8 px-3 gap-1">Process</Button>
                       )}
-                      <Button size="sm" onClick={() => setActionModal({ req, action: "Approved" })} className="bg-emerald-600 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><CheckCircle className="w-3.5 h-3.5"/>Approve</Button>
-                      <Button size="sm" onClick={() => setActionModal({ req, action: "Returned" })} className="bg-amber-500 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><CornerUpLeft className="w-3.5 h-3.5"/>Return</Button>
-                      <Button size="sm" variant="outline" onClick={() => setActionModal({ req, action: "Rejected" })} className="border-rose-200 text-rose-600 hover:bg-rose-50 font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><XCircle className="w-3.5 h-3.5"/>Reject</Button>
+                      {hasPermission("requests", "approve") && (
+                        <Button size="sm" onClick={() => setActionModal({ req, action: "Approved" })} className="bg-emerald-600 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><CheckCircle className="w-3.5 h-3.5"/>Approve</Button>
+                      )}
+                      {hasPermission("requests", "reject") && (
+                        <Button size="sm" onClick={() => setActionModal({ req, action: "Returned" })} className="bg-amber-500 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><CornerUpLeft className="w-3.5 h-3.5"/>Return</Button>
+                      )}
+                      {hasPermission("requests", "reject") && (
+                        <Button size="sm" variant="outline" onClick={() => setActionModal({ req, action: "Rejected" })} className="border-rose-200 text-rose-600 hover:bg-rose-50 font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><XCircle className="w-3.5 h-3.5"/>Reject</Button>
+                      )}
                     </>
                   )}
                   {req.attachment && <Button size="sm" variant="outline" className="border-slate-200 text-slate-600 font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><FileText className="w-3.5 h-3.5"/>View Docs</Button>}
-                  {(isAdmin || (currentStaff && req.staffId === currentStaff.id && req.status === "Pending")) && (
+                  {(hasPermission("requests", "delete") || (currentStaff && req.staffId === currentStaff.id && req.status === "Pending")) && (
                     <Button variant="ghost" size="icon" onClick={() => setDeleteId(req.id)} className="w-8 h-8 text-rose-400 hover:bg-rose-50 rounded-lg ml-auto"><Trash2 className="w-3.5 h-3.5"/></Button>
                   )}
                 </div>

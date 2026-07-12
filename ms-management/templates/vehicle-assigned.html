@@ -1,0 +1,38 @@
+{{> header companyPrimaryColor="#0d9488" bannerBg="#f0fdfa" bannerBorder="#ccfbf1" bannerColor="#0f766e" bannerIcon="🚗" bannerText="VEHICLE ASSIGNED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #0f766e; font-size: 16px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Company Vehicle Assignment
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear {{recipientName}},<br/><br/>
+      We have successfully assigned a company vehicle to your profile in the system. Below are the registered vehicle details:
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdfa; border-radius: 12px; border: 1px solid #ccfbf1; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Vehicle Specifications:</strong><br/>
+            • <strong>Vehicle Brand/Model:</strong> {{brand}}<br/>
+            • <strong>Plate Number:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; color: #0f766e;">{{plate}}</span><br/>
+            • <strong>Assigned Date:</strong> {{assignedDate}}<br/>
+            • <strong>Starting Odometer (KM):</strong> {{startKm}} KM<br/>
+            {{#if ratePerKm}}
+            • <strong>Rate Per KM:</strong> {{ratePerKm}} AED<br/>
+            {{/if}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.5; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Please ensure you record odometer readings accurately and report any issues or damage before driving. Observe all local speed limits and traffic rules.
+    </td>
+  </tr>
+</table>
+{{> footer}}

@@ -1,0 +1,35 @@
+{{> header companyPrimaryColor="#d97706" bannerBg="#fffbeb" bannerBorder="#fef3c7" bannerColor="#b45309" bannerIcon="📁" bannerText="DOCUMENT UPLOADED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #b45309; font-size: 16px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Document Upload Confirmation
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear {{recipientName}},<br/><br/>
+      We confirm that a new document has been uploaded and linked to your profile page in our management system:
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fffbeb; border-radius: 12px; border: 1px solid #fef3c7; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Uploaded Document Info:</strong><br/>
+            • <strong>Document Name:</strong> {{documentName}}<br/>
+            • <strong>Document Category:</strong> {{documentType}}<br/>
+            • <strong>Upload Timestamp:</strong> {{uploadDate}}<br/>
+            • <strong>Status:</strong> Verification Pending
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.5; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Our HR committee will review the document. You will receive a notice if any details are unreadable or expire soon.
+    </td>
+  </tr>
+</table>
+{{> footer}}

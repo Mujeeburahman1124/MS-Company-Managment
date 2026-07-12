@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 const COMPANY_SPECIFIC_MODULES = [
   "Applicants", "Staff", "Tasks", "Interviews", "Leave Requests", "Staff Requests",
@@ -22,7 +23,12 @@ const COMPANY_SPECIFIC_MODULES = [
 ];
 
 export default function SettingsPage() {
-  const { currentRole, companies, updateCompany, siteSettings, updateSiteSettings, addActivityLog, currentUser } = useAuthStore();
+  const { currentRole, companies, updateCompany, siteSettings, updateSiteSettings, addActivityLog, currentUser, hasPermission } = useAuthStore();
+
+  const canView = hasPermission("settings", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
 
   const [form, setForm] = useState({
     siteName:     siteSettings.siteName || "",

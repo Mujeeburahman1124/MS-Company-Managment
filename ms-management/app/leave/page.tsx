@@ -23,8 +23,13 @@ import { toast } from "sonner";
 const LEAVE_TYPES: LeaveRequest["leaveType"][] = ["Annual","Sick","Emergency","Vacation","Unpaid"];
 
 export default function LeavePage() {
-  const { currentRole, currentUser, leaveRequests, staff, addLeaveRequest, updateLeaveRequest, deleteLeaveRequest, addActivityLog } = useAuthStore();
+  const { currentRole, currentUser, leaveRequests, staff, addLeaveRequest, updateLeaveRequest, deleteLeaveRequest, addActivityLog, hasPermission } = useAuthStore();
   const { filters } = useFilterStore();
+
+  const canViewLeave = hasPermission("leave", "view");
+  if (!canViewLeave) {
+    return <AccessDenied />;
+  }
   const [modal, setModal] = useState(false);
   const [viewType, setViewType] = useState<"grid" | "calendar">("grid");
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -157,7 +162,9 @@ export default function LeavePage() {
               <button onClick={() => setViewType("grid")} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${viewType === "grid" ? "bg-white shadow-sm text-blue-600" : "text-slate-400"}`}>Grid</button>
               <button onClick={() => setViewType("calendar")} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${viewType === "calendar" ? "bg-white shadow-sm text-blue-600" : "text-slate-400"}`}>Calendar</button>
             </div>
-            <Button onClick={handleOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>New Request</Button>
+            {hasPermission("leave", "create") && (
+              <Button onClick={handleOpenModal} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>New Request</Button>
+            )}
           </div>
         }
       />
@@ -195,20 +202,24 @@ export default function LeavePage() {
                     </div>
 
                     <div className="flex gap-2 items-center flex-shrink-0">
-                      {isAdmin && (req.status === "Pending" || req.status === "Processing") && (
+                      {(req.status === "Pending" || req.status === "Processing") && (
                         <>
-                          {req.status === "Pending" && (
+                          {req.status === "Pending" && hasPermission("leave", "edit") && (
                             <Button size="sm" onClick={() => {
                               updateLeaveRequest({ ...req, status: "Processing" });
                               toast.success("Status updated to Processing");
                             }} className="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold rounded-xl text-[10px] h-8 px-3 gap-1">Process</Button>
                           )}
-                          <Button size="sm" onClick={() => setApproveModal({ req, action: "Approved" })} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><CheckCircle className="w-3.5 h-3.5"/>Approve</Button>
-                          <Button size="sm" variant="outline" onClick={() => setApproveModal({ req, action: "Rejected" })} className="border-rose-200 text-rose-600 hover:bg-rose-50 font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><XCircle className="w-3.5 h-3.5"/>Reject</Button>
+                          {hasPermission("leave", "approve") && (
+                            <Button size="sm" onClick={() => setApproveModal({ req, action: "Approved" })} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><CheckCircle className="w-3.5 h-3.5"/>Approve</Button>
+                          )}
+                          {hasPermission("leave", "reject") && (
+                            <Button size="sm" variant="outline" onClick={() => setApproveModal({ req, action: "Rejected" })} className="border-rose-200 text-rose-600 hover:bg-rose-50 font-bold rounded-xl text-[10px] h-8 px-3 gap-1"><XCircle className="w-3.5 h-3.5"/>Reject</Button>
+                          )}
                         </>
                       )}
                       {req.approvedBy && <span className="text-[10px] text-slate-400 font-semibold">By {req.approvedBy}</span>}
-                      {(isAdmin || (currentStaff && req.staffId === currentStaff.id && req.status === "Pending")) && (
+                      {(hasPermission("leave", "delete") || (currentStaff && req.staffId === currentStaff.id && req.status === "Pending")) && (
                         <Button variant="ghost" size="icon" onClick={() => setDeleteId(req.id)} className="w-7 h-7 text-rose-400 hover:bg-rose-50 rounded-lg"><Trash2 className="w-3.5 h-3.5"/></Button>
                       )}
                     </div>

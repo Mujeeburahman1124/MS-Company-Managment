@@ -9,6 +9,7 @@ import Payslips from "./components/Payslips";
 import PayrollReports from "./components/PayrollReports";
 import PayrollHistory from "./components/PayrollHistory";
 import { useAuthStore } from "@/store/authStore";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 const ALL_TABS = [
   "Dashboard",
@@ -20,7 +21,12 @@ const ALL_TABS = [
 ];
 
 export default function PayrollPage() {
-  const { currentUser } = useAuthStore();
+  const { currentUser, hasPermission } = useAuthStore();
+
+  const canView = hasPermission("payroll", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const isStaff = currentUser?.role === "Staff";
   const availableTabs = isStaff ? ["Payslips"] : ALL_TABS;
   

@@ -40,7 +40,12 @@ export async function GET() {
       notes: i.notes || undefined,
       status: i.status,
       company: i.company,
-      branch: i.branch
+      branch: i.branch,
+      scheduledBy: i.scheduledBy || "",
+      interviewResult: i.interviewResult || "",
+      feedback: i.feedback || "",
+      remarks: i.remarks || "",
+      candidateResponse: i.candidateResponse || ""
     }));
 
     return NextResponse.json(mapped);
@@ -110,7 +115,12 @@ export async function POST(request: Request) {
         notes: data.notes || null,
         status: data.status || "Scheduled",
         company,
-        branch
+        branch,
+        scheduledBy: user.name || "System",
+        interviewResult: data.interviewResult || "",
+        feedback: data.feedback || "",
+        remarks: data.remarks || "",
+        candidateResponse: data.candidateResponse || ""
       }
     });
 
@@ -169,7 +179,12 @@ export async function POST(request: Request) {
       notes: interview.notes || undefined,
       status: interview.status,
       company: interview.company,
-      branch: interview.branch
+      branch: interview.branch,
+      scheduledBy: interview.scheduledBy || "",
+      interviewResult: interview.interviewResult || "",
+      feedback: interview.feedback || "",
+      remarks: interview.remarks || "",
+      candidateResponse: interview.candidateResponse || ""
     };
 
     // Trigger real-time notifications for the scheduled interview/meeting

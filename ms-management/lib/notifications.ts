@@ -137,6 +137,7 @@ export async function sendEmail({
   let companyPhone = "+971 58 532 2913";
   let companyAddress = "Industrial Area 2, Ajman, UAE";
   let companyLogo = "";
+  let companyPrimaryColor = "#2563eb";
 
   if (company && company !== "System" && company !== "Not Placed") {
     try {
@@ -150,6 +151,7 @@ export async function sendEmail({
         }
         if (dbComp.address) companyAddress = dbComp.address;
         if (dbComp.logo) companyLogo = dbComp.logo;
+        if (dbComp.brandColor) companyPrimaryColor = dbComp.brandColor;
       } else {
         const dbIntComp = await prisma.internalCompany.findFirst({
           where: { name: company }
@@ -183,6 +185,7 @@ export async function sendEmail({
     Interview_Cancelled: "interview-cancelled",
     Interview_Completed: "interview-invitation",
     Interview_Rescheduled: "interview-rescheduled",
+    Interview_Reminder: "interview-reminder",
     Offer: "offer-letter",
     Visa: "visa-expiry-reminder",
     Passport_Expiry: "passport-expiry-reminder",
@@ -191,6 +194,7 @@ export async function sendEmail({
     Placement_Agreement: "placement-agreement",
     Password_Reset: "password-reset",
     Staff_Registration: "staff-registration",
+    Staff_Updated: "staff-updated",
     User_Account_Created: "user-account-created",
     Leave: "leave-application-submitted",
     Leave_Approved: "leave-approved",
@@ -204,6 +208,14 @@ export async function sendEmail({
     Payslip: "payslip-available",
     Birthday: "birthday-wishes",
     System: "system-notification",
+    Applicant_Approved: "applicant-approved",
+    Applicant_Rejected: "applicant-rejected",
+    Applicant_Returned: "applicant-returned",
+    Applicant_Processing: "applicant-processing",
+    Vehicle_Assigned: "vehicle-assigned",
+    Vehicle_Returned: "vehicle-returned",
+    Document_Uploaded: "document-uploaded",
+    Welcome_Email: "welcome-email",
   };
 
   const selectedTemplate = templateType ? (map[templateType] || templateType) : "system-notification";
@@ -226,9 +238,10 @@ export async function sendEmail({
       companyPhone,
       companyAddress,
       logoText,
+      companyLogo: companyLogo || "",
       website: `https://${(companyEmail.match(/@(.+)$/)||["","msjobs.net"])[1]}`,
       year: new Date().getFullYear(),
-      companyPrimaryColor: process.env.PRIMARY_COLOR || '#2563eb',
+      companyPrimaryColor: templateData?.companyPrimaryColor || companyPrimaryColor || process.env.PRIMARY_COLOR || '#2563eb',
       body,
       subject,
       ...templateData,

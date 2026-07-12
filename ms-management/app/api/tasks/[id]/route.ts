@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 type RouteParams = {
@@ -65,6 +65,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (isStaff && !isAssignedToUser) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    if (!isStaff) {
+      if (!(await hasPermissionBackend(user, "tasks", "edit")) && !(await hasPermissionBackend(user, "tasks", "assign"))) {
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
     }
 
     // Require completion proof in history when marking as Completed
@@ -257,8 +263,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     }
 
     // Only managers/admins of the same company (or Super Admin / System users) can delete tasks
-    if (user.role === "Staff") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasPermissionBackend(user, "tasks", "delete"))) {
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const isSystemUser = user.company === "System" || user.role === "Super Admin";

@@ -48,6 +48,59 @@ function calcHours(checkIn: string, checkOut: string) {
   return parseFloat(diff.toFixed(2));
 }
 
+function computeAttendanceMetrics(checkIn: string, checkOut: string, shift: any) {
+  if (!checkIn || !checkOut) {
+    return { workingHours: 0, overtime: 0, lateArrival: 0, earlyLeaving: 0, breakHours: 0 };
+  }
+
+  const shiftIn = shift ? (shift.clockIn || "09:00") : "09:00";
+  const shiftOut = shift ? (shift.clockOut || "18:00") : "18:00";
+  const breakMin = shift ? (shift.breakDuration || 0) : 60;
+  const breakHours = breakMin / 60;
+
+  const employeeElapsed = calcHours(checkIn, checkOut);
+  const netWorkingHours = Math.max(0, employeeElapsed - breakHours);
+
+  const shiftElapsed = calcHours(shiftIn, shiftOut);
+  const shiftRequired = Math.max(0, shiftElapsed - breakHours);
+
+  const isOTEligible = shift ? shift.overtimeEligible !== "No" : true;
+  const overtime = (employeeElapsed > shiftElapsed && isOTEligible) 
+    ? parseFloat((employeeElapsed - shiftElapsed).toFixed(2)) 
+    : 0;
+
+  let lateArrival = 0;
+  try {
+    const [empInH, empInM] = checkIn.split(":").map(Number);
+    const [shInH, shInM] = shiftIn.split(":").map(Number);
+    const empInMin = empInH * 60 + empInM;
+    const shInMin = shInH * 60 + shInM;
+    const grace = shift ? (shift.gracePeriod || 0) : 15;
+    if (empInMin > (shInMin + grace)) {
+      lateArrival = empInMin - shInMin;
+    }
+  } catch (e) {}
+
+  let earlyLeaving = 0;
+  try {
+    const [empOutH, empOutM] = checkOut.split(":").map(Number);
+    const [shOutH, shOutM] = shiftOut.split(":").map(Number);
+    const empOutMin = empOutH * 60 + empOutM;
+    const shOutMin = shOutH * 60 + shOutM;
+    if (empOutMin < shOutMin) {
+      earlyLeaving = shOutMin - empOutMin;
+    }
+  } catch (e) {}
+
+  return {
+    workingHours: parseFloat(netWorkingHours.toFixed(2)),
+    overtime,
+    lateArrival,
+    earlyLeaving,
+    breakHours
+  };
+}
+
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -189,7 +242,7 @@ function MobileStaffCard({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function AttendanceRecords() {
-  const { currentRole, currentUser, staff, staffAttendance, saveAttendance, addActivityLog, ownCompanies, branches, shifts } = useAuthStore();
+  const { currentRole, currentUser, staff, staffAttendance, saveAttendance, addActivityLog, ownCompanies, branches, shifts, payroll, updatePayroll } = useAuthStore();
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
   const [companyFilter, setCompanyFilter] = useState("all");
@@ -237,29 +290,54 @@ export default function AttendanceRecords() {
     setSaved(false);
     setRecords(prev => {
       const updated = { ...prev[id], [field]: value };
-      if (field === "checkIn" || field === "checkOut") {
-        updated.workingHours = calcHours(
-          field === "checkIn" ? value : prev[id].checkIn,
-          field === "checkOut" ? value : prev[id].checkOut
-        );
-      }
+      const s = staff.find(st => st.id === id);
+      const shift = s ? shifts.find(sh => sh.id === s.shiftId) : null;
+
       if (field === "status") {
         if (NO_TIME_STATUSES.includes(value)) {
           updated.checkIn = "";
           updated.checkOut = "";
           updated.workingHours = 0;
-        } else if (value === "Present" || value === "Work From Home") {
-          updated.checkIn = updated.checkIn || "09:00";
-          updated.checkOut = updated.checkOut || "18:00";
-          updated.workingHours = calcHours(updated.checkIn, updated.checkOut);
-        } else if (value === "Late") {
-          updated.checkIn = updated.checkIn || "10:00";
-          updated.checkOut = updated.checkOut || "18:00";
-          updated.workingHours = calcHours(updated.checkIn || "10:00", updated.checkOut || "18:00");
-        } else if (value === "Half Day") {
-          updated.checkIn = updated.checkIn || "09:00";
-          updated.checkOut = updated.checkOut || "13:00";
-          updated.workingHours = calcHours(updated.checkIn || "09:00", updated.checkOut || "13:00");
+          updated.overtime = 0;
+          updated.lateArrival = 0;
+          updated.earlyLeaving = 0;
+          updated.breakHours = 0;
+        } else {
+          if (value === "Present" || value === "Work From Home") {
+            updated.checkIn = updated.checkIn || (shift ? shift.clockIn : "09:00");
+            updated.checkOut = updated.checkOut || (shift ? shift.clockOut : "18:00");
+          } else if (value === "Late") {
+            const shiftIn = shift ? shift.clockIn : "09:00";
+            const [h, m] = shiftIn.split(":").map(Number);
+            const lateTime = `${String(h + 1).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+            updated.checkIn = updated.checkIn || lateTime;
+            updated.checkOut = updated.checkOut || (shift ? shift.clockOut : "18:00");
+          } else if (value === "Half Day") {
+            updated.checkIn = updated.checkIn || (shift ? shift.clockIn : "09:00");
+            const shiftIn = shift ? shift.clockIn : "09:00";
+            const [h, m] = shiftIn.split(":").map(Number);
+            const halfTime = `${String(h + 4).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+            updated.checkOut = updated.checkOut || halfTime;
+          }
+          const metrics = computeAttendanceMetrics(updated.checkIn, updated.checkOut, shift);
+          updated.workingHours = metrics.workingHours;
+          updated.overtime = metrics.overtime;
+          updated.lateArrival = metrics.lateArrival;
+          updated.earlyLeaving = metrics.earlyLeaving;
+          updated.breakHours = metrics.breakHours;
+        }
+      } else if (field === "checkIn" || field === "checkOut") {
+        if (!NO_TIME_STATUSES.includes(updated.status)) {
+          const metrics = computeAttendanceMetrics(
+            field === "checkIn" ? value : updated.checkIn,
+            field === "checkOut" ? value : updated.checkOut,
+            shift
+          );
+          updated.workingHours = metrics.workingHours;
+          updated.overtime = metrics.overtime;
+          updated.lateArrival = metrics.lateArrival;
+          updated.earlyLeaving = metrics.earlyLeaving;
+          updated.breakHours = metrics.breakHours;
         }
       }
       return { ...prev, [id]: updated };
@@ -310,11 +388,11 @@ export default function AttendanceRecords() {
       const rec = records[s.id] || DEFAULT_REC;
 
       // Calculate shift hours
-      let shiftRequiredHours = 9; // default fallback
+      let shiftRequiredHours = 9;
       const staffShift = shifts.find(sh => sh.id === s.shiftId);
       if (staffShift) {
-        const shiftStart = staffShift.startTime || staffShift.clockIn || "09:00";
-        const shiftEnd = staffShift.endTime || staffShift.clockOut || "18:00";
+        const shiftStart = staffShift.clockIn || "09:00";
+        const shiftEnd = staffShift.clockOut || "18:00";
         const computedRequired = calcHours(shiftStart, shiftEnd);
         if (computedRequired > 0) {
           const breakHours = (staffShift.breakDuration || 0) / 60;
@@ -322,23 +400,44 @@ export default function AttendanceRecords() {
         }
       }
 
-      const isOTEligible = staffShift ? staffShift.overtimeEligible !== "No" : true;
-      const overtime = (rec.workingHours > shiftRequiredHours && isOTEligible) ? parseFloat((rec.workingHours - shiftRequiredHours).toFixed(2)) : 0;
+      const metrics = computeAttendanceMetrics(rec.checkIn, rec.checkOut, staffShift);
 
       const newRecord = {
         date,
         status: rec.status,
-        checkIn: rec.checkIn,
-        checkOut: rec.checkOut,
-        workingHours: rec.workingHours,
-        notes: rec.notes,
-        overtime,
+        checkIn: rec.checkIn || "",
+        checkOut: rec.checkOut || "",
+        workingHours: metrics.workingHours,
+        notes: rec.notes || "",
+        overtime: metrics.overtime,
+        lateArrival: metrics.lateArrival,
+        earlyLeaving: metrics.earlyLeaving,
+        breakHours: metrics.breakHours,
       };
+
+      let updatedRecordsList = [newRecord];
       if (existing) {
         const filtered = existing.records.filter((r: any) => r.date !== date);
-        await saveAttendance({ ...existing, records: [...filtered, newRecord] });
+        updatedRecordsList = [...filtered, newRecord];
+        await saveAttendance({ ...existing, records: updatedRecordsList });
       } else {
-        await saveAttendance({ staffId: s.id, staffName: s.name, month, year, records: [newRecord] });
+        await saveAttendance({ staffId: s.id, staffName: s.name, month, year, records: updatedRecordsList });
+      }
+
+      // Automatically recalculate monthly overtime and save into PayrollRecord if it exists
+      const monthlyOvertimeHours = updatedRecordsList.reduce((sum: number, r: any) => sum + (r.overtime || 0), 0);
+      const existingPay = payroll.find(p => p.staffId === s.id && p.month === month && p.year === year);
+      if (existingPay) {
+        const otRate = existingPay.overtimeRate || s.overtimeRate || 15;
+        const newOtPay = parseFloat((monthlyOvertimeHours * otRate).toFixed(2));
+        const diffOtPay = newOtPay - existingPay.overtime;
+        
+        await updatePayroll({
+          ...existingPay,
+          overtimeHours: monthlyOvertimeHours,
+          overtime: newOtPay,
+          netSalary: parseFloat((existingPay.netSalary + diffOtPay).toFixed(2))
+        });
       }
     }
 

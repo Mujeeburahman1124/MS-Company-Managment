@@ -14,9 +14,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { History, Shield, Trash2, RotateCcw, Archive } from "lucide-react";
 import { toast } from "sonner";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function ActivityLogPage() {
-  const { currentRole, currentUser, activityLogs, archivedActivityLogs, clearActivityLogs, restoreActivityLogs, deleteArchivedLog } = useAuthStore();
+  const { currentRole, currentUser, activityLogs, archivedActivityLogs, clearActivityLogs, restoreActivityLogs, deleteArchivedLog, hasPermission } = useAuthStore();
+
+  const canView = hasPermission("activityLog", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const { filters } = useFilterStore();
   const isSuperAdmin = currentRole === "Super Admin";
   const [showArchived, setShowArchived] = useState(false);

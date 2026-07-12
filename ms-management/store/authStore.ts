@@ -397,9 +397,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   hasPermission: (moduleKey: string, action: string) => {
     const state = get();
-    if (state.currentRole === "Super Admin") {
-      return true;
-    }
 
     // 0. User-specific custom permission overrides check
     const userPermissions = typeof state.currentUser?.permissions === 'string'
@@ -448,13 +445,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
     }
 
+    // 2. Load role permissions
     const role = state.roles.find((role: Role) => role.name === state.currentRole);
-    if (!role) return false;
     const permissionModule = getPermissionModuleName(moduleKey);
-    if (!permissionModule) return true; // unknown module keys (e.g., internal util) — allow
-    const permissions = role.permissions[permissionModule];
-    if (!permissions) return false; // module not listed in role → deny by default
-    return Boolean((permissions as any)[action]);
+
+    if (role && permissionModule) {
+      const permissions = role.permissions ? (
+        typeof role.permissions === 'string'
+          ? (() => { try { return JSON.parse(role.permissions); } catch { return null; } })()
+          : role.permissions
+      ) : null;
+      if (permissions && permissions[permissionModule]) {
+        const modulePerms = permissions[permissionModule];
+        if (modulePerms && modulePerms[action] !== undefined) {
+          return Boolean(modulePerms[action]);
+        }
+      }
+    }
+
+    // 3. Fallback for Super Admin (general CRUD is allowed, but approve/reject/assign must be explicit)
+    if (state.currentRole === "Super Admin") {
+      if (["approve", "reject", "assign"].includes(action)) {
+        return false;
+      }
+      return true;
+    }
+
+    return false;
   },
   
   // Applicants CRUD APIs
