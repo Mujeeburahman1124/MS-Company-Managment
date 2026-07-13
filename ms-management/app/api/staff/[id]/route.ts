@@ -161,6 +161,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         passportNumber: data.passportNumber ?? undefined,
         emiratesId: data.emiratesId ?? undefined,
         status: data.status ?? undefined,
+        gender: data.gender ?? undefined,
         company: data.company ?? undefined,
         branch: data.branch ?? undefined,
         documents: data.documents !== undefined ? data.documents : undefined,

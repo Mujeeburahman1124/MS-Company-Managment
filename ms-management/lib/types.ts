@@ -85,6 +85,7 @@ export interface Staff {
   passportNumber: string;
   emiratesId: string;
   status: "Active" | "Inactive" | "Suspended";
+  gender?: string | null;
   company: string;
   branch: string;
   createdBy: string;

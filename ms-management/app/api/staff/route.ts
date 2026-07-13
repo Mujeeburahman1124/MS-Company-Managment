@@ -177,6 +177,7 @@ export async function POST(request: Request) {
         passportNumber: data.passportNumber || "",
         emiratesId: data.emiratesId || "",
         status: data.status || "Active",
+        gender: data.gender || "",
         company: data.company,
         branch: branch,
         createdBy: user.name,

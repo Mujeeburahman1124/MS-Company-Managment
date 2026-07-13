@@ -25,6 +25,7 @@ interface FormData {
   mobile: string;
   whatsapp: string;
   dateOfBirth: string;
+  gender: string;
   nationality: string;
   currentCountry: string;
   applyCountry: string;
@@ -65,6 +66,7 @@ export default function NewApplicantPage() {
       mobile: "",
       whatsapp: "",
       dateOfBirth: "1995-01-01",
+      gender: "Male",
       nationality: "India",
       currentCountry: "UAE",
       applyCountry: "UAE",
@@ -208,6 +210,23 @@ export default function NewApplicantPage() {
                   {...register("fullName", { required: true })}
                 />
                 {errors.fullName && <span className="text-[9px] text-rose-500 font-bold">Name is required</span>}
+              </div>
+
+              {/* Gender */}
+              <div className="space-y-1">
+                <Label htmlFor="gender" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  Gender <span className="text-rose-500">*</span>
+                </Label>
+                <select
+                  id="gender"
+                  className="w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 font-semibold text-slate-700"
+                  {...register("gender", { required: true })}
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                {errors.gender && <span className="text-[9px] text-rose-500 font-bold block">Gender is required</span>}
               </div>
 
               {/* Date of Birth */}

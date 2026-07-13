@@ -176,6 +176,7 @@ export async function POST(request: Request) {
         photo: data.photo || null,
         applicationDate: data.applicationDate || new Date().toISOString().slice(0, 10),
         fullName: data.fullName,
+        gender: data.gender || "",
         dateOfBirth: data.dateOfBirth || "",
         email: data.email ? data.email.trim().toLowerCase() : "",
         mobile: data.mobile || "",

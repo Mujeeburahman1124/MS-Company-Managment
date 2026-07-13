@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 interface FormData {
   name: string; email: string; mobile: string; whatsapp: string;
-  birthday: string; nationality: string; position: string;
+  birthday: string; gender: string; nationality: string; position: string;
   joiningDate: string; passportNumber: string; passportExpiry: string;
   visaExpiry: string; emiratesId: string;
   company?: string; branch?: string; role?: string;
@@ -47,6 +47,7 @@ export default function NewStaffPage() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
     defaultValues: { 
       nationality: "India", position: "", joiningDate: "2026-06-04", birthday: "1995-01-01",
+      gender: "Male",
       company: currentUser.company, branch: currentUser.branch === "All" ? "" : currentUser.branch, role: ""
     }
   });
@@ -190,6 +191,22 @@ export default function NewStaffPage() {
                   )}
                 </div>
               ))}
+              
+              {/* Gender selection */}
+              <div className="space-y-1">
+                <Label htmlFor="gender" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Gender <span className="text-rose-500">*</span></Label>
+                <select
+                  id="gender"
+                  className="w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400 font-semibold text-slate-700"
+                  {...register("gender", { required: "Gender is required" })}
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                {errors.gender && <span className="text-[9px] text-rose-500 font-bold block">{errors.gender.message}</span>}
+              </div>
+
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nationality <span className="text-rose-500">*</span></Label>
                 <select className="w-full bg-white border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400" {...register("nationality", { required: true })}>

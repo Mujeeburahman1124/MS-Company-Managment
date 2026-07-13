@@ -148,6 +148,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         photo: data.photo !== undefined ? data.photo : undefined,
         applicationDate: data.applicationDate ?? undefined,
         fullName: data.fullName ?? undefined,
+        gender: data.gender ?? undefined,
         dateOfBirth: data.dateOfBirth ?? undefined,
         email: data.email ?? undefined,
         mobile: data.mobile ?? undefined,

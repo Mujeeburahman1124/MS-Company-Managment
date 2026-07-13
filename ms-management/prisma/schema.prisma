@@ -131,6 +131,7 @@ model Staff {
   passportNumber     String
   emiratesId         String
   status             String   // "Active" | "Inactive" | "Suspended"
+  gender             String?  @default("")
   company            String
   branch             String
   createdBy          String
