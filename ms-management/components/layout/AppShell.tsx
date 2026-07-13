@@ -10,9 +10,63 @@ import BottomNav from "./BottomNav";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import ReminderEngine from "@/components/shared/ReminderEngine";
+import ThemeApplier from "@/components/layout/ThemeApplier";
 import { useAuthStore } from "@/store/authStore";
 import AccessDenied from "@/components/shared/AccessDenied";
 import { getPermissionModuleName } from "@/lib/constants";
+import { toast as originalToast } from "sonner";
+
+// Global toast deduplication and duration control interceptor
+if (typeof window !== "undefined") {
+  const activeToasts = new Set<string>();
+
+  const wrapToastFn = (origFn: any) => {
+    if (!origFn || (origFn as any).__wrapped) return origFn;
+
+    const newFn = (message: any, options: any = {}) => {
+      const msgStr = typeof message === "string" ? message : JSON.stringify(message);
+      if (activeToasts.has(msgStr)) return "";
+
+      activeToasts.add(msgStr);
+
+      const toastId = origFn(message, {
+        ...options,
+        duration: 4000, // 4 seconds duration
+        onDismiss: (t: any) => {
+          activeToasts.delete(msgStr);
+          if (options.onDismiss) options.onDismiss(t);
+        },
+        onAutoClose: (t: any) => {
+          activeToasts.delete(msgStr);
+          if (options.onAutoClose) options.onAutoClose(t);
+        }
+      });
+
+      // Safety timeout to remove message from Set
+      setTimeout(() => {
+        activeToasts.delete(msgStr);
+      }, 4500);
+
+      return toastId;
+    };
+    newFn.__wrapped = true;
+    return newFn;
+  };
+
+  // Override standard methods on the global toast instance
+  if ((originalToast as any).success && !(originalToast as any).success.__wrapped) {
+    (originalToast as any).success = wrapToastFn((originalToast as any).success);
+  }
+  if ((originalToast as any).error && !(originalToast as any).error.__wrapped) {
+    (originalToast as any).error = wrapToastFn((originalToast as any).error);
+  }
+  if ((originalToast as any).warning && !(originalToast as any).warning.__wrapped) {
+    (originalToast as any).warning = wrapToastFn((originalToast as any).warning);
+  }
+  if ((originalToast as any).info && !(originalToast as any).info.__wrapped) {
+    (originalToast as any).info = wrapToastFn((originalToast as any).info);
+  }
+}
 
 /** Pages that do NOT require authentication */
 const PUBLIC_PATHS = ["/login", "/forgot-password", "/tracking", "/apply"];
@@ -96,7 +150,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className={cn("font-sans", "min-h-[100dvh] bg-slate-50 flex flex-col w-full")}>
         <main className="flex-1 flex flex-col">{children}</main>
-        <Toaster position="top-right" closeButton richColors />
+        <Toaster position="top-right" offset="70px" closeButton richColors />
         <ReminderEngine />
       </div>
     );
@@ -190,8 +244,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <BottomNav />
         </div>
       </div>
-      <Toaster position="top-right" closeButton richColors />
+      <Toaster position="top-right" offset="70px" closeButton richColors />
       <ReminderEngine />
+      {/* ThemeApplier: zero-render component that watches siteSettings
+          and keeps CSS variables in sync on every page and after refresh */}
+      <ThemeApplier />
     </div>
   );
 }

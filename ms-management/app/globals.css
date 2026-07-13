@@ -88,22 +88,20 @@
   --sidebar-ring: oklch(0.48 0.22 260);
 
   /* Custom premium tokens */
-  --ms-gradient-start: #080a0f; /* High contrast black */
-  --ms-gradient-mid: #1d4ed8; /* Logo blue */
-  --ms-gradient-end: #2563eb;
-  --ms-glow: 0 0 35px rgba(29, 78, 216, 0.15);
+  --ms-gradient-start: var(--sidebar, #080a0f);
+  --ms-gradient-mid: var(--primary, #1d4ed8);
+  --ms-gradient-end: var(--primary, #2563eb);
+  --ms-glow: 0 0 35px rgba(59, 130, 246, 0.15);
   --ms-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 20px -8px rgba(0, 0, 0, 0.02);
-  --ms-card-shadow-hover: 0 16px 32px -8px rgba(29, 78, 216, 0.1), 0 0 0 1px oklch(0.48 0.22 260 / 8%);
+  --ms-card-shadow-hover: 0 16px 32px -8px rgba(59, 130, 246, 0.1), 0 0 0 1px oklch(0.48 0.22 260 / 8%);
+  --ms-brand-grad: linear-gradient(135deg, var(--primary, #1d4ed8) 0%, var(--sidebar, #0f172a) 100%);
+  --ms-success-grad: linear-gradient(135deg, #059669 0%, #10b981 100%);
 
-  /* Status Colors */
+  /* Status Colors — semantic, not theme-driven */
   --ms-status-processing: #2563eb;
   --ms-status-placed: #10b981;
   --ms-status-returned: #f59e0b;
   --ms-status-rejected: #ef4444;
-
-  /* Brand Gradient Palette */
-  --ms-brand-grad: linear-gradient(135deg, #1d4ed8 0%, #0f172a 100%);
-  --ms-success-grad: linear-gradient(135deg, #059669 0%, #10b981 100%);
 }
 
 .dark {
@@ -439,6 +437,7 @@
 }
 
 /* ─── Glassmorphism Header ─── */
+/* Base fallback — overridden at runtime by applyTheme.ts */
 .ms-glass {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -446,6 +445,7 @@
 }
 
 /* ─── Frosted Bottom Nav ─── */
+/* Base fallback — overridden at runtime by applyTheme.ts */
 .ms-frost {
   backdrop-filter: blur(20px) saturate(200%);
   -webkit-backdrop-filter: blur(20px) saturate(200%);
@@ -453,8 +453,9 @@
 }
 
 /* ─── Sidebar Gradient ─── */
+/* Base fallback – overridden at runtime by applyTheme.ts via #ms-dynamic-theme */
 .ms-sidebar-gradient {
-  background: linear-gradient(180deg, #0c1529 0%, #101d3a 40%, #0e1a33 100%);
+  background: linear-gradient(180deg, var(--sidebar, #0c1529) 0%, var(--ms-gradient-start, #101d3a) 40%, var(--sidebar, #0e1a33) 100%);
 }
 
 /* ─── Global Search & Filter (Req 28) ─── */
@@ -552,9 +553,10 @@
 }
 
 /* ─── Gradient Accent Line (for PageHeader) ─── */
+/* Overridden at runtime by applyTheme.ts */
 .ms-accent-line {
   height: 3px;
-  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #06b6d4 100%);
+  background: linear-gradient(90deg, var(--primary, #2563eb) 0%, var(--ms-gradient-mid, #7c3aed) 50%, var(--primary, #06b6d4) 100%);
   border-radius: 100px;
   width: 60px;
   margin-top: 4px;

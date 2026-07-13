@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Save, Building, Paintbrush, Globe, Mail, Phone, MapPin,
   CheckCircle2, ShieldAlert, Share2, ToggleLeft, ToggleRight, FileText
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import AccessDenied from "@/components/shared/AccessDenied";
+import { applyThemeCssVars } from "@/lib/applyTheme";
 
 const COMPANY_SPECIFIC_MODULES = [
   "Applicants", "Staff", "Tasks", "Interviews", "Leave Requests", "Staff Requests",
@@ -94,6 +95,27 @@ export default function SettingsPage() {
 
   const isSuperAdmin = currentRole === "Super Admin";
 
+  // Live theme preview — apply colors to CSS variables whenever the form
+  // color fields change. This gives instant visual feedback on both desktop
+  // and mobile without requiring a Save action first.
+  useEffect(() => {
+    applyThemeCssVars({
+      primaryColor:     form.primaryColor,
+      sidebarColor:     form.sidebarColor,
+      backgroundColor:  form.backgroundColor,
+      cardColor:        form.cardColor,
+      textColor:        form.textColor,
+      borderColor:      form.borderColor,
+      buttonColor:      form.buttonColor,
+      headerColor:      form.headerColor,
+      fontFamily:       form.fontFamily,
+    });
+  }, [
+    form.primaryColor, form.sidebarColor, form.backgroundColor,
+    form.cardColor, form.textColor, form.borderColor,
+    form.buttonColor, form.headerColor, form.fontFamily
+  ]);
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSuperAdmin) { toast.error("Only Super Admin can save settings"); return; }
@@ -141,7 +163,7 @@ export default function SettingsPage() {
       newValue: `Site settings updated by ${currentUser.name}`,
       ipAddress: "192.168.1.102",
     });
-    toast.success("Settings saved successfully! Refresh page to apply typography.");
+    toast.success("Settings saved and theme applied successfully!");
   };
 
   if (!isSuperAdmin) {

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { User, Applicant, Staff, Company, InternalCompany, Branch, Task, Interview, LeaveRequest, StaffRequest, Vehicle, Supplier, Placement, Notification, ActivityLog, PayrollRecord, Role, PasswordResetRequest, StaffAttendance, SiteSettings, Shift, OvertimeRequest, AttendanceCorrection, SentEmail, SentWhatsApp, PayrollRules } from "../lib/types";
 import { getPermissionModuleName } from "../lib/constants";
+import { applyThemeCssVars } from "../lib/applyTheme";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -382,6 +383,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         salarySetups,
         isStoreLoaded: true
       });
+      // Apply theme CSS variables immediately after store load (covers page refresh,
+      // initial login, and back-navigation — works on Android Chrome + Safari iOS).
+      if (settings) {
+        applyThemeCssVars(settings);
+      }
     } catch (e) {
       console.error("initStore failed:", e);
     }
@@ -1315,6 +1321,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (res.ok) {
       const saved = await res.json();
       set({ siteSettings: saved });
+      // Apply theme CSS variables immediately so the UI updates without a
+      // page refresh. Works on desktop, Android Chrome, and Safari iOS.
+      applyThemeCssVars(saved);
     }
   },
 
