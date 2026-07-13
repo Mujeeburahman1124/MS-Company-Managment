@@ -93,7 +93,7 @@ function buildAgreementHtml(placement: Placement, terms: any[], settings: any): 
     <div class="info-box">
       <div class="info-grid">
         ${infoRow("Client Company Name", placement.companyName)}
-        ${infoRow("Trade License Number", placement.clientTradeLicense)}
+        ${infoRow("Trade License Number", placement.clientTradeLicense || "N/A (Optional)")}
         ${infoRow("Company Address", placement.clientAddress)}
         ${infoRow("Contact Person", placement.clientContactPerson)}
         ${infoRow("Mobile Number", placement.clientContactNumber)}

@@ -251,6 +251,31 @@ export default function PlacementPage() {
       .catch(console.error);
   }, []);
 
+  // Listen to URL parameters to automatically trigger Generate or View Agreement dialogs
+  // (e.g. after successful placement creation redirection from Applicant Detail page)
+  useEffect(() => {
+    if (typeof window !== "undefined" && placements.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const generateId = params.get("generateAgreementId");
+      const viewId = params.get("viewAgreementId");
+
+      if (generateId) {
+        const found = placements.find(p => p.id === generateId);
+        if (found) {
+          setAgreementFormModal(found);
+          // Clean the query parameters so refresh doesn't trigger modal again
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      } else if (viewId) {
+        const found = placements.find(p => p.id === viewId);
+        if (found) {
+          setAgreementModal(found);
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      }
+    }
+  }, [placements]);
+
   // Registration Dialog states
   const [registerModal, setRegisterModal] = useState(false);
 

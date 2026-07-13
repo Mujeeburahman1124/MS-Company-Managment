@@ -177,47 +177,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       }
     });
 
-    // Auto-create Placement record when status becomes Placed
-    if (data.status === "Placed" && existing.status !== "Placed") {
-      const existingPlacement = await prisma.placement.findFirst({
-        where: { applicantId: id }
-      });
-
-      if (!existingPlacement) {
-        const clientCompany = await prisma.company.findFirst({
-          where: { name: data.clientName || updated.clientName || "" }
-        });
-
-        await prisma.placement.create({
-          data: {
-            applicantId: id,
-            applicantName: updated.fullName,
-            companyId: clientCompany?.id || "unknown-client",
-            companyName: data.clientName || updated.clientName || "Unknown Client Company",
-            position: updated.applyingPositions && Array.isArray(updated.applyingPositions) && updated.applyingPositions[0] ? (updated.applyingPositions[0] as string) : "Staff Member",
-            salary: Number(data.salary) || 0,
-            placementDate: data.placementDate || new Date().toISOString().slice(0, 10),
-            status: "Placed",
-            company: updated.company,
-            branch: updated.branch,
-            createdAt: new Date().toISOString().slice(0, 10),
-            agreementStatus: "Signed",
-            passportNumber: updated.passportNumber || "",
-            mobileNumber: updated.mobile || "",
-            registrationDate: new Date().toISOString().slice(0, 10),
-            placementDeadline: new Date().toISOString().slice(0, 10),
-            registrationFee: 0,
-            placementFee: 0,
-            refundStatus: "Not Applicable",
-            agreementAccepted: true,
-            agreementHistory: [
-              `Placement automatically created upon applicant status change to Placed.`,
-              `Placed with company: ${data.clientName || updated.clientName || "Unknown Client"} on ${data.placementDate || new Date().toISOString().slice(0, 10)}.`
-            ]
-          }
-        });
-      }
-    }
 
     // If status has changed, trigger real-time notifications
     if (data.status && data.status !== existing.status && updated.email) {

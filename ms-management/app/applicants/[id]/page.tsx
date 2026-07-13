@@ -282,18 +282,21 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
           experience: applicant.experience || "",
           passportExpiry: applicant.passportExpiry || "",
           photo: applicant.photo || "",
-          companyId: "temp",
-          company: "MS Horizon F.Z.E",
-          branch: "Dubai",
+          companyId: companies.find(c => c.name === placementData.companyName)?.id || "temp",
+          company: applicant.company || "MS Horizon F.Z.E",
+          branch: applicant.branch || "Dubai",
           ...placementData,
           status: "Placed"
         })
       });
       if (!placeRes.ok) throw new Error("Failed to create placement record");
+      const createdPlacement = await placeRes.json();
 
-      toast.success("Placement generated successfully!");
-      router.refresh();
+      toast.success("Placement record created successfully!");
       setIsCreatePlacementModalOpen(false);
+      
+      // Redirect to the placement agreement page (passing query param to auto-open agreement modal)
+      router.push(`/placement?generateAgreementId=${createdPlacement.id}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to process placement");
     }

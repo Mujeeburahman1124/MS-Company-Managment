@@ -245,7 +245,7 @@ export default function CreatePlacementModal({
           <div className="space-y-4">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
               <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px]">5</span>
-              Visa Process Tracking
+              Visa & Process Status
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
@@ -258,60 +258,46 @@ export default function CreatePlacementModal({
                 </select>
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Visa Processing Stage</Label>
-                <select name="visaProcessingStage" value={formData.visaProcessingStage} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400">
-                  <option value="">Select Stage</option>
-                  <option value="Documents Collected">Documents Collected</option>
-                  <option value="Offer Letter Signed">Offer Letter Signed</option>
-                  <option value="Quota Approved">Quota Approved</option>
-                  <option value="Labour Approval">Labour Approval</option>
-                  <option value="E-Visa Issued">E-Visa Issued</option>
-                  <option value="Status Change">Status Change / In-Country</option>
-                  <option value="Medical Done">Medical Done</option>
-                  <option value="Emirates ID Biometrics">Emirates ID Biometrics</option>
-                  <option value="Visa Stamped">Visa Stamped</option>
+                <Label className="text-[10px] font-bold text-slate-500 uppercase">Visa Status</Label>
+                <select name="visaStatus" value={formData.visaStatus} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400">
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Issued">Issued</option>
+                  <option value="N/A">N/A</option>
                 </select>
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Visa Number</Label>
-                <Input name="visaNumber" value={formData.visaNumber} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px]">6</span>
-              Placement Fee & Payments
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Registration Fee</Label>
-                <Input name="registrationFee" type="number" value={formData.registrationFee} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Placement Fee</Label>
-                <Input name="placementFee" type="number" value={formData.placementFee} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Payment Status</Label>
-                <select name="paymentStatus" value={formData.paymentStatus} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400">
-                  <option value="Unpaid">Unpaid</option>
-                  <option value="Partially Paid">Partially Paid</option>
-                  <option value="Fully Paid">Fully Paid</option>
+                <Label className="text-[10px] font-bold text-slate-500 uppercase">Medical Status</Label>
+                <select name="medicalStatus" value={formData.medicalStatus} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400">
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Passed">Passed</option>
+                  <option value="Failed">Failed</option>
+                  <option value="N/A">N/A</option>
                 </select>
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Paid Amount</Label>
-                <Input name="paidAmount" type="number" value={formData.paidAmount} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
+                <Label className="text-[10px] font-bold text-slate-500 uppercase">Emirates ID Status</Label>
+                <select name="emiratesIdStatus" value={formData.emiratesIdStatus} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400">
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Biometrics Done">Biometrics Done</option>
+                  <option value="Issued">Issued</option>
+                  <option value="N/A">N/A</option>
+                </select>
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Due Amount</Label>
-                <Input name="dueAmount" type="number" value={formData.dueAmount} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Receipt Number</Label>
-                <Input name="receiptNumber" value={formData.receiptNumber} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
+                <Label className="text-[10px] font-bold text-slate-500 uppercase">Labour Contract Status</Label>
+                <select name="labourContractStatus" value={formData.labourContractStatus} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 focus:border-blue-400">
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Signed">Signed</option>
+                  <option value="Submitted">Submitted</option>
+                  <option value="Approved">Approved</option>
+                  <option value="N/A">N/A</option>
+                </select>
               </div>
             </div>
           </div>
