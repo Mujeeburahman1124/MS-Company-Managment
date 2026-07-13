@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Applicant } from "@/lib/types";
 import { toast } from "sonner";
 import Link from "next/link";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import AccessDenied from "@/components/shared/AccessDenied";
 
 export default function TrackingPage() {
@@ -285,14 +285,16 @@ export default function TrackingPage() {
   const totalPlacedInPipeline = baseApplicants.filter(a => a.status === "Placed").length;
 
   const STAGES: Applicant["status"][] = [
+    "Registered",
     "Pending",
     "Processing",
     "Interview Scheduled",
     "Selected",
     "Visa Processing",
+    "Ready To Travel",
     "Placed",
-    "Returned",
-    "Rejected"
+    "Rejected",
+    "Returned"
   ];
 
   const handleStatusSubmit = (e: React.FormEvent) => {
@@ -363,60 +365,70 @@ export default function TrackingPage() {
     e.preventDefault();
     const id = e.dataTransfer.getData("appId");
     const app = baseApplicants.find(a => a.id === id);
-    if (app && app.status !== newStatus) {
-      if (
-        newStatus === "Placed" ||
-        newStatus === "Processing" ||
-        newStatus === "Rejected" ||
-        newStatus === "Returned"
-      ) {
-        setDraggedApplicant(app);
-        setTargetStatus(newStatus);
-        setStatusReason("");
-        setPlacedCompany("");
-        setPlacedDate("");
-        setIsStatusDialogOpen(true);
-      } else {
-        const updated = {
-          ...app,
-          status: newStatus,
-          statusHistory: [
-            {
-              oldStatus: app.status,
-              newStatus: newStatus,
-              changedBy: currentUser.name,
-              date: new Date().toISOString().replace("T", " ").slice(0, 19),
-              reason: `Moved via Kanban board to ${newStatus}`
-            },
-            ...app.statusHistory
-          ]
-        };
-        updateApplicant(updated);
-        addActivityLog({
-          id: `LOG-${Date.now()}`,
-          dateTime: new Date().toISOString().replace("T", " ").slice(0, 19),
-          userName: currentUser.name,
-          role: currentUser.role,
-          company: currentUser.company,
-          branch: currentUser.branch,
-          action: "Status Changed",
-          module: "Tracking",
-          oldValue: app.status,
-          newValue: newStatus,
-          ipAddress: "192.168.1.102"
-        });
-        toast.success(`${app.fullName} moved to ${newStatus}`);
+    if (app) {
+      initiateStatusChange(app, newStatus);
+    }
+  };
+
+  const initiateStatusChange = (app: Applicant, newStatus: Applicant["status"]) => {
+    if (app.status === newStatus) return;
+    if (
+      newStatus === "Placed" ||
+      newStatus === "Processing" ||
+      newStatus === "Rejected" ||
+      newStatus === "Returned"
+    ) {
+      setDraggedApplicant(app);
+      setTargetStatus(newStatus);
+      setStatusReason("");
+      setPlacedCompany("");
+      setPlacedDate("");
+      setIsStatusDialogOpen(true);
+    } else {
+      const updated = {
+        ...app,
+        status: newStatus,
+        statusHistory: [
+          {
+            oldStatus: app.status,
+            newStatus: newStatus,
+            changedBy: currentUser.name,
+            date: new Date().toISOString().replace("T", " ").slice(0, 19),
+            reason: `Status changed to ${newStatus}`
+          },
+          ...app.statusHistory
+        ]
+      };
+      updateApplicant(updated);
+      addActivityLog({
+        id: `LOG-${Date.now()}`,
+        dateTime: new Date().toISOString().replace("T", " ").slice(0, 19),
+        userName: currentUser.name,
+        role: currentUser.role,
+        company: currentUser.company,
+        branch: currentUser.branch,
+        action: "Status Changed",
+        module: "Tracking",
+        oldValue: app.status,
+        newValue: newStatus,
+        ipAddress: "Browser"
+      });
+      toast.success(`${app.fullName} status updated to ${newStatus}`);
+      if (selectedApp?.id === app.id) {
+        setSelectedApp(updated);
       }
     }
   };
 
   const getColColor = (status: string) => {
     switch (status) {
+      case "Registered": return "bg-indigo-50 border-indigo-200 text-indigo-700";
       case "Pending": return "bg-slate-50 border-slate-200 text-slate-700";
       case "Processing": return "bg-sky-50 border-sky-200 text-sky-700";
       case "Interview Scheduled": return "bg-purple-50 border-purple-200 text-purple-700";
-      case "Selected": return "bg-indigo-50 border-indigo-200 text-indigo-700";
+      case "Selected": return "bg-blue-50 border-blue-200 text-blue-700";
       case "Visa Processing": return "bg-amber-50 border-amber-200 text-amber-700";
+      case "Ready To Travel": return "bg-teal-50 border-teal-200 text-teal-700";
       case "Placed": return "bg-emerald-50 border-emerald-200 text-emerald-700";
       case "Returned": return "bg-orange-50 border-orange-200 text-orange-700";
       case "Rejected": return "bg-rose-50 border-rose-200 text-rose-700";
@@ -524,6 +536,67 @@ export default function TrackingPage() {
               <div className="text-base font-extrabold text-slate-800">{baseApplicants.filter(a => a.status === "Visa Processing").length} Processing</div>
             </div>
           </Card>
+        </div>
+      </div>
+
+      {/* Interactive Status KPI Cards */}
+      <div className="bg-slate-50/60 border-b border-slate-100 px-4 md:px-6 py-3 flex-shrink-0">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Filter Pipeline by Status</h3>
+            {statusFilter !== "all" && (
+              <button 
+                onClick={() => setFilter("tracking", { status: "all" })}
+                className="text-[9px] font-bold text-purple-600 hover:text-purple-700"
+              >
+                Clear Status Filter
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2.5 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+            {/* 'All' Card */}
+            <Card 
+              onClick={() => setFilter("tracking", { status: "all", page: 1 })}
+              className={cn(
+                "flex-shrink-0 min-w-[110px] p-3 rounded-xl border transition-all cursor-pointer select-none",
+                statusFilter === "all" 
+                  ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-500/10" 
+                  : "bg-white border-slate-100 hover:border-purple-200 text-slate-700"
+              )}
+            >
+              <div className={cn("text-[9px] font-bold uppercase tracking-wider", statusFilter === "all" ? "text-purple-100" : "text-slate-400")}>
+                All Stages
+              </div>
+              <div className="text-sm font-extrabold mt-0.5">
+                {baseApplicants.length}
+              </div>
+            </Card>
+
+            {STAGES.map(stage => {
+              const count = baseApplicants.filter(a => a.status === stage).length;
+              const isSelected = statusFilter === stage;
+              
+              return (
+                <Card
+                  key={stage}
+                  onClick={() => setFilter("tracking", { status: stage, page: 1 })}
+                  className={cn(
+                    "flex-shrink-0 min-w-[125px] p-3 rounded-xl border transition-all cursor-pointer select-none",
+                    isSelected 
+                      ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-500/10"
+                      : "bg-white border-slate-100 hover:border-purple-200 text-slate-700"
+                  )}
+                >
+                  <div className={cn("text-[9px] font-bold uppercase tracking-wider truncate", isSelected ? "text-purple-100" : "text-slate-400")}>
+                    {stage}
+                  </div>
+                  <div className="text-sm font-extrabold mt-0.5">
+                    {count}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -912,19 +985,80 @@ export default function TrackingPage() {
 
           {selectedApp && (
             <div className="space-y-5 pt-3">
-              {/* Core Status & Expiration Progress */}
-              <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Current Phase</div>
-                  <div className="text-sm font-extrabold text-slate-800 mt-0.5 flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse inline-block" />
-                    {selectedApp.status}
+              {/* Snapshot Details Block */}
+              <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-center gap-4">
+                <Avatar className="w-16 h-16 rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
+                  {selectedApp.photo ? (
+                    <AvatarImage src={selectedApp.photo} className="object-cover rounded-xl" />
+                  ) : (
+                    <AvatarFallback className="rounded-xl bg-purple-100 text-sm font-black text-purple-700">
+                      {selectedApp.fullName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-extrabold text-slate-800 truncate">{selectedApp.fullName}</h3>
+                  <div className="text-[10px] font-semibold text-slate-400 font-mono mt-0.5">
+                    ID: {selectedApp.id} · Tracking: {selectedApp.trackingCode || "N/A"}
                   </div>
-                  <div className="text-[10px] font-medium text-slate-400 mt-1">Application Date: {formatDate(selectedApp.applicationDate)}</div>
+                  <div className="text-[9px] font-bold text-slate-500 flex flex-wrap gap-1.5 items-center mt-1.5">
+                    <span className="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full uppercase tracking-wider">{selectedApp.nationality}</span>
+                    <span className="bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full uppercase tracking-wider">{selectedApp.applyingPositions ? selectedApp.applyingPositions.join(", ") : "N/A"}</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Detail fields snapshot */}
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Passport Number</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.passportNumber || "N/A"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Passport Expiry</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.passportExpiry ? formatDate(selectedApp.passportExpiry) : "N/A"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Client Company</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.clientName || "Pending Placement"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Consultant</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.createdBy || "System"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Registration Date</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.createdAt ? formatDate(selectedApp.createdAt.slice(0, 10)) : formatDate(selectedApp.applicationDate)}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Last Activity</span>
+                  <strong className="text-slate-800 font-bold text-[10px] truncate block">
+                    {selectedApp.statusHistory && selectedApp.statusHistory[0] 
+                      ? `${selectedApp.statusHistory[0].newStatus} (${selectedApp.statusHistory[0].date.slice(0, 10)})` 
+                      : "Registered"}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Status Change Dropdown Selector (Especially useful for Mobile/Tablet) */}
+              <div className="border border-slate-100 rounded-2xl p-4 bg-white space-y-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Change Pipeline Stage / Status
+                </Label>
                 <div className="flex gap-2">
+                  <select
+                    value={selectedApp.status}
+                    onChange={(e) => initiateStatusChange(selectedApp, e.target.value as Applicant["status"])}
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+                  >
+                    {STAGES.map(stage => (
+                      <option key={stage} value={stage}>{stage}</option>
+                    ))}
+                  </select>
                   <Link href={`/applicants/${selectedApp.id}`}>
-                    <Button variant="outline" size="sm" className="rounded-xl text-[10px] font-bold h-8 border-slate-200">View Full Profile</Button>
+                    <Button variant="outline" size="sm" className="rounded-xl text-[10px] font-bold h-9 border-slate-200 px-3">
+                      Full Profile
+                    </Button>
                   </Link>
                 </div>
               </div>

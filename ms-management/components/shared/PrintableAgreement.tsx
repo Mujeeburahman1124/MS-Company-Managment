@@ -15,7 +15,7 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
   const companyEmail = siteSettings?.email || "info@mshorizon.ae";
   const companyWebsite = siteSettings?.companyWebsite || "www.mshorizon.ae";
   const printFooterText = siteSettings?.printFooter || "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement";
-  const primaryBrandingColor = siteSettings?.primaryColor || "#1a365d";
+  const primaryBrandingColor = "#7c3aed"; // Overridden to Purple branding
 
   const candidateDeclText = siteSettings?.candidateDeclaration || 
     "I hereby declare that I accept the offer of employment and the terms set out in this Agreement. I verify that the passport information, address, and credentials provided are correct. I agree to abide by the labour regulations of the United Arab Emirates.";
@@ -79,13 +79,18 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
         }
 
         @media print {
-          @page { size: A4 portrait; margin: 10mm 15mm; }
+          @page { size: A4 portrait; margin: 12mm 15mm; }
           html, body, main, div, table, tr, td {
             background: white !important;
             background-color: white !important;
             box-shadow: none !important;
           }
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; }
+          body { 
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact; 
+            background: white !important;
+            font-family: system-ui, -apple-system, sans-serif !important;
+          }
           
           /* Display on print */
           .printable-agreement { 
@@ -100,8 +105,8 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
           }
           
           /* Print engine table headers and footers repeating on every page */
-          .print-header-spacer { height: 75px; }
-          .print-footer-spacer { height: 50px; }
+          .print-header-spacer { height: 85px; }
+          .print-footer-spacer { height: 55px; }
           
           .print-header {
             position: fixed;
@@ -112,9 +117,10 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #cbd5e1;
+            border-bottom: 2px solid #7c3aed;
             padding-bottom: 5px;
             background: white !important;
+            z-index: 9999;
           }
           
           .print-footer {
@@ -123,18 +129,19 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
             left: 0;
             right: 0;
             height: 45px;
-            border-top: 1px solid #cbd5e1;
+            border-top: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: white !important;
             font-size: 8pt;
             color: #64748b;
+            z-index: 9999;
           }
 
           .page-break-before { page-break-before: always; }
           .page-break-after { page-break-after: always; }
-          .no-break { page-break-inside: avoid; }
+          .no-break { page-break-inside: avoid; break-inside: avoid; }
           .hide-on-print { display: none !important; }
           
           /* Native CSS page numbering counter */
@@ -149,26 +156,26 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
           margin: 0 auto;
           background: white;
           padding: 15mm;
-          font-family: 'Times New Roman', Times, serif;
-          color: #000;
+          font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          color: #0d1117;
           font-size: 10pt;
-          line-height: 1.4;
+          line-height: 1.45;
         }
 
         .header-logo { max-width: 180px; max-height: 65px; object-fit: contain; }
         
-        h1, h2, h3, h4, h5 { font-family: 'Arial', sans-serif; color: ${primaryBrandingColor}; margin-top: 0; }
-        .section-title { font-size: 11pt; font-weight: bold; border-bottom: 1.5px solid ${primaryBrandingColor}; padding-bottom: 3px; margin-bottom: 10px; margin-top: 15px; text-transform: uppercase; }
+        h1, h2, h3, h4, h5 { color: ${primaryBrandingColor}; margin-top: 0; }
+        .section-title { font-size: 10.5pt; font-weight: bold; border-bottom: 2px solid ${primaryBrandingColor}; padding-bottom: 3px; margin-bottom: 12px; margin-top: 18px; text-transform: uppercase; color: ${primaryBrandingColor}; }
         
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .info-box { border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
-        .info-label { font-size: 8pt; color: #475569; font-weight: bold; text-transform: uppercase; margin-bottom: 1px; }
-        .info-value { font-size: 10pt; font-weight: bold; color: #0f172a; }
+        .info-box { border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 15px; background-color: #fafafa; }
+        .info-label { font-size: 8pt; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+        .info-value { font-size: 9.5pt; font-weight: bold; color: #0f172a; }
         
         .terms-list { padding-left: 18px; margin-bottom: 15px; text-align: justify; font-size: 9.5pt; }
         .terms-list li { margin-bottom: 8px; }
         
-        .signature-box { border: 1px dashed #cbd5e1; height: 80px; display: flex; align-items: center; justify-content: center; margin-top: 5px; border-radius: 4px; overflow: hidden; position: relative; }
+        .signature-box { border: 1.5px dashed #cbd5e1; height: 90px; display: flex; align-items: center; justify-content: center; margin-top: 5px; border-radius: 8px; overflow: hidden; position: relative; }
         .signature-img { max-width: 100%; max-height: 100%; object-fit: contain; }
       `,}} />
 
@@ -179,14 +186,22 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
             <td>
               <div className="print-header">
                 <div className="flex items-center gap-2">
-                  {siteSettings?.logo ? (
-                    <img src={siteSettings.logo} alt="" className="h-8 w-auto object-contain" />
-                  ) : null}
-                  <span className="text-xs font-bold text-slate-800">{companyName}</span>
+                  <img src={siteSettings?.logo || "/logo.png"} alt="" className="h-8 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-black text-slate-800 uppercase tracking-tight">{companyName}</span>
+                    <span className="text-[6px] text-slate-400 font-bold uppercase tracking-wider">Recruitment & Placement</span>
+                  </div>
                 </div>
-                <div className="text-right text-[8px] text-slate-500">
-                  <p>Agreement Ref: MSH-{placement.id?.substring(0, 8).toUpperCase()}</p>
-                  <p>Applicant Name: {placement.applicantName}</p>
+                <div className="flex items-center gap-3 text-right text-[8px] text-slate-500">
+                  <div>
+                    <p className="font-mono font-bold text-slate-800">Agreement Ref: MSH-PLM-{placement.id?.substring(0, 8).toUpperCase()}</p>
+                    <p>Candidate: {placement.applicantName}</p>
+                  </div>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=https://msjobs.net/tracking?code=${placement.id}`}
+                    alt=""
+                    className="w-8 h-8 object-contain bg-white p-0.5 border border-slate-100 rounded"
+                  />
                 </div>
               </div>
               <div className="print-header-spacer"></div>
@@ -337,25 +352,10 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
                 </div>
               </div>
 
-              {/* FINANCIAL INFORMATION */}
-              <h3 className="section-title no-break">7. Financial Information</h3>
-              <div className="info-box bg-slate-50/50 no-break">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2.5 gap-x-4">
-                  <div><div className="info-label">Registration Fee</div><div className="info-value">{placement.registrationFee?.toLocaleString() || "0.00"} AED</div></div>
-                  <div><div className="info-label">Placement Fee</div><div className="info-value">{placement.placementFee?.toLocaleString() || "0.00"} AED</div></div>
-                  <div><div className="info-label">Total Paid</div><div className="info-value">{placement.paidAmount?.toLocaleString() || "0.00"} AED</div></div>
-                  <div><div className="info-label">Pending Balance</div><div className="info-value text-rose-600 font-bold">{placement.dueAmount?.toLocaleString() || "0.00"} AED</div></div>
-                  <div><div className="info-label">Payment Date</div><div className="info-value">{placement.placementDate ? new Date(placement.placementDate).toLocaleDateString('en-GB') : "N/A"}</div></div>
-                  <div><div className="info-label">Payment Method</div><div className="info-value">{placement.paymentMethod || "N/A"}</div></div>
-                  <div><div className="info-label">Receipt Number</div><div className="info-value">{placement.receiptNumber || "N/A"}</div></div>
-                  <div><div className="info-label">Refund Status</div><div className="info-value">{placement.refundStatus || "Not Applicable"}</div></div>
-                </div>
-              </div>
-
               <div className="page-break-before"></div>
 
               {/* TERMS AND CONDITIONS */}
-              <h3 className="section-title mt-0">8. Terms & Conditions</h3>
+              <h3 className="section-title mt-0">7. Terms & Conditions</h3>
               <div className="text-justify mb-4">
                 <ol className="terms-list list-decimal">
                   {finalTerms.map((term: any, idx: number) => (
@@ -367,7 +367,7 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
               </div>
 
               {/* DECLARATIONS */}
-              <h3 className="section-title no-break">9. Declarations</h3>
+              <h3 className="section-title no-break">8. Declarations</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6 text-justify no-break">
                 <div className="border border-slate-200 p-3 rounded-lg bg-slate-50/50">
                   <h4 className="font-bold text-slate-800 mb-1">Candidate Declaration</h4>
@@ -380,7 +380,7 @@ export default function PrintableAgreement({ placement, terms }: { placement: Pl
               </div>
 
               {/* SIGNATURES */}
-              <h3 className="section-title no-break">10. Signatures & Stamp</h3>
+              <h3 className="section-title no-break">9. Signatures & Stamp</h3>
               <div className="no-break">
                 <div className="grid grid-cols-2 gap-12 mt-4">
                   {/* Applicant Signature */}

@@ -226,11 +226,8 @@ export default function PlacementPage() {
       .catch(console.error);
   }, []);
 
-  // Registration Wizard states
+  // Registration Dialog states
   const [registerModal, setRegisterModal] = useState(false);
-  const [wizardStep, setWizardStep] = useState(1);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [wizardSignatures, setWizardSignatures] = useState({ applicant: "", company: "" });
 
   const TODAY_ISO = new Date().toISOString().slice(0, 10);
   const NINETY_DAYS_ISO = (() => { const d = new Date(); d.setDate(d.getDate() + 90); return d.toISOString().slice(0, 10); })();
@@ -251,6 +248,19 @@ export default function PlacementPage() {
   // Action / Detail modals
   const [editModal, setEditModal] = useState<Placement | null>(null);
   const [agreementModal, setAgreementModal] = useState<Placement | null>(null);
+  const [agreementFormModal, setAgreementFormModal] = useState<Placement | null>(null);
+  const [formTermsAndConditions, setFormTermsAndConditions] = useState("");
+  const [formApplicantSign, setFormApplicantSign] = useState("");
+  const [formCompanySign, setFormCompanySign] = useState("");
+
+  useEffect(() => {
+    if (agreementFormModal) {
+      setFormTermsAndConditions(agreementFormModal.termsAndConditions || DEFAULT_TERMS);
+      setFormApplicantSign(agreementFormModal.applicantSign || "");
+      setFormCompanySign(agreementFormModal.companySign || "");
+    }
+  }, [agreementFormModal]);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Status edit form states
@@ -364,27 +374,9 @@ export default function PlacementPage() {
       toast.error("Applicant information and contact details are required.");
       return;
     }
-    if (!termsAccepted) {
-      toast.error("You must accept the terms and conditions before proceeding.");
-      return;
-    }
-    if (!wizardSignatures.applicant) {
-      toast.error("Applicant signature is required.");
-      return;
-    }
 
     if (isSubmittingRegistration) return; // prevent double submission
     setIsSubmittingRegistration(true);
-
-    const isoDate = new Date().toISOString();
-    let ip = "Unknown";
-    try {
-      const ipRes = await fetch("https://api.ipify.org?format=json");
-      const ipData = await ipRes.json();
-      ip = ipData.ip;
-    } catch (e) {
-      console.error("Failed to fetch IP", e);
-    }
 
     // Find applicant email for notification
     const selectedApplicant = applicants.find(a => a.id === registerForm.applicantId);
@@ -419,22 +411,20 @@ export default function PlacementPage() {
       status: "Registered",
       company: currentUser.company,
       branch: currentUser.branch,
-      agreementStatus: "Signed",
+      agreementStatus: "Pending",
       refundStatus: "Not Applicable",
-      agreementAccepted: true,
-      applicantSign: wizardSignatures.applicant,
-      companySign: wizardSignatures.company || undefined,
-      applicantSignDate: isoDate,
-      applicantSignIp: ip,
-      applicantSignDevice: navigator.userAgent,
+      agreementAccepted: false,
+      applicantSign: "",
+      companySign: undefined,
+      applicantSignDate: "",
+      applicantSignIp: "",
+      applicantSignDevice: "",
       notes: registerForm.notes,
-      termsAndConditions: registerForm.termsAndConditions,
+      termsAndConditions: DEFAULT_TERMS,
       createdBy: currentUser.name,
       createdAt: registerForm.registrationDate,
       agreementHistory: [
-        `Registration recorded and Registration Fee (AED ${registerForm.registrationFee}) paid on ${formatDate(registerForm.registrationDate)} by ${currentUser.name}.`,
-        `Terms & Conditions accepted and signed by Applicant.`,
-        wizardSignatures.company ? `Counter-signed by Company Officer.` : `Pending Counter-signature.`
+        `Registration recorded and Registration Fee (AED ${registerForm.registrationFee}) paid on ${formatDate(registerForm.registrationDate)} by ${currentUser.name}.`
       ]
     };
 
@@ -446,7 +436,7 @@ export default function PlacementPage() {
         await addNotification({
           id: `notif-${Date.now()}`,
           title: "New Placement Registration",
-          message: `${registerForm.applicantName} has been registered for placement. Agreement signed. Registration Fee: AED ${registerForm.registrationFee}.`,
+          message: `${registerForm.applicantName} has been registered for placement. Registration Fee: AED ${registerForm.registrationFee}.`,
           type: "activity",
           read: false,
           time: new Date().toISOString(),
@@ -477,7 +467,7 @@ export default function PlacementPage() {
         console.warn("Non-critical: failed to create activity log", logErr);
       }
 
-      toast.success("Applicant registered and payment agreement executed!");
+      toast.success("Placement record created successfully!");
       setRegisterModal(false);
       resetRegisterForm();
     } catch (err: any) {
@@ -485,6 +475,51 @@ export default function PlacementPage() {
       toast.error(err?.message || "Failed to register placement. Please try again.");
     } finally {
       setIsSubmittingRegistration(false);
+    }
+  };
+
+  const handleGenerateAgreementSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!agreementFormModal) return;
+    if (!formApplicantSign) {
+      toast.error("Applicant signature is required to generate the agreement.");
+      return;
+    }
+
+    const isoDate = new Date().toISOString();
+    let ip = "Unknown";
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipRes.json();
+      ip = ipData.ip;
+    } catch (err) {
+      console.error("Failed to fetch IP", err);
+    }
+
+    const updated: Placement = {
+      ...agreementFormModal,
+      agreementStatus: "Signed",
+      agreementAccepted: true,
+      applicantSign: formApplicantSign,
+      companySign: formCompanySign || undefined,
+      applicantSignDate: isoDate,
+      applicantSignIp: ip,
+      applicantSignDevice: typeof window !== "undefined" ? window.navigator.userAgent : "Server",
+      termsAndConditions: formTermsAndConditions,
+      agreementHistory: [
+        ...(agreementFormModal.agreementHistory || []),
+        `Placement Agreement generated and signed by Applicant on ${formatDate(isoDate.slice(0, 10))}.`,
+        formCompanySign ? `Counter-signed by Company Officer.` : `Pending Counter-signature.`
+      ]
+    };
+
+    try {
+      await updatePlacement(updated);
+      toast.success("Placement Agreement generated successfully!");
+      setAgreementFormModal(null);
+      setAgreementModal(updated);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to generate agreement.");
     }
   };
 
@@ -506,9 +541,6 @@ export default function PlacementPage() {
       notes: "",
       termsAndConditions: DEFAULT_TERMS
     });
-    setWizardStep(1);
-    setTermsAccepted(false);
-    setWizardSignatures({ applicant: "", company: "" });
   };
 
   const openEditModal = (p: Placement) => {
@@ -1092,13 +1124,23 @@ export default function PlacementPage() {
 
                   {/* Card Action Buttons */}
                   <div className="flex gap-2 mt-auto pt-2 border-t border-slate-100">
-                    <Button 
-                      size="sm" 
-                      onClick={() => setAgreementModal(p)} 
-                      className="flex-1 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-[10px] font-bold h-8 gap-1 shadow-sm"
-                    >
-                      <FileCheck className="w-3.5 h-3.5" /> View & Sign
-                    </Button>
+                    {p.agreementStatus === "Pending" ? (
+                      <Button 
+                        size="sm" 
+                        onClick={() => setAgreementFormModal(p)} 
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[10px] font-bold h-8 gap-1 shadow-sm"
+                      >
+                        <FileText className="w-3.5 h-3.5" /> Generate Agreement
+                      </Button>
+                    ) : (
+                      <Button 
+                        size="sm" 
+                        onClick={() => setAgreementModal(p)} 
+                        className="flex-1 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-[10px] font-bold h-8 gap-1 shadow-sm"
+                      >
+                        <FileCheck className="w-3.5 h-3.5" /> View & Print
+                      </Button>
+                    )}
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -1123,235 +1165,191 @@ export default function PlacementPage() {
         )}
       </div>
 
-      {/* REGISTRATION WIZARD DIALOG */}
+      {/* REGISTRATION DIALOG */}
       <Dialog open={registerModal} onOpenChange={setRegisterModal}>
         <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto print:hidden">
           <DialogHeader className="border-b border-slate-100 pb-3">
             <DialogTitle className="text-base font-extrabold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
-              <Sparkles className="w-5 h-5 text-blue-600" /> MS Horizon F.Z.E Registration
+              <Sparkles className="w-5 h-5 text-blue-600" /> New Placement Registration
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-400">
-              Complete applicant details, accept the legal contract, collect registration fee, and track timelines.
+              Create a new placement record for the selected candidate. Agreement generation can be performed as a separate step.
             </DialogDescription>
           </DialogHeader>
 
-          {/* Progress Indicators */}
-          <div className="flex items-center justify-between px-6 py-3 bg-slate-50 rounded-2xl my-2">
-            <div className="flex items-center gap-2">
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${wizardStep === 1 ? "bg-blue-600 text-white" : wizardStep > 1 ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"}`}>1</span>
-              <span className={`text-[10px] font-bold ${wizardStep === 1 ? "text-slate-800" : "text-slate-400"}`}>Applicant Info</span>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-300" />
-            <div className="flex items-center gap-2">
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${wizardStep === 2 ? "bg-blue-600 text-white" : wizardStep > 2 ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"}`}>2</span>
-              <span className={`text-[10px] font-bold ${wizardStep === 2 ? "text-slate-800" : "text-slate-400"}`}>Agreement Terms</span>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-300" />
-            <div className="flex items-center gap-2">
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${wizardStep === 3 ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-500"}`}>3</span>
-              <span className={`text-[10px] font-bold ${wizardStep === 3 ? "text-slate-800" : "text-slate-400"}`}>Sign & Pay</span>
-            </div>
-          </div>
-
-          {/* STEP 1: Applicant Information */}
-          {wizardStep === 1 && (
-            <div className="space-y-4 pt-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5 md:col-span-2">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select Applicant <span className="text-rose-500">*</span></Label>
-                  <Select value={registerForm.applicantId} onValueChange={v => handleApplicantSelect(v || "")}>
-                    <SelectTrigger className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400">
-                      <SelectValue placeholder="Choose applicant to register" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white rounded-xl text-xs">
-                      {applicants.map(a => (
-                        <SelectItem key={a.id} value={a.id}>{a.fullName} - {a.id} ({a.nationality})</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Passport / Emirates ID No <span className="text-rose-500">*</span></Label>
-                  <Input 
-                    value={registerForm.passportNumber} 
-                    onChange={e => setRegisterForm(f => ({ ...f, passportNumber: e.target.value }))}
-                    className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile Number <span className="text-rose-500">*</span></Label>
-                  <Input 
-                    value={registerForm.mobileNumber} 
-                    onChange={e => setRegisterForm(f => ({ ...f, mobileNumber: e.target.value }))}
-                    className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Registration Date</Label>
-                  <Input 
-                    type="date" 
-                    value={registerForm.registrationDate} 
-                    onChange={e => setRegisterForm(f => ({ ...f, registrationDate: e.target.value }))}
-                    className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Placement Deadline (Auto +90 days)</Label>
-                  <Input 
-                    type="date" 
-                    value={registerForm.placementDeadline} 
-                    onChange={e => setRegisterForm(f => ({ ...f, placementDeadline: e.target.value }))}
-                    className="bg-white border-slate-200 bg-slate-50 rounded-xl text-xs h-9 focus:border-blue-400" 
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Registration Fee (AED) <span className="text-rose-500">*</span></Label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
-                    <Input 
-                      type="number" 
-                      value={registerForm.registrationFee} 
-                      onChange={e => setRegisterForm(f => ({ ...f, registrationFee: parseFloat(e.target.value) || 0 }))}
-                      className="bg-white border-slate-200 rounded-xl text-xs h-9 pl-12 focus:border-blue-400" 
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Placement Fee (AED) <span className="text-rose-500">*</span></Label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
-                    <Input 
-                      type="number" 
-                      value={registerForm.placementFee} 
-                      onChange={e => setRegisterForm(f => ({ ...f, placementFee: parseFloat(e.target.value) || 0 }))}
-                      className="bg-white border-slate-200 rounded-xl text-xs h-9 pl-12 focus:border-blue-400" 
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 md:col-span-2">
-                  <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Desired Job Position</Label>
-                  <Input 
-                    value={registerForm.position} 
-                    onChange={e => setRegisterForm(f => ({ ...f, position: e.target.value }))}
-                    placeholder="e.g. Sales Executive, Driver, receptionist"
-                    className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
-                  />
-                </div>
+          <div className="space-y-4 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select Applicant <span className="text-rose-500">*</span></Label>
+                <Select value={registerForm.applicantId} onValueChange={v => handleApplicantSelect(v || "")}>
+                  <SelectTrigger className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400">
+                    <SelectValue placeholder="Choose applicant to register" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded-xl text-xs">
+                    {applicants.map(a => (
+                      <SelectItem key={a.id} value={a.id}>{a.fullName} - {a.id} ({a.nationality})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="flex justify-end pt-4 gap-2 border-t border-slate-100">
-                <Button type="button" variant="ghost" onClick={() => setRegisterModal(false)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
-                <Button 
-                  type="button" 
-                  disabled={!registerForm.applicantId || !registerForm.passportNumber || !registerForm.mobileNumber}
-                  onClick={() => setWizardStep(2)} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-4 h-9 gap-1"
-                >
-                  Continue <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: Terms and Conditions Acceptance */}
-          {wizardStep === 2 && (
-            <div className="space-y-4 pt-2">
-              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4">
-                <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-wider mb-1">Customize Agreement Terms & Conditions</h4>
-                <p className="text-[9px] text-slate-400 font-semibold mb-2 leading-relaxed">
-                  Modify the agreement clauses below manually if this company uses different placement rules.
-                </p>
-                
-                <textarea 
-                  rows={10}
-                  value={registerForm.termsAndConditions}
-                  onChange={e => setRegisterForm(f => ({ ...f, termsAndConditions: e.target.value }))}
-                  className="w-full text-[10px] bg-white border border-slate-200 rounded-xl font-sans p-3 text-slate-600 focus:outline-none focus:border-blue-400 leading-relaxed shadow-inner"
-                  placeholder="Type or paste customized terms and conditions..."
-                />
-              </div>
-
-              {/* Mandatory acceptance checkbox */}
-              <div className="flex items-start gap-2.5 p-3 border border-blue-100 bg-blue-50/20 rounded-xl">
-                <input 
-                  type="checkbox" 
-                  id="agree-checkbox" 
-                  checked={termsAccepted}
-                  onChange={e => setTermsAccepted(e.target.checked)}
-                  className="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 mt-0.5 cursor-pointer" 
-                />
-                <Label htmlFor="agree-checkbox" className="text-[11px] font-bold text-slate-700 leading-normal cursor-pointer">
-                  (Mandatory) I Agree to the Terms & Conditions of the MS Horizon F.Z.E Payment & Placement Service Agreement.
-                </Label>
-              </div>
-
-              <div className="flex justify-end pt-4 gap-2 border-t border-slate-100">
-                <Button type="button" variant="ghost" onClick={() => setWizardStep(1)} className="text-xs rounded-xl px-4 h-9 gap-1"><ArrowLeft className="w-3.5 h-3.5" /> Back</Button>
-                <Button 
-                  type="button" 
-                  disabled={!termsAccepted}
-                  onClick={() => setWizardStep(3)} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-4 h-9 gap-1 disabled:opacity-50"
-                >
-                  Continue <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Signatures & Payment confirmation */}
-          {wizardStep === 3 && (
-            <div className="space-y-4 pt-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <SignaturePad 
-                  label="Applicant Signature (Required)" 
-                  onSave={sign => setWizardSignatures(s => ({ ...s, applicant: sign }))}
-                />
-                <SignaturePad 
-                  label="Authorized Rep Counter-Signature (Optional)" 
-                  onSave={sign => setWizardSignatures(s => ({ ...s, company: sign }))}
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Passport / Emirates ID No <span className="text-rose-500">*</span></Label>
+                <Input 
+                  value={registerForm.passportNumber} 
+                  onChange={e => setRegisterForm(f => ({ ...f, passportNumber: e.target.value }))}
+                  className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Internal Consultant Notes</Label>
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile Number <span className="text-rose-500">*</span></Label>
+                <Input 
+                  value={registerForm.mobileNumber} 
+                  onChange={e => setRegisterForm(f => ({ ...f, mobileNumber: e.target.value }))}
+                  className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Registration Date</Label>
+                <Input 
+                  type="date" 
+                  value={registerForm.registrationDate} 
+                  onChange={e => setRegisterForm(f => ({ ...f, registrationDate: e.target.value }))}
+                  className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Placement Deadline (Auto +90 days)</Label>
+                <Input 
+                  type="date" 
+                  value={registerForm.placementDeadline} 
+                  onChange={e => setRegisterForm(f => ({ ...f, placementDeadline: e.target.value }))}
+                  className="bg-white border-slate-200 bg-slate-50 rounded-xl text-xs h-9 focus:border-blue-400" 
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Registration Fee (AED) <span className="text-rose-500">*</span></Label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
+                  <Input 
+                    type="number" 
+                    value={registerForm.registrationFee} 
+                    onChange={e => setRegisterForm(f => ({ ...f, registrationFee: parseFloat(e.target.value) || 0 }))}
+                    className="bg-white border-slate-200 rounded-xl text-xs h-9 pl-12 focus:border-blue-400" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Placement Fee (AED) <span className="text-rose-500">*</span></Label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">AED</span>
+                  <Input 
+                    type="number" 
+                    value={registerForm.placementFee} 
+                    onChange={e => setRegisterForm(f => ({ ...f, placementFee: parseFloat(e.target.value) || 0 }))}
+                    className="bg-white border-slate-200 rounded-xl text-xs h-9 pl-12 focus:border-blue-400" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Desired Job Position</Label>
+                <Input 
+                  value={registerForm.position} 
+                  onChange={e => setRegisterForm(f => ({ ...f, position: e.target.value }))}
+                  placeholder="e.g. Sales Executive, Driver, receptionist"
+                  className="bg-white border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400" 
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Notes</Label>
                 <textarea 
                   rows={2}
                   value={registerForm.notes}
                   onChange={e => setRegisterForm(f => ({ ...f, notes: e.target.value }))}
                   placeholder="Record initial comments, cash/receipt references or candidate guidelines..."
-                  className="w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-white focus:outline-none focus:border-blue-400"
+                  className="w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-white focus:outline-none focus:border-blue-400 resize-none"
                 />
               </div>
+            </div>
 
-              <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 space-y-2">
-                <h5 className="text-[10px] font-extrabold text-indigo-800 uppercase tracking-wider flex items-center gap-1.5"><DollarSign className="w-4 h-4" /> Registration Payment Summary</h5>
-                <div className="text-[11px] font-semibold text-slate-600 space-y-1 leading-normal">
-                  <div className="flex justify-between"><span>Applicant Registration Fee:</span> <span className="font-extrabold text-slate-800">AED {registerForm.registrationFee.toLocaleString()}</span></div>
-                  <div className="flex justify-between border-b pb-1.5"><span>Remaining Placement Fee:</span> <span className="text-slate-500">AED {registerForm.placementFee.toLocaleString()} (Collect upon successful job match)</span></div>
-                  <div className="flex justify-between pt-1"><span>Payment Status:</span> <span className="text-emerald-700 font-extrabold flex items-center gap-1"><Check className="w-3.5 h-3.5" /> PAID (Registration Fee Recorded)</span></div>
+            <div className="flex justify-end pt-4 gap-2 border-t border-slate-100">
+              <Button type="button" variant="ghost" onClick={() => setRegisterModal(false)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
+              <Button 
+                type="button" 
+                disabled={!registerForm.applicantId || !registerForm.passportNumber || !registerForm.mobileNumber || isSubmittingRegistration}
+                onClick={handleRegisterSubmit} 
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 h-9 gap-1.5"
+              >
+                {isSubmittingRegistration ? "Creating..." : "Create Placement"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* GENERATE AGREEMENT DIALOG */}
+      <Dialog open={!!agreementFormModal} onOpenChange={open => !open && setAgreementFormModal(null)}>
+        <DialogContent className="rounded-3xl bg-white border border-slate-100 shadow-2xl p-6 w-[95vw] sm:w-full max-w-3xl max-h-[90vh] overflow-y-auto print:hidden">
+          {agreementFormModal && (
+            <form onSubmit={handleGenerateAgreementSubmit} className="space-y-5">
+              <DialogHeader className="border-b border-slate-100 pb-3">
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                <DialogTitle className="text-base font-extrabold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                  Generate Placement Agreement
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-400">
+                  Customize terms and collect signatures for <span className="font-bold text-slate-700">{agreementFormModal.applicantName}</span>.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4">
+                  <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-wider mb-1">Agreement Terms & Conditions</h4>
+                  <p className="text-[9px] text-slate-400 font-semibold mb-2 leading-relaxed">
+                    Review and modify the clauses below as needed.
+                  </p>
+                  
+                  <textarea 
+                    rows={8}
+                    value={formTermsAndConditions}
+                    onChange={e => setFormTermsAndConditions(e.target.value)}
+                    className="w-full text-[10px] bg-white border border-slate-200 rounded-xl font-sans p-3 text-slate-600 focus:outline-none focus:border-blue-400 leading-relaxed shadow-inner"
+                    placeholder="Type or paste customized terms and conditions..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <SignaturePad 
+                    label="Applicant Signature (Required)" 
+                    onSave={setFormApplicantSign}
+                    defaultValue={formApplicantSign}
+                  />
+                  <SignaturePad 
+                    label="Authorized Rep Counter-Signature (Optional)" 
+                    onSave={setFormCompanySign}
+                    defaultValue={formCompanySign}
+                  />
                 </div>
               </div>
 
               <div className="flex justify-end pt-4 gap-2 border-t border-slate-100">
-                <Button type="button" variant="ghost" onClick={() => setWizardStep(2)} className="text-xs rounded-xl px-4 h-9 gap-1"><ArrowLeft className="w-3.5 h-3.5" /> Back</Button>
+                <Button type="button" variant="ghost" onClick={() => setAgreementFormModal(null)} className="text-xs rounded-xl px-4 h-9">Cancel</Button>
                 <Button 
-                  type="button" 
-                  disabled={!wizardSignatures.applicant}
-                  onClick={handleRegisterSubmit} 
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs px-5 h-9 gap-1.5 shadow-md shadow-emerald-500/10 transition-all"
+                  type="submit" 
+                  disabled={!formApplicantSign}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs px-5 h-9 shadow-md shadow-purple-500/10 transition-all"
                 >
-                  <CheckCircle className="w-4 h-4" /> Finalize Registration & Pay
+                  Generate Agreement & Sign
                 </Button>
               </div>
-            </div>
+            </form>
           )}
         </DialogContent>
       </Dialog>
@@ -1645,10 +1643,6 @@ export default function PlacementPage() {
                       <tr className="bg-slate-50/50 print:bg-white">
                         <td className="p-2 font-bold text-slate-400">Placement Deadline</td>
                         <td className="p-2 text-slate-900">{formatDate(agreementModal.placementDeadline)}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-bold text-slate-400">Registration Fee Paid</td>
-                        <td className="p-2 text-slate-900 font-bold">AED {agreementModal.registrationFee?.toLocaleString() || "0"}</td>
                       </tr>
                       <tr className="bg-slate-50/50 print:bg-white">
                         <td className="p-2 font-bold text-slate-400">Agreement Reference ID</td>

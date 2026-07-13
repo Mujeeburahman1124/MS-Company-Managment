@@ -85,11 +85,6 @@ export default function ReminderEngine() {
           company,
         };
         addNotification(notif);
-        if (isFirstScanDoneRef.current) {
-          toast.info(`${title}: ${message}`, {
-            duration: 5000,
-          });
-        }
       }
     };
 

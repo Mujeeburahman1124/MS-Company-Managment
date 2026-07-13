@@ -70,24 +70,6 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Handle Android Back button or browser back
-  useEffect(() => {
-    const handlePopState = () => {
-      if (isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [isOpen, onClose]);
-
-  // Push state to allow back-to-close behavior
-  useEffect(() => {
-    if (isOpen) {
-      window.history.pushState({ drawerOpen: true }, '');
-    }
-  }, [isOpen]);
-
   return (
     <>
       {/* Backdrop */}
@@ -96,13 +78,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
           "fixed inset-0 z-50 bg-black/60 transition-opacity duration-300 md:hidden",
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
-        onClick={() => {
-          if (window.history.state?.drawerOpen) {
-            window.history.back(); // Triggers popstate and closes drawer
-          } else {
-            onClose();
-          }
-        }}
+        onClick={onClose}
       />
 
       {/* Drawer */}
@@ -167,11 +143,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                         <Link
                           key={item.name}
                           href={item.href}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onClose();
-                            router.replace(item.href);
-                          }}
+                          onClick={onClose}
                           className={cn(
                             "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium",
                             isActive

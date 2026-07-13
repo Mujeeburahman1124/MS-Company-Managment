@@ -46,7 +46,7 @@ export interface Applicant {
   visaExpiry: string;
   passportExpiry: string;
   passportNumber: string;
-  status: "Pending" | "Processing" | "Interview Scheduled" | "Selected" | "Visa Processing" | "Placed" | "Rejected" | "Returned";
+  status: "Registered" | "Pending" | "Processing" | "Interview Scheduled" | "Selected" | "Visa Processing" | "Ready To Travel" | "Placed" | "Rejected" | "Returned";
   trackingCode: string;
   company: string;
   branch: string;

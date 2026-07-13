@@ -113,7 +113,7 @@ export default function BottomNav() {
                     onClick={() => setShowMore(false)}
                     className={cn(
                       "flex flex-col items-center justify-center py-3 px-2 rounded-2xl transition-all gap-1.5",
-                      isActive ? "bg-blue-600 text-white" : "bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      isActive ? "bg-purple-600 text-white" : "bg-slate-50 dark:bg-slate-855 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -131,7 +131,7 @@ export default function BottomNav() {
         {/* Back Button */}
         <button
           onClick={() => { setShowMore(false); router.back(); }}
-          className="flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100"
+          className="flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-purple-600 active:scale-95 duration-100"
         >
           <ChevronLeft className="w-5 h-5" />
           <span className="text-[9px] font-semibold mt-1 tracking-wide">Back</span>
@@ -142,8 +142,8 @@ export default function BottomNav() {
           href="/dashboard"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
-            pathname === "/dashboard" && "text-blue-600"
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-purple-600 active:scale-95 duration-100",
+            pathname === "/dashboard" && "text-purple-600"
           )}
         >
           <LayoutGrid className="w-5 h-5" />
@@ -155,8 +155,8 @@ export default function BottomNav() {
           href="/notifications"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all relative text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
-            pathname?.startsWith("/notifications") && "text-blue-600"
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all relative text-slate-500 dark:text-slate-400 hover:text-purple-600 active:scale-95 duration-100",
+            pathname?.startsWith("/notifications") && "text-purple-600"
           )}
         >
           <div className="relative flex items-center justify-center">
@@ -175,8 +175,8 @@ export default function BottomNav() {
           href="/profile"
           onClick={() => setShowMore(false)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
-            pathname?.startsWith("/profile") && "text-blue-600"
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-purple-600 active:scale-95 duration-100",
+            pathname?.startsWith("/profile") && "text-purple-600"
           )}
         >
           <User className="w-5 h-5" />
@@ -187,8 +187,8 @@ export default function BottomNav() {
         <button
           onClick={() => setShowMore(!showMore)}
           className={cn(
-            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-blue-600 active:scale-95 duration-100",
-            showMore && "text-blue-600"
+            "flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-purple-600 active:scale-95 duration-100",
+            showMore && "text-purple-600"
           )}
         >
           <Menu className="w-5 h-5" />
