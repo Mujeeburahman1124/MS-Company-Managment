@@ -41,9 +41,9 @@ export default function StaffPage() {
     return <AccessDenied />;
   }
 
-  const f = filters.staff;
+  const f = filters.staff || {};
 
-  let list = staff;
+  let list = staff || [];
   if (currentRole !== "Super Admin" && currentUser.company !== "System") {
     list = list.filter(s => s.company === currentUser.company);
     // Strict Branch Validation: If not a Company Admin, restrict to own branch.
@@ -54,22 +54,26 @@ export default function StaffPage() {
 
   if (f.search) {
     const q = f.search.toLowerCase();
-    list = list.filter(s => s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q) || s.position.toLowerCase().includes(q));
+    list = list.filter(s => 
+      (s.name || "").toLowerCase().includes(q) || 
+      (s.email || "").toLowerCase().includes(q) || 
+      (s.position || "").toLowerCase().includes(q)
+    );
   }
-  if (f.mobileSearch) list = list.filter(s => s.mobile.includes(f.mobileSearch));
+  if (f.mobileSearch) list = list.filter(s => (s.mobile || "").includes(f.mobileSearch));
   if (f.status && f.status !== "all") list = list.filter(s => s.status === f.status);
   if (f.company && f.company !== "all") list = list.filter(s => s.company === f.company);
   if (f.branch && f.branch !== "all") list = list.filter(s => s.branch === f.branch);
   if (f.nationality && f.nationality !== "all") list = list.filter(s => s.nationality === f.nationality);
-  if (f.fromDate) list = list.filter(s => new Date(s.joiningDate) >= new Date(f.fromDate));
-  if (f.toDate) list = list.filter(s => new Date(s.joiningDate) <= new Date(f.toDate));
+  if (f.fromDate) list = list.filter(s => s.joiningDate && new Date(s.joiningDate) >= new Date(f.fromDate));
+  if (f.toDate) list = list.filter(s => s.joiningDate && new Date(s.joiningDate) <= new Date(f.toDate));
 
   const sortBy = f.sortBy || "newest";
   list = [...list].sort((a, b) => {
-    if (sortBy === "name_asc") return a.name.localeCompare(b.name);
-    if (sortBy === "name_desc") return b.name.localeCompare(a.name);
-    if (sortBy === "oldest") return new Date(a.joiningDate).getTime() - new Date(b.joiningDate).getTime();
-    return new Date(b.joiningDate).getTime() - new Date(a.joiningDate).getTime();
+    if (sortBy === "name_asc") return (a.name || "").localeCompare(b.name || "");
+    if (sortBy === "name_desc") return (b.name || "").localeCompare(a.name || "");
+    if (sortBy === "oldest") return new Date(a.joiningDate || "").getTime() - new Date(b.joiningDate || "").getTime();
+    return new Date(b.joiningDate || "").getTime() - new Date(a.joiningDate || "").getTime();
   });
 
   const totalItems = list.length;
@@ -123,13 +127,13 @@ export default function StaffPage() {
                           <img src={s.photo} className="w-full h-full object-cover rounded-xl" />
                         ) : (
                           <AvatarFallback className="rounded-xl bg-emerald-50 text-emerald-700 font-bold text-sm">
-                            {s.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()}
+                            {(s.name || "").split(" ").map(w=>w[0]||"").join("").slice(0,2).toUpperCase()}
                           </AvatarFallback>
                         )}
                       </div>
-                      <div>
-                        <div className="text-sm font-bold text-slate-800 leading-tight">{s.name}</div>
-                        <div className="text-[10px] text-slate-500 font-semibold mt-0.5">{s.position}</div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold text-slate-800 leading-tight truncate" title={s.name}>{s.name}</div>
+                        <div className="text-[10px] text-slate-500 font-semibold mt-0.5 truncate" title={s.position}>{s.position}</div>
                       </div>
                     </div>
                     <StatusBadge status={s.status} />
@@ -147,14 +151,14 @@ export default function StaffPage() {
                     </div>
                   )}
 
-                  <div className="space-y-1.5 text-[11px] text-slate-600 border-t border-slate-50 pt-2">
+                  <div className="space-y-1.5 text-[11px] text-slate-600 border-t border-slate-50 pt-2 min-w-0">
                     <div className="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
                       <span>{s.nationalityFlag}</span>
                       <span>{s.nationality}</span>
                     </div>
-                    <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400" />{s.email}</div>
+                    <div className="flex items-center gap-1.5 min-w-0"><Mail className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" /><span className="truncate flex-1" title={s.email}>{s.email}</span></div>
                     <div className="flex items-center justify-between gap-1.5 flex-wrap">
-                      <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" />{s.mobile}</div>
+                      <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />{s.mobile}</div>
                       {s.whatsapp && (
                         <a href={`https://wa.me/${s.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 hover:text-emerald-800">
                           <MessageCircle className="w-3.5 h-3.5 text-emerald-500" /> WhatsApp
@@ -162,11 +166,11 @@ export default function StaffPage() {
                       )}
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">Joined: {formatDate(s.joiningDate)}</div>
-                    <div className="text-[10px] text-slate-400 font-medium">{s.company} · {s.branch}</div>
+                    <div className="text-[10px] text-slate-400 font-medium truncate">{s.company} · {s.branch}</div>
                   </div>
 
                   {/* Documents overlay panel inside card */}
-                  {s.documents && s.documents.length > 0 && (
+                  {s.documents && Array.isArray(s.documents) && s.documents.length > 0 && (
                     <div className="border-t border-slate-50 pt-2">
                       <button type="button" onClick={() => setOpenDocsId(openDocsId === s.id ? null : s.id)} className="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1">
                         📄 View Attachments ({s.documents.length})
@@ -213,9 +217,9 @@ export default function StaffPage() {
                     <TableCell className="font-bold text-slate-400 text-[10px]">{s.id}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Avatar className="w-8 h-8 rounded-lg border border-slate-100">
+                        <Avatar className="w-8 h-8 rounded-lg border border-slate-100 flex-shrink-0">
                           <AvatarFallback className="rounded-lg bg-emerald-50 text-emerald-700 font-bold text-[11px]">
-                            {s.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()}
+                            {(s.name || "").split(" ").map(w=>w[0]||"").join("").slice(0,2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>

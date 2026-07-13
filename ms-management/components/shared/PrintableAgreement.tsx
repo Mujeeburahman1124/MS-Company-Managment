@@ -481,8 +481,6 @@ export function usePrintAgreement() {
     }
     printWindow.document.write(html);
     printWindow.document.close();
-    // Fallback: close after printing (optional – let the user close manually)
-    printWindow.addEventListener("afterprint", () => printWindow.close());
   }, [siteSettings]);
 
   return printAgreement;
