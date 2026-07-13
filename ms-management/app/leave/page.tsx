@@ -11,6 +11,7 @@ import StatusBadge from "@/components/shared/StatusBadge";
 import EmptyState from "@/components/shared/EmptyState";
 import Pagination from "@/components/shared/Pagination";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import AccessDenied from "@/components/shared/AccessDenied";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";

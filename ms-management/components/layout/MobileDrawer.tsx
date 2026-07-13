@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { getPermissionModuleName } from '@/lib/constants';
@@ -16,6 +16,7 @@ type MobileDrawerProps = {
 
 export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentUser, currentRole, hasPermission, logout } = useAuthStore();
   const isSuperAdmin = currentRole === "Super Admin";
 
@@ -166,9 +167,10 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                         <Link
                           key={item.name}
                           href={item.href}
-                          onClick={() => {
-                            if (window.history.state?.drawerOpen) window.history.back();
-                            else onClose();
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onClose();
+                            router.replace(item.href);
                           }}
                           className={cn(
                             "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium",
@@ -206,9 +208,9 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             </div>
             <button
               onClick={() => {
-                if (window.history.state?.drawerOpen) window.history.back();
-                else onClose();
+                onClose();
                 logout();
+                router.replace('/login');
               }}
               className="p-2 text-white/50 hover:text-red-400 transition-colors shrink-0 rounded-lg hover:bg-white/5"
               title="Logout"

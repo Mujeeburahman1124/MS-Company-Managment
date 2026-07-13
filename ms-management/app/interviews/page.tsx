@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, Calendar, Clock, Video, Phone, MapPin, Trash2, Globe, User, Mail } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useFilterStore } from "@/store/filterStore";
-import { exportToCSV } from "@/lib/utils";
+import { exportToCSV, cn } from "@/lib/utils";
 import PageHeader from "@/components/shared/PageHeader";
 import FilterBar from "@/components/shared/FilterBar";
 import StatusBadge from "@/components/shared/StatusBadge";

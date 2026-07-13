@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { AttendanceRecord } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -307,14 +308,14 @@ export default function AttendanceRecords() {
             updated.checkIn = updated.checkIn || (shift ? shift.clockIn : "09:00");
             updated.checkOut = updated.checkOut || (shift ? shift.clockOut : "18:00");
           } else if (value === "Late") {
-            const shiftIn = shift ? shift.clockIn : "09:00";
+            const shiftIn = shift?.clockIn || "09:00";
             const [h, m] = shiftIn.split(":").map(Number);
             const lateTime = `${String(h + 1).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
             updated.checkIn = updated.checkIn || lateTime;
             updated.checkOut = updated.checkOut || (shift ? shift.clockOut : "18:00");
           } else if (value === "Half Day") {
             updated.checkIn = updated.checkIn || (shift ? shift.clockIn : "09:00");
-            const shiftIn = shift ? shift.clockIn : "09:00";
+            const shiftIn = shift?.clockIn || "09:00";
             const [h, m] = shiftIn.split(":").map(Number);
             const halfTime = `${String(h + 4).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
             updated.checkOut = updated.checkOut || halfTime;
@@ -415,7 +416,7 @@ export default function AttendanceRecords() {
         breakHours: metrics.breakHours,
       };
 
-      let updatedRecordsList = [newRecord];
+      let updatedRecordsList: AttendanceRecord[] = [newRecord];
       if (existing) {
         const filtered = existing.records.filter((r: any) => r.date !== date);
         updatedRecordsList = [...filtered, newRecord];

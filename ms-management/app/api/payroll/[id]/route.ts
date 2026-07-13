@@ -13,6 +13,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
+    const data = await request.json();
+
     if (data.status === "Approved") {
       if (!(await hasPermissionBackend(user, "payroll", "approve"))) {
         return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
@@ -22,9 +25,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
       }
     }
-
-    const { id } = await params;
-    const data = await request.json();
 
     const existing = await prisma.payrollRecord.findUnique({
       where: { id }

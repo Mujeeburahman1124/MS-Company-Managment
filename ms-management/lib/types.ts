@@ -618,6 +618,8 @@ export interface AttendanceRecord {
   overtime: number;
   workingHours?: number;
   breakHours?: number;
+  lateArrival?: number;
+  earlyLeaving?: number;
   notes?: string;
 }
 

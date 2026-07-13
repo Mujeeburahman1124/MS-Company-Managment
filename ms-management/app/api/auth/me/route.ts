@@ -65,6 +65,7 @@ export async function GET() {
         status: user.status,
         photo: user.photo,
         theme: user.theme,
+        permissions: user.permissions,
         companyLogo,
         companyName
       }

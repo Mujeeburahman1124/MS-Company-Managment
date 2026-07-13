@@ -102,7 +102,8 @@ export async function POST(request: Request) {
         company: user.company,
         branch: user.branch,
         status: user.status,
-        photo: user.photo
+        photo: user.photo,
+        permissions: user.permissions
       }
     });
 
