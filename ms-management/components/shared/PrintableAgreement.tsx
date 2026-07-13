@@ -1,445 +1,499 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Placement } from "@/lib/types";
 import { useAuthStore } from "@/store/authStore";
 
-export default function PrintableAgreement({ placement, terms }: { placement: Placement; terms?: any[] }) {
-  const { siteSettings } = useAuthStore();
-
-  // Load site setting variables with fallbacks
-  const companyName = siteSettings?.siteName || "MS Horizon F.Z.E";
-  const companyLicense = siteSettings?.companyLicense || "2013854/FZE";
-  const companyAddress = siteSettings?.address || "Office 101, Business Bay, Dubai, UAE";
-  const companyPhone = siteSettings?.phone || "+971 4 123 4567";
-  const companyEmail = siteSettings?.email || "info@mshorizon.ae";
-  const companyWebsite = siteSettings?.companyWebsite || "www.mshorizon.ae";
-  const printFooterText = siteSettings?.printFooter || "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement";
-  const primaryBrandingColor = "#7c3aed"; // Overridden to Purple branding
-
-  const candidateDeclText = siteSettings?.candidateDeclaration || 
+// ─────────────────────────────────────────────────────────────────────────────
+// Utility: Build a self-contained HTML string for the Placement Agreement.
+// This is rendered into a new browser window for printing so that:
+//   • No CSS from the main app hides or clips the content.
+//   • window.print() is called only after all images and content have loaded.
+//   • Works consistently in Chrome, Edge, Firefox, Android Chrome, and Safari.
+// ─────────────────────────────────────────────────────────────────────────────
+function buildAgreementHtml(placement: Placement, terms: any[], settings: any): string {
+  const companyName = settings?.siteName || "MS Horizon F.Z.E";
+  const companyLicense = settings?.companyLicense || "2013854/FZE";
+  const companyAddress = settings?.address || "Office 101, Business Bay, Dubai, UAE";
+  const companyPhone = settings?.phone || "+971 4 123 4567";
+  const companyEmail = settings?.email || "info@mshorizon.ae";
+  const companyWebsite = settings?.companyWebsite || "www.mshorizon.ae";
+  const logoUrl = settings?.logo || "/logo.png";
+  const footerText = settings?.printFooter || "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement";
+  const candidateDecl = settings?.candidateDeclaration ||
     "I hereby declare that I accept the offer of employment and the terms set out in this Agreement. I verify that the passport information, address, and credentials provided are correct. I agree to abide by the labour regulations of the United Arab Emirates.";
-  const consultancyDeclText = siteSettings?.consultancyDeclaration || 
+  const consultancyDecl = settings?.consultancyDeclaration ||
     "We declare that we will act as the authorized placement agent, coordinating the scheduling, interview processing, and document management in compliance with MoHRE policies and UAE Federal Labour Laws.";
 
-  // Safe parsing of placement terms if it's stored as JSON
-  let termsList: any[] = [];
+  // Build final terms list
+  let finalTerms: { title: string; content: string }[] = [];
   try {
     if (placement.termsAndConditions) {
       const parsed = JSON.parse(placement.termsAndConditions);
-      if (Array.isArray(parsed)) termsList = parsed;
+      if (Array.isArray(parsed)) finalTerms = parsed;
     }
-  } catch(e) {}
+  } catch (_) {}
 
-  // Build the final T&Cs list
-  let finalTerms: any[] = [];
-  if (termsList.length > 0) {
-    finalTerms = termsList;
-  } else if (terms && terms.length > 0) {
+  if (finalTerms.length === 0 && terms && terms.length > 0) {
     finalTerms = terms.filter((t: any) => t.isActive !== false);
-  } else if (siteSettings?.placementTerms) {
-    const lines = siteSettings.placementTerms.split("\n").filter(Boolean);
+  }
+  if (finalTerms.length === 0 && settings?.placementTerms) {
+    const lines = settings.placementTerms.split("\n").filter(Boolean);
     finalTerms = lines.map((line: string, i: number) => {
-      const dotIdx = line.indexOf(".");
-      if (dotIdx > 0 && dotIdx < 30) {
-        return {
-          title: line.substring(0, dotIdx).trim(),
-          content: line.substring(dotIdx + 1).trim()
-        };
-      }
-      return {
-        title: `Clause ${i + 1}`,
-        content: line
-      };
+      const dot = line.indexOf(".");
+      if (dot > 0 && dot < 30) return { title: line.substring(0, dot).trim(), content: line.substring(dot + 1).trim() };
+      return { title: `Clause ${i + 1}`, content: line };
     });
-  } else {
-    // Standard legal fallback terms
+  }
+  if (finalTerms.length === 0) {
     finalTerms = [
       { title: "Candidate Responsibilities", content: "The Candidate agrees to submit all necessary documentation, including passports, visa copies, and education credentials, within 3 business days. The Candidate agrees to perform their duties in accordance with the policies of the Placed Company and successfully complete the probation period." },
       { title: "Consultancy Responsibilities", content: "The Consultancy agrees to provide professional placement, screening, and guidance services. The Consultancy will coordinate recruitment timelines, coordinate interviews, and assist with document translation and onboarding with the Placed Company." },
-      { title: "Placement/Service Fee Terms", content: "All service fees are subject to VAT at the prevailing rate in the UAE. The placement service fees are payable in full as set out in this Agreement and are non-refundable once visa processes or work permits have been initiated by the Placed Company." }
+      { title: "Placement/Service Fee Terms", content: "All service fees are subject to VAT at the prevailing rate in the UAE. The placement service fees are payable in full as set out in this Agreement and are non-refundable once visa processes or work permits have been initiated by the Placed Company." },
     ];
   }
-
-  // Append Refund and Replacement policies if they exist in siteSettings
-  if (siteSettings?.refundPolicy && !finalTerms.some(t => t.title.toLowerCase().includes("refund"))) {
-    finalTerms.push({ title: "Refund Policy", content: siteSettings.refundPolicy });
+  if (settings?.refundPolicy && !finalTerms.some(t => t.title.toLowerCase().includes("refund"))) {
+    finalTerms.push({ title: "Refund Policy", content: settings.refundPolicy });
   }
-  if (siteSettings?.replacementPolicy && !finalTerms.some(t => t.title.toLowerCase().includes("replacement"))) {
-    finalTerms.push({ title: "Replacement Policy", content: siteSettings.replacementPolicy });
+  if (settings?.replacementPolicy && !finalTerms.some(t => t.title.toLowerCase().includes("replacement"))) {
+    finalTerms.push({ title: "Replacement Policy", content: settings.replacementPolicy });
   }
 
-  return (
-    <div className="bg-white w-full text-black printable-agreement relative">
-      {/* Global CSS for A4 Print */}
-      <style dangerouslySetInnerHTML={{__html: `
-        /* Hide on screen by default */
-        .printable-agreement {
-          display: none !important;
-        }
+  const refId = (placement.id || "").substring(0, 8).toUpperCase();
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://msjobs.net/tracking?code=${placement.id}`;
 
-        @media print {
-          @page { size: A4 portrait; margin: 12mm 15mm; }
-          html, body, main, div, table, tr, td {
-            background: white !important;
-            background-color: white !important;
-            box-shadow: none !important;
-          }
-          body { 
-            -webkit-print-color-adjust: exact; 
-            print-color-adjust: exact; 
-            background: white !important;
-            font-family: system-ui, -apple-system, sans-serif !important;
-          }
-          
-          /* Display on print */
-          .printable-agreement { 
-            display: block !important;
-            width: 100% !important; 
-            max-width: none !important; 
-            padding: 0 !important; 
-            margin: 0 !important; 
-            box-shadow: none !important; 
-            border: none !important; 
-            background: white !important; 
-          }
-          
-          /* Print engine table headers and footers repeating on every page */
-          .print-header-spacer { height: 85px; }
-          .print-footer-spacer { height: 55px; }
-          
-          .print-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 75px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 2px solid #7c3aed;
-            padding-bottom: 5px;
-            background: white !important;
-            z-index: 9999;
-          }
-          
-          .print-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 45px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: white !important;
-            font-size: 8pt;
-            color: #64748b;
-            z-index: 9999;
-          }
+  // Helper to produce a safe value for HTML display
+  const v = (val: any, fallback = "—") => {
+    const s = String(val ?? "").trim();
+    return s && s !== "null" && s !== "undefined" ? s : fallback;
+  };
 
-          .page-break-before { page-break-before: always; }
-          .page-break-after { page-break-after: always; }
-          .no-break { page-break-inside: avoid; break-inside: avoid; }
-          .hide-on-print { display: none !important; }
-          
-          /* Native CSS page numbering counter */
-          .page-number::after {
-            content: "Page " counter(page) " of " counter(pages);
-          }
-        }
-        
-        .printable-agreement {
-          width: 210mm;
-          min-height: 297mm;
-          margin: 0 auto;
-          background: white;
-          padding: 15mm;
-          font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-          color: #0d1117;
-          font-size: 10pt;
-          line-height: 1.45;
-        }
+  const infoRow = (label: string, value: any) => `
+    <div class="info-cell">
+      <div class="info-label">${label}</div>
+      <div class="info-value">${v(value)}</div>
+    </div>`;
 
-        .header-logo { max-width: 180px; max-height: 65px; object-fit: contain; }
-        
-        h1, h2, h3, h4, h5 { color: ${primaryBrandingColor}; margin-top: 0; }
-        .section-title { font-size: 10.5pt; font-weight: bold; border-bottom: 2px solid ${primaryBrandingColor}; padding-bottom: 3px; margin-bottom: 12px; margin-top: 18px; text-transform: uppercase; color: ${primaryBrandingColor}; }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .info-box { border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 15px; background-color: #fafafa; }
-        .info-label { font-size: 8pt; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
-        .info-value { font-size: 9.5pt; font-weight: bold; color: #0f172a; }
-        
-        .terms-list { padding-left: 18px; margin-bottom: 15px; text-align: justify; font-size: 9.5pt; }
-        .terms-list li { margin-bottom: 8px; }
-        
-        .signature-box { border: 1.5px dashed #cbd5e1; height: 90px; display: flex; align-items: center; justify-content: center; margin-top: 5px; border-radius: 8px; overflow: hidden; position: relative; }
-        .signature-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-      `,}} />
+  const termsHtml = finalTerms.map((t, i) =>
+    `<li><strong>${t.title}:</strong> ${t.content}</li>`
+  ).join("");
 
-      {/* Repeating print engine layout table */}
-      <table className="w-full">
-        <thead className="hidden print:table-header-group">
-          <tr>
-            <td>
-              <div className="print-header">
-                <div className="flex items-center gap-2">
-                  <img src={siteSettings?.logo || "/logo.png"} alt="" className="h-8 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
-                  <div className="flex flex-col text-left">
-                    <span className="text-xs font-black text-slate-800 uppercase tracking-tight">{companyName}</span>
-                    <span className="text-[6px] text-slate-400 font-bold uppercase tracking-wider">Recruitment & Placement</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-right text-[8px] text-slate-500">
-                  <div>
-                    <p className="font-mono font-bold text-slate-800">Agreement Ref: MSH-PLM-{placement.id?.substring(0, 8).toUpperCase()}</p>
-                    <p>Candidate: {placement.applicantName}</p>
-                  </div>
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=https://msjobs.net/tracking?code=${placement.id}`}
-                    alt=""
-                    className="w-8 h-8 object-contain bg-white p-0.5 border border-slate-100 rounded"
-                  />
-                </div>
-              </div>
-              <div className="print-header-spacer"></div>
-            </td>
-          </tr>
-        </thead>
+  const applicantSignHtml = placement.applicantSign
+    ? `<img src="${placement.applicantSign}" alt="Applicant Signature" class="sig-img" />`
+    : `<span class="sig-pending">Digital signature pending</span>`;
+  const companySignHtml = placement.companySign
+    ? `<img src="${placement.companySign}" alt="Company Signature" class="sig-img" />`
+    : `<span class="sig-pending">Authorized Signature &amp; Company Stamp</span>`;
+  const photoHtml = placement.photo
+    ? `<img src="${placement.photo}" alt="Candidate Photo" class="candidate-photo" />`
+    : "";
 
-        <tbody>
-          <tr>
-            <td className="p-0">
-              {/* Branded Letterhead Header */}
-              <div className="flex justify-between items-start border-b-2 border-slate-800 pb-3 mb-4 print:mt-0">
-                <div>
-                  <img src={siteSettings?.logo || "/logo.png"} alt="Company Logo" className="header-logo" onError={(e) => e.currentTarget.style.display='none'} />
-                  <h2 className="text-lg font-black text-slate-800 mt-1">{companyName}</h2>
-                  <p className="text-[9px] text-slate-600">Professional Recruitment & Placement Consultancy</p>
-                  <p className="text-[8px] text-slate-500">License No: {companyLicense} • {companyAddress}</p>
-                </div>
-                <div className="text-right text-[8px] text-slate-500 space-y-0.5">
-                  <p>Tel: {companyPhone}</p>
-                  <p>Email: {companyEmail}</p>
-                  <p>Web: {companyWebsite}</p>
-                </div>
-              </div>
-
-              {/* Centered Agreement Title Block */}
-              <div className="text-center my-6 no-break">
-                <h1 className="text-xs font-black uppercase tracking-wider text-slate-900 border-b border-double border-slate-900 pb-1 inline-block">
-                  PAYMENT & PLACEMENT SERVICE AGREEMENT
-                </h1>
-                <div className="flex justify-center gap-12 mt-2 text-[9px] font-semibold text-slate-600">
-                  <span>Agreement No: <strong className="text-slate-900">MSH-PLM-{placement.id?.substring(0, 8).toUpperCase()}</strong></span>
-                  <span>Agreement Date: <strong className="text-slate-900">{placement.placementDate || new Date().toLocaleDateString('en-GB')}</strong></span>
-                  <span>Applicant ID: <strong className="text-slate-900">{placement.applicantId?.substring(0, 8).toUpperCase()}</strong></span>
-                </div>
-              </div>
-
-              <div className="mb-4 text-justify text-xs">
-                <p>This Professional Placement Agreement (the "Agreement") is entered into on <strong>{placement.placementDate || new Date().toLocaleDateString('en-GB')}</strong> by and between the recruitment consultancy, candidate, and placed client company under the terms set out below.</p>
-              </div>
-
-              {/* EMPLOYEE INFORMATION */}
-              <h3 className="section-title">1. Employee Information</h3>
-              <div className="info-box bg-slate-50/50 no-break flex gap-6 items-start">
-                <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
-                  <div><div className="info-label">Full Name</div><div className="info-value">{placement.applicantName}</div></div>
-                  <div><div className="info-label">Passport Number</div><div className="info-value">{placement.passportNumber || "N/A"}</div></div>
-                  <div><div className="info-label">Nationality</div><div className="info-value">{placement.nationality || "N/A"}</div></div>
-                  <div><div className="info-label">Gender</div><div className="info-value">{placement.gender || "N/A"}</div></div>
-                  <div><div className="info-label">Date of Birth</div><div className="info-value">{placement.dateOfBirth || "N/A"}</div></div>
-                  <div><div className="info-label">Mobile Number</div><div className="info-value">{placement.mobileNumber || "N/A"}</div></div>
-                  <div><div className="info-label">WhatsApp Number</div><div className="info-value">{placement.whatsappNumber || "N/A"}</div></div>
-                  <div><div className="info-label">Email Address</div><div className="info-value">{placement.emailAddress || "N/A"}</div></div>
-                  <div><div className="info-label">Emirates ID</div><div className="info-value">{placement.emiratesId || "N/A"}</div></div>
-                  <div><div className="info-label">Marital Status</div><div className="info-value">{placement.maritalStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Education</div><div className="info-value">{placement.education || "N/A"}</div></div>
-                  <div><div className="info-label">Experience</div><div className="info-value">{placement.experience || "N/A"}</div></div>
-                  <div><div className="info-label">Passport Expiry</div><div className="info-value">{placement.passportExpiry || "N/A"}</div></div>
-                  <div><div className="info-label">Visa Status</div><div className="info-value">{placement.visaStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Registration Date</div><div className="info-value">{placement.registrationDate || "N/A"}</div></div>
-                  <div className="col-span-2 md:col-span-3"><div className="info-label">Current Address</div><div className="info-value">{placement.currentAddress || "N/A"}</div></div>
-                </div>
-                {placement.photo && (
-                  <div className="flex-shrink-0 w-24 h-32 border border-slate-200 rounded-md overflow-hidden bg-white p-1 self-center">
-                    <img src={placement.photo} alt="Candidate Photo" className="w-full h-full object-contain" />
-                  </div>
-                )}
-              </div>
-
-              {/* RECRUITMENT CONSULTANCY DETAILS */}
-              <h3 className="section-title">2. Recruitment Consultancy Details</h3>
-              <div className="info-box bg-slate-50/50 no-break">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
-                  <div><div className="info-label">Company Name</div><div className="info-value">{companyName}</div></div>
-                  <div><div className="info-label">Trade License Number</div><div className="info-value">{companyLicense}</div></div>
-                  <div><div className="info-label">Office Address</div><div className="info-value">{companyAddress}</div></div>
-                  <div><div className="info-label">Telephone</div><div className="info-value">{companyPhone}</div></div>
-                  <div><div className="info-label">Email Address</div><div className="info-value">{companyEmail}</div></div>
-                  <div><div className="info-label">Website</div><div className="info-value">{companyWebsite}</div></div>
-                  <div><div className="info-label">Authorized Representative</div><div className="info-value">{placement.createdBy || "Authorized Signatory"}</div></div>
-                </div>
-              </div>
-
-              {/* PLACED COMPANY DETAILS */}
-              {placement.status === "Placed" && (
-                <>
-                  <h3 className="section-title no-break">3. Placed Company Details</h3>
-                  <div className="info-box bg-slate-50/50 no-break">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
-                      <div><div className="info-label">Client Company Name</div><div className="info-value">{placement.companyName}</div></div>
-                      <div><div className="info-label">Trade License Number</div><div className="info-value">{placement.clientTradeLicense || "N/A (Optional)"}</div></div>
-                      <div><div className="info-label">Company Address</div><div className="info-value">{placement.clientAddress || "N/A"}</div></div>
-                      <div><div className="info-label">Contact Person</div><div className="info-value">{placement.clientContactPerson || "N/A"}</div></div>
-                      <div><div className="info-label">Mobile Number</div><div className="info-value">{placement.clientContactNumber || "N/A"}</div></div>
-                      <div><div className="info-label">Email Address</div><div className="info-value">{placement.clientEmail || "N/A"}</div></div>
-                      <div><div className="info-label">Country</div><div className="info-value">{placement.clientCountry || "N/A"}</div></div>
-                      <div><div className="info-label">Location / City</div><div className="info-value">{placement.workLocation || placement.city || "N/A"}</div></div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* EMPLOYMENT DETAILS */}
-              <h3 className="section-title no-break">4. Employment Details</h3>
-              <div className="info-box bg-slate-50/50 no-break">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4">
-                  <div><div className="info-label">Job Title</div><div className="info-value">{placement.position}</div></div>
-                  <div><div className="info-label">Department</div><div className="info-value">{placement.department || "N/A"}</div></div>
-                  <div><div className="info-label">Working Location</div><div className="info-value">{placement.workLocation || "N/A"}</div></div>
-                  <div><div className="info-label">Country</div><div className="info-value">{placement.clientCountry || "United Arab Emirates"}</div></div>
-                  <div><div className="info-label">Joining Date</div><div className="info-value">{placement.joiningDate ? new Date(placement.joiningDate).toLocaleDateString('en-GB') : "N/A"}</div></div>
-                  <div><div className="info-label">Contract Duration</div><div className="info-value">{placement.contractDuration || "N/A"}</div></div>
-                  <div><div className="info-label">Probation Period</div><div className="info-value">{placement.probationPeriod || "N/A"}</div></div>
-                  <div><div className="info-label">Working Hours / Days</div><div className="info-value">{placement.workingHours || "N/A"}</div></div>
-                  <div><div className="info-label">Weekly Off</div><div className="info-value">{placement.weeklyOff || "N/A"}</div></div>
-                  <div><div className="info-label">Shift Timing</div><div className="info-value">{placement.shiftDetails || "N/A"}</div></div>
-                </div>
-              </div>
-
-              {/* SALARY & COMPENSATION */}
-              <h3 className="section-title no-break">5. Salary & Compensation Details</h3>
-              <div className="info-box bg-slate-50/50 no-break">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2.5 gap-x-4">
-                  <div><div className="info-label">Basic Salary</div><div className="info-value">{placement.salary?.toLocaleString() || "0.00"} {placement.currency || "AED"}</div></div>
-                  <div><div className="info-label">Currency</div><div className="info-value">{placement.currency || "AED"}</div></div>
-                  <div><div className="info-label">Payment Frequency</div><div className="info-value">{placement.paymentFrequency || "Monthly"}</div></div>
-                  <div><div className="info-label">Accommodation</div><div className="info-value">{placement.accommodation || "Not Provided"}</div></div>
-                  <div><div className="info-label">Transportation</div><div className="info-value">{placement.transportation || "Not Provided"}</div></div>
-                  <div><div className="info-label">Food Allowance</div><div className="info-value">{placement.foodAllowance || "Not Provided"}</div></div>
-                  <div><div className="info-label">Medical Insurance</div><div className="info-value">{placement.medicalInsurance || "Provided as per UAE Law"}</div></div>
-                  <div><div className="info-label">Annual Leave</div><div className="info-value">{placement.annualLeave || "As per UAE Law"}</div></div>
-                  <div><div className="info-label">Air Ticket</div><div className="info-value">{placement.airTicket || "Not Provided"}</div></div>
-                  <div className="col-span-2"><div className="info-label">Other Benefits</div><div className="info-value">{placement.otherBenefits || "None"}</div></div>
-                </div>
-              </div>
-
-              {/* VISA & EMPLOYMENT PROCESS */}
-              <h3 className="section-title no-break">6. Visa & Employment Process</h3>
-              <div className="info-box bg-slate-50/50 no-break">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-2.5 gap-x-4">
-                  <div><div className="info-label">Visa Type</div><div className="info-value">{placement.placementVisaType || "N/A"}</div></div>
-                  <div><div className="info-label">Visa Status</div><div className="info-value">{placement.visaStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Medical Status</div><div className="info-value">{placement.medicalStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Labour Contract Status</div><div className="info-value">{placement.labourContractStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Emirates ID Status</div><div className="info-value">{placement.emiratesIdStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Joining Status</div><div className="info-value">{placement.joiningStatus || "N/A"}</div></div>
-                  <div><div className="info-label">Travel Status</div><div className="info-value">{placement.travelStatus || "N/A"}</div></div>
-                </div>
-              </div>
-
-              <div className="page-break-before"></div>
-
-              {/* TERMS AND CONDITIONS */}
-              <h3 className="section-title mt-0">7. Terms & Conditions</h3>
-              <div className="text-justify mb-4">
-                <ol className="terms-list list-decimal">
-                  {finalTerms.map((term: any, idx: number) => (
-                    <li key={idx} className="no-break">
-                      <strong>{term.title}:</strong> {term.content}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-
-              {/* DECLARATIONS */}
-              <h3 className="section-title no-break">8. Declarations</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6 text-justify no-break">
-                <div className="border border-slate-200 p-3 rounded-lg bg-slate-50/50">
-                  <h4 className="font-bold text-slate-800 mb-1">Candidate Declaration</h4>
-                  <p className="text-[10px] leading-relaxed italic">{candidateDeclText}</p>
-                </div>
-                <div className="border border-slate-200 p-3 rounded-lg bg-slate-50/50">
-                  <h4 className="font-bold text-slate-800 mb-1">Consultancy Declaration</h4>
-                  <p className="text-[10px] leading-relaxed italic">{consultancyDeclText}</p>
-                </div>
-              </div>
-
-              {/* SIGNATURES */}
-              <h3 className="section-title no-break">9. Signatures & Stamp</h3>
-              <div className="no-break">
-                <div className="grid grid-cols-2 gap-12 mt-4">
-                  {/* Applicant Signature */}
-                  <div>
-                    <div className="font-bold text-slate-800 mb-1 text-xs">Employee Signature:</div>
-                    <div className="signature-box bg-white">
-                      {placement.applicantSign ? (
-                        <img src={placement.applicantSign} alt="Applicant Signature" className="signature-img" />
-                      ) : (
-                        <span className="text-slate-400 italic text-xs">Digital signature pending</span>
-                      )}
-                    </div>
-                    <div className="mt-2 space-y-0.5 text-[10px] text-slate-600">
-                      <p>Name: <strong>{placement.applicantName}</strong></p>
-                      <p>Date: {placement.applicantSignDate ? new Date(placement.applicantSignDate).toLocaleDateString('en-GB') : "Pending"}</p>
-                      {placement.applicantSignIp && <p>IP: {placement.applicantSignIp}</p>}
-                    </div>
-                  </div>
-
-                  {/* Company Stamp & Signature */}
-                  <div>
-                    <div className="font-bold text-slate-800 mb-1 text-xs">Consultancy Stamp & Signature:</div>
-                    <div className="signature-box border-slate-300 bg-slate-50/50 flex-col">
-                      {placement.companySign ? (
-                        <img src={placement.companySign} alt="Company Signature" className="signature-img" />
-                      ) : (
-                        <span className="text-slate-400 italic text-[10px] text-center px-4">Authorized Signature<br/>& Company Stamp</span>
-                      )}
-                    </div>
-                    <div className="mt-2 space-y-0.5 text-[10px] text-slate-600">
-                      <p>Name: <strong>{placement.createdBy || "Authorized Signatory"}</strong></p>
-                      <p>Place: Dubai, UAE</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-
-        <tfoot className="hidden print:table-footer-group">
-          <tr>
-            <td>
-              <div className="print-footer-spacer"></div>
-              <div className="print-footer">
-                <span>{printFooterText}</span>
-                <span className="page-number"></span>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-
-      {/* Screen-only Footer inside the scroll boundaries */}
-      <div className="mt-10 pt-3 border-t border-slate-200 text-center text-[9px] text-slate-400 print:hidden">
-        <p>{printFooterText}</p>
-        <p>This is a system generated legal document. Ref Reference ID: {placement.id}</p>
+  const placedCompanySection = placement.status === "Placed" ? `
+    <h3 class="section-title">3. Placed Company Details</h3>
+    <div class="info-box">
+      <div class="info-grid">
+        ${infoRow("Client Company Name", placement.companyName)}
+        ${infoRow("Trade License Number", placement.clientTradeLicense)}
+        ${infoRow("Company Address", placement.clientAddress)}
+        ${infoRow("Contact Person", placement.clientContactPerson)}
+        ${infoRow("Mobile Number", placement.clientContactNumber)}
+        ${infoRow("Email Address", placement.clientEmail)}
+        ${infoRow("Country", placement.clientCountry)}
+        ${infoRow("Location / City", (placement as any).workLocation || (placement as any).city)}
       </div>
+    </div>` : "";
 
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Placement Agreement – ${v(placement.applicantName)} – ${refId}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.5;
+      color: #0d1117;
+      background: white;
+      padding: 0;
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 14mm 16mm 18mm 16mm;
+      background: white;
+    }
+
+    /* ── Header / Letterhead ── */
+    .letterhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2.5px solid #1e293b;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .letterhead-left h2 { font-size: 13pt; font-weight: 900; color: #0f172a; margin: 4px 0 2px; }
+    .letterhead-left p { font-size: 7.5pt; color: #64748b; }
+    .letterhead-right { text-align: right; font-size: 8pt; color: #64748b; line-height: 1.6; }
+    .company-logo { max-width: 170px; max-height: 60px; object-fit: contain; display: block; }
+
+    /* ── Agreement Title Block ── */
+    .title-block { text-align: center; margin: 16px 0; }
+    .title-block h1 { font-size: 12pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; border-bottom: 2px double #0f172a; display: inline-block; padding-bottom: 4px; }
+    .title-meta { display: flex; justify-content: center; gap: 40px; margin-top: 8px; font-size: 8pt; font-weight: 600; color: #475569; }
+    .title-meta strong { color: #0f172a; }
+
+    /* ── Intro Paragraph ── */
+    .intro { margin-bottom: 14px; font-size: 9.5pt; text-align: justify; }
+
+    /* ── Section Titles ── */
+    .section-title {
+      font-size: 10pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #7c3aed;
+      border-bottom: 2px solid #7c3aed;
+      padding-bottom: 3px;
+      margin-bottom: 10px;
+      margin-top: 18px;
+    }
+
+    /* ── Info Box & Grid ── */
+    .info-box {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fafafa;
+      margin-bottom: 12px;
+    }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 14px; }
+    .info-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 14px; }
+    .info-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 14px; }
+    .info-cell {}
+    .info-label { font-size: 7.5pt; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+    .info-value { font-size: 9.5pt; font-weight: 700; color: #0f172a; }
+
+    /* ── Candidate Photo ── */
+    .candidate-photo { width: 80px; height: 105px; object-fit: cover; border: 1px solid #cbd5e1; border-radius: 4px; }
+
+    /* ── Terms List ── */
+    .terms-list { padding-left: 18px; font-size: 9pt; text-align: justify; }
+    .terms-list li { margin-bottom: 7px; }
+
+    /* ── Declarations ── */
+    .declarations { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .decl-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f8fafc; }
+    .decl-box h4 { font-size: 9pt; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+    .decl-box p { font-size: 8.5pt; color: #475569; font-style: italic; line-height: 1.55; text-align: justify; }
+
+    /* ── Signatures ── */
+    .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 14px; }
+    .sig-block {}
+    .sig-label { font-size: 9pt; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+    .sig-box {
+      border: 1.5px dashed #94a3b8;
+      border-radius: 8px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    .sig-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .sig-pending { font-size: 9pt; color: #94a3b8; font-style: italic; }
+    .sig-meta { font-size: 8.5pt; color: #475569; margin-top: 5px; line-height: 1.5; }
+
+    /* ── QR code ── */
+    .qr-img { width: 60px; height: 60px; object-fit: contain; }
+
+    /* ── Footer ── */
+    .print-footer {
+      margin-top: 24px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      color: #94a3b8;
+    }
+
+    /* ── Page break ── */
+    .page-break { page-break-before: always; break-before: always; }
+    .no-break { page-break-inside: avoid; break-inside: avoid; }
+
+    /* ── Print media ── */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .page { width: 100%; padding: 0; margin: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- LETTERHEAD -->
+    <div class="letterhead">
+      <div class="letterhead-left">
+        <img src="${logoUrl}" alt="${companyName} Logo" class="company-logo"
+          onerror="this.style.display='none'" />
+        <h2>${companyName}</h2>
+        <p>Professional Recruitment &amp; Placement Consultancy</p>
+        <p>License No: ${companyLicense} &bull; ${companyAddress}</p>
+      </div>
+      <div class="letterhead-right">
+        <div>Tel: ${companyPhone}</div>
+        <div>Email: ${companyEmail}</div>
+        <div>Web: ${companyWebsite}</div>
+        <img src="${qrUrl}" alt="QR Code" class="qr-img" style="margin-top:6px;margin-left:auto;"
+          onerror="this.style.display='none'" />
+      </div>
     </div>
-  );
+
+    <!-- AGREEMENT TITLE -->
+    <div class="title-block">
+      <h1>Payment &amp; Placement Service Agreement</h1>
+      <div class="title-meta">
+        <span>Agreement No: <strong>MSH-PLM-${refId}</strong></span>
+        <span>Agreement Date: <strong>${v(placement.placementDate, new Date().toLocaleDateString("en-GB"))}</strong></span>
+        <span>Applicant ID: <strong>${(placement.applicantId || "").substring(0, 8).toUpperCase()}</strong></span>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <p class="intro">
+      This Professional Placement Agreement (the &ldquo;Agreement&rdquo;) is entered into on
+      <strong>${v(placement.placementDate, new Date().toLocaleDateString("en-GB"))}</strong>
+      by and between the recruitment consultancy, candidate, and placed client company under the terms set out below.
+    </p>
+
+    <!-- 1. EMPLOYEE INFORMATION -->
+    <h3 class="section-title">1. Employee Information</h3>
+    <div class="info-box no-break">
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div class="info-grid" style="flex:1;">
+          ${infoRow("Full Name", placement.applicantName)}
+          ${infoRow("Passport Number", placement.passportNumber)}
+          ${infoRow("Nationality", placement.nationality)}
+          ${infoRow("Gender", (placement as any).gender)}
+          ${infoRow("Date of Birth", (placement as any).dateOfBirth)}
+          ${infoRow("Mobile Number", placement.mobileNumber)}
+          ${infoRow("WhatsApp Number", (placement as any).whatsappNumber)}
+          ${infoRow("Email Address", (placement as any).emailAddress)}
+          ${infoRow("Emirates ID", (placement as any).emiratesId)}
+          ${infoRow("Marital Status", (placement as any).maritalStatus)}
+          ${infoRow("Education", (placement as any).education)}
+          ${infoRow("Experience", (placement as any).experience)}
+          ${infoRow("Passport Expiry", placement.passportExpiry)}
+          ${infoRow("Visa Status", placement.visaStatus)}
+          ${infoRow("Registration Date", placement.registrationDate)}
+          <div class="info-cell" style="grid-column: 1 / -1;">
+            <div class="info-label">Current Address</div>
+            <div class="info-value">${v((placement as any).currentAddress)}</div>
+          </div>
+        </div>
+        ${photoHtml ? `<div style="flex-shrink:0;">${photoHtml}</div>` : ""}
+      </div>
+    </div>
+
+    <!-- 2. RECRUITMENT CONSULTANCY DETAILS -->
+    <h3 class="section-title">2. Recruitment Consultancy Details</h3>
+    <div class="info-box no-break">
+      <div class="info-grid">
+        ${infoRow("Company Name", companyName)}
+        ${infoRow("Trade License Number", companyLicense)}
+        ${infoRow("Office Address", companyAddress)}
+        ${infoRow("Telephone", companyPhone)}
+        ${infoRow("Email Address", companyEmail)}
+        ${infoRow("Website", companyWebsite)}
+        ${infoRow("Authorized Representative", (placement as any).createdBy || "Authorized Signatory")}
+      </div>
+    </div>
+
+    <!-- 3. PLACED COMPANY DETAILS (conditional) -->
+    ${placedCompanySection}
+
+    <!-- 4. EMPLOYMENT DETAILS -->
+    <h3 class="section-title">4. Employment Details</h3>
+    <div class="info-box no-break">
+      <div class="info-grid">
+        ${infoRow("Job Title", placement.position)}
+        ${infoRow("Department", (placement as any).department)}
+        ${infoRow("Working Location", (placement as any).workLocation)}
+        ${infoRow("Country", placement.clientCountry || "United Arab Emirates")}
+        ${infoRow("Joining Date", placement.joiningDate ? new Date(placement.joiningDate).toLocaleDateString("en-GB") : "—")}
+        ${infoRow("Contract Duration", (placement as any).contractDuration)}
+        ${infoRow("Probation Period", (placement as any).probationPeriod)}
+        ${infoRow("Working Hours / Days", (placement as any).workingHours)}
+        ${infoRow("Weekly Off", (placement as any).weeklyOff)}
+        ${infoRow("Shift Timing", (placement as any).shiftDetails)}
+      </div>
+    </div>
+
+    <!-- 5. SALARY & COMPENSATION -->
+    <h3 class="section-title">5. Salary &amp; Compensation Details</h3>
+    <div class="info-box no-break">
+      <div class="info-grid-4">
+        ${infoRow("Basic Salary", `${placement.salary?.toLocaleString() || "0.00"} ${(placement as any).currency || "AED"}`)}
+        ${infoRow("Currency", (placement as any).currency || "AED")}
+        ${infoRow("Payment Frequency", (placement as any).paymentFrequency || "Monthly")}
+        ${infoRow("Accommodation", (placement as any).accommodation || "Not Provided")}
+        ${infoRow("Transportation", (placement as any).transportation || "Not Provided")}
+        ${infoRow("Food Allowance", (placement as any).foodAllowance || "Not Provided")}
+        ${infoRow("Medical Insurance", (placement as any).medicalInsurance || "Provided as per UAE Law")}
+        ${infoRow("Annual Leave", (placement as any).annualLeave || "As per UAE Law")}
+        ${infoRow("Air Ticket", (placement as any).airTicket || "Not Provided")}
+        <div class="info-cell" style="grid-column: 1 / -1;">
+          <div class="info-label">Other Benefits</div>
+          <div class="info-value">${v((placement as any).otherBenefits, "None")}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. VISA & EMPLOYMENT PROCESS -->
+    <h3 class="section-title">6. Visa &amp; Employment Process</h3>
+    <div class="info-box no-break">
+      <div class="info-grid-4">
+        ${infoRow("Visa Type", (placement as any).placementVisaType)}
+        ${infoRow("Visa Status", placement.visaStatus)}
+        ${infoRow("Medical Status", (placement as any).medicalStatus)}
+        ${infoRow("Labour Contract Status", (placement as any).labourContractStatus)}
+        ${infoRow("Emirates ID Status", (placement as any).emiratesIdStatus)}
+        ${infoRow("Joining Status", (placement as any).joiningStatus)}
+        ${infoRow("Travel Status", (placement as any).travelStatus)}
+      </div>
+    </div>
+
+    <!-- PAGE BREAK before Terms -->
+    <div class="page-break"></div>
+
+    <!-- 7. TERMS & CONDITIONS -->
+    <h3 class="section-title" style="margin-top:0;">7. Terms &amp; Conditions</h3>
+    <ol class="terms-list">
+      ${termsHtml}
+    </ol>
+
+    <!-- 8. DECLARATIONS -->
+    <h3 class="section-title">8. Declarations</h3>
+    <div class="declarations no-break">
+      <div class="decl-box">
+        <h4>Candidate Declaration</h4>
+        <p>${candidateDecl}</p>
+      </div>
+      <div class="decl-box">
+        <h4>Consultancy Declaration</h4>
+        <p>${consultancyDecl}</p>
+      </div>
+    </div>
+
+    <!-- 9. SIGNATURES -->
+    <h3 class="section-title">9. Signatures &amp; Stamp</h3>
+    <div class="signatures no-break">
+      <div class="sig-block">
+        <div class="sig-label">Employee Signature:</div>
+        <div class="sig-box">${applicantSignHtml}</div>
+        <div class="sig-meta">
+          <div>Name: <strong>${v(placement.applicantName)}</strong></div>
+          <div>Date: ${v((placement as any).applicantSignDate ? new Date((placement as any).applicantSignDate).toLocaleDateString("en-GB") : null, "Pending")}</div>
+          ${(placement as any).applicantSignIp ? `<div>IP: ${(placement as any).applicantSignIp}</div>` : ""}
+        </div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-label">Consultancy Stamp &amp; Signature:</div>
+        <div class="sig-box">${companySignHtml}</div>
+        <div class="sig-meta">
+          <div>Name: <strong>${v((placement as any).createdBy, "Authorized Signatory")}</strong></div>
+          <div>Place: Dubai, UAE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="print-footer">
+      <span>${footerText}</span>
+      <span>Ref: ${placement.id}</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Wait for all images to finish loading before printing
+    var images = document.images;
+    var loadedCount = 0;
+    var total = images.length;
+
+    function tryPrint() {
+      // Small delay to allow fonts and layout to stabilise
+      setTimeout(function () {
+        window.print();
+      }, 400);
+    }
+
+    if (total === 0) {
+      tryPrint();
+    } else {
+      for (var i = 0; i < total; i++) {
+        if (images[i].complete) {
+          loadedCount++;
+          if (loadedCount >= total) tryPrint();
+        } else {
+          images[i].addEventListener('load', function () {
+            loadedCount++;
+            if (loadedCount >= total) tryPrint();
+          });
+          images[i].addEventListener('error', function () {
+            loadedCount++;
+            if (loadedCount >= total) tryPrint();
+          });
+        }
+      }
+    }
+  </script>
+</body>
+</html>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hook: returns a printAgreement callback that opens a new window and prints.
+// ─────────────────────────────────────────────────────────────────────────────
+export function usePrintAgreement() {
+  const { siteSettings } = useAuthStore();
+
+  const printAgreement = useCallback((placement: Placement, terms: any[] = []) => {
+    const html = buildAgreementHtml(placement, terms, siteSettings);
+    const printWindow = window.open("", "_blank", "width=900,height=700,toolbar=0,menubar=0,scrollbars=1");
+    if (!printWindow) {
+      alert("Please allow pop-ups for this site to print the agreement.");
+      return;
+    }
+    printWindow.document.write(html);
+    printWindow.document.close();
+    // Fallback: close after printing (optional – let the user close manually)
+    printWindow.addEventListener("afterprint", () => printWindow.close());
+  }, [siteSettings]);
+
+  return printAgreement;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Default export: kept for backwards-compat – renders nothing on screen.
+// The actual print is triggered via usePrintAgreement().
+// ─────────────────────────────────────────────────────────────────────────────
+export default function PrintableAgreement({ placement, terms }: { placement: Placement; terms?: any[] }) {
+  // This component intentionally renders nothing on-screen.
+  // Print is initiated by calling usePrintAgreement() from the parent page.
+  return null;
 }

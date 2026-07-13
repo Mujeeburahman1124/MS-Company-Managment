@@ -13,7 +13,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EmptyState from "@/components/shared/EmptyState";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
-import PrintableAgreement from "@/components/shared/PrintableAgreement";
+import PrintableAgreement, { usePrintAgreement } from "@/components/shared/PrintableAgreement";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -146,6 +146,31 @@ function SignaturePad({ label, onSave, defaultValue }: { label: string; onSave: 
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// ─── Print Buttons ───────────────────────────────────────────────────────────
+// Opens a dedicated print window (new tab) that contains the fully rendered
+// agreement HTML and auto-triggers window.print() after all images load.
+function PrintButtons({ placement, terms }: { placement: any; terms?: any[] }) {
+  const printAgreement = usePrintAgreement();
+  return (
+    <div className="flex gap-2 justify-end print:hidden">
+      <Button
+        variant="outline"
+        onClick={() => printAgreement(placement, terms ?? [])}
+        className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm"
+      >
+        <Printer className="w-4 h-4" /> Print Agreement
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => printAgreement(placement, terms ?? [])}
+        className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm"
+      >
+        <Download className="w-4 h-4" /> Download PDF Copy
+      </Button>
     </div>
   );
 }
@@ -1685,14 +1710,7 @@ export default function PlacementPage() {
                 </div>
 
                 {/* Controls */}
-                <div className="flex gap-2 justify-end print:hidden">
-                  <Button variant="outline" onClick={() => window.print()} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
-                    <Printer className="w-4 h-4" /> Print Agreement
-                  </Button>
-                  <Button variant="outline" onClick={() => window.print()} className="rounded-xl text-xs font-bold border-slate-200 gap-1.5 h-10 shadow-sm">
-                    <Download className="w-4 h-4" /> Download PDF Copy
-                  </Button>
-                </div>
+                <PrintButtons placement={agreementModal} terms={placementTerms} />
               </div>
 
               {/* Right Column: Signing pads and contract logs */}
