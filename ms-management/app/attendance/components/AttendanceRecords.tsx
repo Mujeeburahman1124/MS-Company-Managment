@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { AttendanceRecord } from "@/lib/types";
 import { Card } from "@/components/ui/card";
@@ -252,6 +252,12 @@ export default function AttendanceRecords() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [viewMode, setViewMode] = useState<"sheet" | "cards">("sheet");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setViewMode("cards");
+    }
+  }, []);
 
   // ── Filtered staff ──
   const isSystemUser = currentUser?.company === "System";

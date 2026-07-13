@@ -354,66 +354,122 @@ export default function PayrollHistory() {
             {filteredPayroll.length === 0 ? (
               <EmptyState title="No payroll records found" description="Adjust filters or generate payroll records." />
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-slate-50/80 border-b border-slate-100">
-                    <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="text-left px-4 py-3">Employee</th>
-                      <th className="text-left px-4 py-3 w-28">Month</th>
-                      <th className="text-left px-4 py-3 w-32">Basic Salary</th>
-                      <th className="text-left px-4 py-3 w-56">Hourly Overtime</th>
-                      <th className="text-left px-4 py-3 w-32">Deductions</th>
-                      <th className="text-left px-4 py-3 w-32">Net Salary</th>
-                      <th className="text-left px-4 py-3 w-28">Status</th>
-                      <th className="text-right px-4 py-3 w-44">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPayroll.map(p => {
-                      const totalDeductions = (p.advanceDeduction || 0) + (p.loanDeduction || 0) + (p.deductions || 0);
-                      return (
-                        <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/30 text-slate-600">
-                          <td className="px-4 py-3">
-                            <div className="font-bold text-slate-800">{p.staffName}</div>
+              <>
+                {/* Mobile Portrait View */}
+                <div className="space-y-3 p-4 md:hidden">
+                  {filteredPayroll.map(p => {
+                    const totalDeductions = (p.advanceDeduction || 0) + (p.loanDeduction || 0) + (p.deductions || 0);
+                    return (
+                      <Card key={p.id} className="rounded-2xl border-slate-100 p-4 bg-white shadow-xs flex flex-col gap-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-bold text-slate-800 text-xs">{p.staffName}</div>
                             <div className="text-[10px] text-slate-400">{p.position}</div>
-                          </td>
-                          <td className="px-4 py-3 font-semibold text-slate-700">{p.month} {p.year}</td>
-                          <td className="px-4 py-3 font-medium text-slate-700">AED {p.basicSalary.toLocaleString()}</td>
-                          <td className="px-4 py-3">
+                          </div>
+                          <StatusBadge status={p.status} />
+                        </div>
+                        <div className="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                          <div><strong>Month:</strong> {p.month} {p.year}</div>
+                          <div><strong>Basic Salary:</strong> AED {p.basicSalary.toLocaleString()}</div>
+                          <div>
+                            <strong>Overtime:</strong>{" "}
                             {p.overtimeHours && p.overtimeHours > 0 ? (
-                              <div>
-                                <span className="font-bold text-emerald-600">AED {p.overtime.toLocaleString()}</span>
-                                <div className="text-[9px] text-slate-400 mt-0.5 font-medium">
-                                  {p.overtimeHours} hrs @ AED {p.overtimeRate}/hr
-                                </div>
-                              </div>
+                              <span className="font-bold text-emerald-600">
+                                AED {p.overtime.toLocaleString()} ({p.overtimeHours} hrs)
+                              </span>
                             ) : (
-                              <span className="text-slate-400 italic">No Overtime</span>
+                              "None"
                             )}
-                          </td>
-                          <td className="px-4 py-3 font-bold text-rose-600">
-                            {totalDeductions > 0 ? `-AED ${totalDeductions.toLocaleString()}` : "—"}
-                          </td>
-                          <td className="px-4 py-3 font-black text-slate-800">AED {p.netSalary.toLocaleString()}</td>
-                          <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex gap-1.5 justify-end">
-                              {p.status === "Approved" && (
-                                <Button size="sm" onClick={() => handlePay(p)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] h-7 px-2.5 gap-1">
-                                  <CheckCircle2 className="w-3.5 h-3.5" /> Pay
-                                </Button>
+                          </div>
+                          <div>
+                            <strong>Deductions:</strong>{" "}
+                            {totalDeductions > 0 ? (
+                              <span className="font-bold text-rose-600">AED {totalDeductions.toLocaleString()}</span>
+                            ) : (
+                              "None"
+                            )}
+                          </div>
+                          <div className="mt-1 pt-1 border-t border-slate-200/50 font-black text-slate-800">
+                            Net Salary: AED {p.netSalary.toLocaleString()}
+                          </div>
+                        </div>
+                        <div className="flex justify-end gap-1.5 pt-1.5 border-t border-slate-100">
+                          {p.status === "Approved" && (
+                            <Button size="sm" onClick={() => handlePay(p)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-[10px] h-8 px-3 gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Pay
+                            </Button>
+                          )}
+                          <Button size="sm" variant="outline" onClick={() => setViewPayslip(p)} className="border-slate-200 text-slate-600 font-bold rounded-xl text-[10px] h-8 px-3 gap-1">
+                            <Eye className="w-3.5 h-3.5" /> Payslip
+                          </Button>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-slate-50/80 border-b border-slate-100">
+                      <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="text-left px-4 py-3">Employee</th>
+                        <th className="text-left px-4 py-3 w-28">Month</th>
+                        <th className="text-left px-4 py-3 w-32">Basic Salary</th>
+                        <th className="text-left px-4 py-3 w-56">Hourly Overtime</th>
+                        <th className="text-left px-4 py-3 w-32">Deductions</th>
+                        <th className="text-left px-4 py-3 w-32">Net Salary</th>
+                        <th className="text-left px-4 py-3 w-28">Status</th>
+                        <th className="text-right px-4 py-3 w-44">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPayroll.map(p => {
+                        const totalDeductions = (p.advanceDeduction || 0) + (p.loanDeduction || 0) + (p.deductions || 0);
+                        return (
+                          <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/30 text-slate-600">
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-slate-800">{p.staffName}</div>
+                              <div className="text-[10px] text-slate-400">{p.position}</div>
+                            </td>
+                            <td className="px-4 py-3 font-semibold text-slate-700">{p.month} {p.year}</td>
+                            <td className="px-4 py-3 font-medium text-slate-700">AED {p.basicSalary.toLocaleString()}</td>
+                            <td className="px-4 py-3">
+                              {p.overtimeHours && p.overtimeHours > 0 ? (
+                                <div>
+                                  <span className="font-bold text-emerald-600">AED {p.overtime.toLocaleString()}</span>
+                                  <div className="text-[9px] text-slate-400 mt-0.5 font-medium">
+                                    {p.overtimeHours} hrs @ AED {p.overtimeRate}/hr
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-slate-400 italic">No Overtime</span>
                               )}
-                              <Button size="sm" variant="outline" onClick={() => setViewPayslip(p)} className="border-slate-200 text-slate-600 font-bold rounded-lg text-[10px] h-7 px-2.5 gap-1 hover:bg-slate-50">
-                                <Eye className="w-3.5 h-3.5" /> Payslip
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            </td>
+                            <td className="px-4 py-3 font-bold text-rose-600">
+                              {totalDeductions > 0 ? `-AED ${totalDeductions.toLocaleString()}` : "—"}
+                            </td>
+                            <td className="px-4 py-3 font-black text-slate-800">AED {p.netSalary.toLocaleString()}</td>
+                            <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex gap-1.5 justify-end">
+                                {p.status === "Approved" && (
+                                  <Button size="sm" onClick={() => handlePay(p)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] h-7 px-2.5 gap-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Pay
+                                  </Button>
+                                )}
+                                <Button size="sm" variant="outline" onClick={() => setViewPayslip(p)} className="border-slate-200 text-slate-600 font-bold rounded-lg text-[10px] h-7 px-2.5 gap-1 hover:bg-slate-50">
+                                  <Eye className="w-3.5 h-3.5" /> Payslip
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </Card>
         </>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, FileText, Trash2, Phone, Mail, MessageCircle, Eye, Download } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
@@ -25,6 +25,12 @@ export default function StaffPage() {
   const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [openDocsId, setOpenDocsId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setViewMode("grid");
+    }
+  }, []);
 
   const canViewStaff = hasPermission("staff", "view");
   const canCreateStaff = hasPermission("staff", "create");

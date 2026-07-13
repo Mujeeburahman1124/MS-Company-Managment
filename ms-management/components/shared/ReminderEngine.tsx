@@ -130,8 +130,6 @@ export default function ReminderEngine() {
           newValue: `Automated alert email sent to: ${to} (Subject: ${subject})`,
           ipAddress: "127.0.0.1",
         });
-
-        toast.success(`Automated email alert sent to ${candidateName} (${to})`);
       }
     };
 
@@ -172,8 +170,6 @@ export default function ReminderEngine() {
           newValue: `Automated WhatsApp alert sent to: ${to} (Message: ${message.slice(0, 40)}...)`,
           ipAddress: "127.0.0.1",
         });
-
-        toast.success(`Automated WhatsApp API alert sent to ${to}`);
       }
     };
 

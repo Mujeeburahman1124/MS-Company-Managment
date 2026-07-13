@@ -20,10 +20,11 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const router = useRouter();
-  const { currentUser, currentRole, notifications, logout } = useAuthStore();
+  const { currentUser, currentRole, notifications, markNotificationRead, markAllNotificationsRead, logout } = useAuthStore();
   const unreadCount = notifications.filter(n => !n.read).length;
   
   const { theme, setTheme } = useTheme();
@@ -99,19 +100,68 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
       {/* Right side */}
       <div className="flex items-center gap-1 flex-shrink-0">
 
-        {/* Notifications */}
-        <Link
-          href="/notifications"
-          className="relative p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700"
-          title="Notifications"
-        >
-          <Bell className={cn("w-4 h-4", unreadCount > 0 && "text-blue-600")} />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-rose-500 text-white text-[8px] font-extrabold rounded-full flex items-center justify-center px-0.5 border border-white">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </Link>
+        {/* Notifications Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="relative p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500 hover:text-slate-700 outline-none focus:ring-0 cursor-pointer">
+            <Bell className={cn("w-4 h-4", unreadCount > 0 && "text-purple-600")} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-rose-500 text-white text-[8px] font-extrabold rounded-full flex items-center justify-center px-0.5 border border-white">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 bg-white border border-slate-100 rounded-2xl shadow-2xl p-0 overflow-hidden">
+            <div className="px-4 py-3 bg-slate-50/50 border-b border-slate-100/50 flex justify-between items-center">
+              <span className="text-xs font-bold text-slate-800">Notifications ({unreadCount})</span>
+              {unreadCount > 0 && (
+                <button
+                  onClick={async () => {
+                    await markAllNotificationsRead();
+                    toast.success("All marked as read");
+                  }}
+                  className="text-[10px] text-purple-600 hover:text-purple-700 font-bold hover:underline"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
+            <div className="max-h-64 overflow-y-auto divide-y divide-slate-100/50">
+              {notifications.length === 0 ? (
+                <div className="p-6 text-center text-xs text-slate-400 font-medium">
+                  <Bell className="w-8 h-8 mx-auto mb-2 opacity-20 text-slate-450" />
+                  No new notifications
+                </div>
+              ) : (
+                notifications.slice(0, 10).map((n) => (
+                  <div
+                    key={n.id}
+                    onClick={async () => {
+                      await markNotificationRead(n.id);
+                      if (n.link) {
+                        router.push(n.link);
+                      }
+                    }}
+                    className={cn(
+                      "p-3 text-[11px] leading-relaxed cursor-pointer hover:bg-slate-50 transition-colors flex flex-col gap-0.5",
+                      !n.read ? "bg-purple-50/10 font-semibold" : "text-slate-500"
+                    )}
+                  >
+                    <div className="flex justify-between items-start">
+                      <span className={cn("text-xs font-bold", !n.read ? "text-purple-900" : "text-slate-700")}>{n.title}</span>
+                      <span className="text-[9px] text-slate-400">{n.time.split(" ")[1] || n.time}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500">{n.message}</div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="p-2 border-t border-slate-100/50 bg-slate-50/50 text-center">
+              <Link href="/notifications" className="text-[10px] text-purple-600 hover:text-purple-700 font-bold block">
+                View All Notifications
+              </Link>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Theme Toggle */}
         <DropdownMenu>

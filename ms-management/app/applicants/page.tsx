@@ -1,7 +1,7 @@
 "use strict";
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Applicant } from "@/lib/types";
 import Link from "next/link";
 import { Plus, Table as TableIcon, LayoutGrid, FileText, Trash2, CheckCircle, XCircle } from "lucide-react";
@@ -24,6 +24,12 @@ export default function ApplicantsPage() {
   const { filters, setFilter } = useFilterStore();
   
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setViewMode("grid");
+    }
+  }, []);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
  

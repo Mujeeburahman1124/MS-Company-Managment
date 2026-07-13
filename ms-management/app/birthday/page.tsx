@@ -180,61 +180,109 @@ export default function BirthdayPage() {
         {/* Main Content Area */}
         <div className="lg:col-span-3">
           {viewMode === "list" ? (
-            <Card className="rounded-2xl border-slate-100 bg-white shadow-sm overflow-hidden overflow-x-auto">
-              {list.length === 0 ? <EmptyState title="No staff birthdays found" /> : (
-                <Table>
-                  <TableHeader className="bg-slate-50/50">
-                    <TableRow className="border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      <TableHead>Staff Member</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Birthday</TableHead>
-                      <TableHead>Turning Age</TableHead>
-                      <TableHead>Countdown</TableHead>
-                      <TableHead className="text-right">Auto Wish</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {list.map(item => (
-                      <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/30 text-xs font-semibold text-slate-600">
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
-                              {item.photo ? (
-                                <img src={item.photo} className="w-full h-full object-cover" />
-                              ) : (
-                                <AvatarFallback className="rounded-lg bg-pink-50 text-pink-700 font-bold text-[11px] w-full h-full flex items-center justify-center">
-                                  {item.name.charAt(0)}
-                                </AvatarFallback>
-                              )}
-                            </div>
-                            <div>
-                              <Link href={`/staff/${item.id}`} className="font-bold text-slate-800 hover:text-blue-600 block">{item.name}</Link>
-                              <div className="text-[10px] text-slate-400">{item.position}</div>
-                            </div>
+            <>
+              {/* Mobile Portrait View */}
+              <div className="space-y-3 md:hidden">
+                {list.length === 0 ? (
+                  <EmptyState title="No staff birthdays found" />
+                ) : (
+                  list.map(item => (
+                    <Card key={item.id} className="rounded-2xl border-slate-100 p-4 bg-white shadow-sm flex flex-col gap-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
+                            {item.photo ? (
+                              <img src={item.photo} className="w-full h-full object-cover" />
+                            ) : (
+                              <AvatarFallback className="rounded-lg bg-pink-50 text-pink-700 font-bold text-[11px] w-full h-full flex items-center justify-center">
+                                {item.name.charAt(0)}
+                              </AvatarFallback>
+                            )}
                           </div>
-                        </TableCell>
-                        <TableCell className="text-[10px]">{item.company}<br/><span className="text-slate-400">{item.branch}</span></TableCell>
-                        <TableCell className="text-[10px] font-bold text-slate-700">
-                          {new Date(item.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </TableCell>
-                        <TableCell><span className="font-extrabold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">{item.age}</span></TableCell>
-                        <TableCell>
-                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold ${getStatusColor(item.daysLeft)}`}>
-                            <Calendar className="w-3.5 h-3.5"/>
-                            {item.daysLeft === 0 ? "Today!" : item.daysLeft === 1 ? "Tomorrow" : `In ${item.daysLeft} days`}
+                          <div>
+                            <Link href={`/staff/${item.id}`} className="font-bold text-slate-800 hover:text-blue-600 block text-xs">{item.name}</Link>
+                            <div className="text-[10px] text-slate-400">{item.position}</div>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
-                            <Mail className="w-3 h-3 text-emerald-500" /> Sent (8:00AM)
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </Card>
+                        </div>
+                        <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg border text-[9px] font-bold ${getStatusColor(item.daysLeft)}`}>
+                          <Calendar className="w-3 h-3"/>
+                          {item.daysLeft === 0 ? "Today!" : item.daysLeft === 1 ? "Tomorrow" : `In ${item.daysLeft} d`}
+                        </div>
+                      </div>
+                      <div className="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div><strong>Company/Branch:</strong> {item.company} / {item.branch}</div>
+                        <div><strong>Birthday:</strong> {new Date(item.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        <div><strong>Turning Age:</strong> <span className="font-extrabold text-slate-700 bg-slate-200/50 px-1.5 py-0.2 rounded">{item.age}</span></div>
+                      </div>
+                      <div className="flex justify-end pt-1 border-t border-slate-100">
+                        <div className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
+                          <Mail className="w-3 h-3 text-emerald-500" /> Sent (8:00AM)
+                        </div>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop View */}
+              <div className="hidden md:block">
+                <Card className="rounded-2xl border-slate-100 bg-white shadow-sm overflow-hidden overflow-x-auto">
+                  {list.length === 0 ? <EmptyState title="No staff birthdays found" /> : (
+                    <Table>
+                      <TableHeader className="bg-slate-50/50">
+                        <TableRow className="border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          <TableHead>Staff Member</TableHead>
+                          <TableHead>Company</TableHead>
+                          <TableHead>Birthday</TableHead>
+                          <TableHead>Turning Age</TableHead>
+                          <TableHead>Countdown</TableHead>
+                          <TableHead className="text-right">Auto Wish</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {list.map(item => (
+                          <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/30 text-xs font-semibold text-slate-600">
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
+                                  {item.photo ? (
+                                    <img src={item.photo} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <AvatarFallback className="rounded-lg bg-pink-50 text-pink-700 font-bold text-[11px] w-full h-full flex items-center justify-center">
+                                      {item.name.charAt(0)}
+                                    </AvatarFallback>
+                                  )}
+                                </div>
+                                <div>
+                                  <Link href={`/staff/${item.id}`} className="font-bold text-slate-800 hover:text-blue-600 block">{item.name}</Link>
+                                  <div className="text-[10px] text-slate-400">{item.position}</div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-[10px]">{item.company}<br/><span className="text-slate-400">{item.branch}</span></TableCell>
+                            <TableCell className="text-[10px] font-bold text-slate-700">
+                              {new Date(item.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </TableCell>
+                            <TableCell><span className="font-extrabold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">{item.age}</span></TableCell>
+                            <TableCell>
+                              <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold ${getStatusColor(item.daysLeft)}`}>
+                                <Calendar className="w-3.5 h-3.5"/>
+                                {item.daysLeft === 0 ? "Today!" : item.daysLeft === 1 ? "Tomorrow" : `In ${item.daysLeft} days`}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
+                                <Mail className="w-3 h-3 text-emerald-500" /> Sent (8:00AM)
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </Card>
+              </div>
+            </>
           ) : (
             <Card className="rounded-2xl border-slate-100 p-5 bg-white shadow-sm space-y-4">
               {/* Calendar Month Header */}

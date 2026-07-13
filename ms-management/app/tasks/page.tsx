@@ -467,43 +467,76 @@ export default function TasksPage() {
                 <div className="text-[11px] text-slate-300">Tasks marked as Completed or Cancelled will appear here</div>
               </div>
             ) : (
-              <table className="w-full text-xs">
-                <thead className="bg-emerald-50/60 border-b border-emerald-100">
-                  <tr className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-                    <th className="text-left px-4 py-3">Task</th>
-                    <th className="text-left px-4 py-3">Assignee</th>
-                    <th className="text-left px-4 py-3">Dates</th>
-                    <th className="text-left px-4 py-3">Status</th>
-                    <th className="text-right px-4 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* Mobile View for History */}
+                <div className="space-y-3 p-4 md:hidden">
                   {paginated.map(t => (
-                    <tr key={t.id} className="border-b border-slate-50 hover:bg-emerald-50/20 font-semibold text-slate-600">
-                      <td className="px-4 py-3">
-                        <div className="font-bold text-slate-800 flex gap-2 items-center">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0"/>
-                          {t.title}
+                    <Card key={t.id} className="rounded-2xl border-slate-100 p-4 bg-white shadow-sm flex flex-col gap-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="font-bold text-slate-800 text-xs flex gap-1.5 items-center">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0"/>
+                            {t.title}
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-1">{t.id} • <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase ${priorityColor(t.priority)}`}>{t.priority}</span></div>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5 pl-5">{t.id} • <span className={`text-[9px] font-extrabold px-1 py-0.5 rounded uppercase ${priorityColor(t.priority)}`}>{t.priority}</span></div>
-                        {t.applicantName && <div className="text-[9px] text-blue-600 font-bold mt-1 pl-5">👤 {t.applicantName}</div>}
-                      </td>
-                      <td className="px-4 py-3 text-slate-700">{t.assignedTo}</td>
-                      <td className="px-4 py-3 text-[10px]">
-                        <div className="text-slate-400">Assigned: {formatDateTime(t.assignedDate)}</div>
-                        <div className="font-bold mt-0.5 text-slate-700">Due: {formatDateTime(t.deadline)}</div>
-                      </td>
-                      <td className="px-4 py-3">
                         <StatusBadge status={t.status}/>
-                      </td>
-                      <td className="px-4 py-3 text-right space-x-1">
+                      </div>
+                      <div className="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div><strong>Assignee:</strong> {t.assignedTo}</div>
+                        <div><strong>Assigned Date:</strong> {formatDateTime(t.assignedDate)}</div>
+                        <div><strong>Due Date:</strong> {formatDateTime(t.deadline)}</div>
+                        {t.applicantName && <div className="text-blue-600 font-bold mt-1">👤 Candidate: {t.applicantName}</div>}
+                      </div>
+                      <div className="flex justify-end gap-1.5 pt-1.5 border-t border-slate-100">
                         <Button variant="ghost" size="icon" onClick={() => { setHistoryTask(t); setHistoryModalOpen(true); }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="History"><History className="w-4 h-4"/></Button>
                         {canDeleteTasks && <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>}
-                      </td>
-                    </tr>
+                      </div>
+                    </Card>
                   ))}
-                </tbody>
-              </table>
+                </div>
+
+                {/* Desktop View for History */}
+                <div className="hidden md:block">
+                  <table className="w-full text-xs">
+                    <thead className="bg-emerald-50/60 border-b border-emerald-100">
+                      <tr className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                        <th className="text-left px-4 py-3">Task</th>
+                        <th className="text-left px-4 py-3">Assignee</th>
+                        <th className="text-left px-4 py-3">Dates</th>
+                        <th className="text-left px-4 py-3">Status</th>
+                        <th className="text-right px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginated.map(t => (
+                        <tr key={t.id} className="border-b border-slate-50 hover:bg-emerald-50/20 font-semibold text-slate-600">
+                          <td className="px-4 py-3">
+                            <div className="font-bold text-slate-800 flex gap-2 items-center">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0"/>
+                              {t.title}
+                            </div>
+                            <div className="text-[10px] text-slate-400 mt-0.5 pl-5">{t.id} • <span className={`text-[9px] font-extrabold px-1 py-0.5 rounded uppercase ${priorityColor(t.priority)}`}>{t.priority}</span></div>
+                            {t.applicantName && <div className="text-[9px] text-blue-600 font-bold mt-1 pl-5">👤 {t.applicantName}</div>}
+                          </td>
+                          <td className="px-4 py-3 text-slate-700">{t.assignedTo}</td>
+                          <td className="px-4 py-3 text-[10px]">
+                            <div className="text-slate-400">Assigned: {formatDateTime(t.assignedDate)}</div>
+                            <div className="font-bold mt-0.5 text-slate-700">Due: {formatDateTime(t.deadline)}</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <StatusBadge status={t.status}/>
+                          </td>
+                          <td className="px-4 py-3 text-right space-x-1">
+                            <Button variant="ghost" size="icon" onClick={() => { setHistoryTask(t); setHistoryModalOpen(true); }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="History"><History className="w-4 h-4"/></Button>
+                            {canDeleteTasks && <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         ) : view === "kanban" ? (
@@ -580,46 +613,93 @@ export default function TasksPage() {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto flex-1">
-            {list.length === 0 ? <EmptyState title="No tasks found" /> : (
-              <table className="w-full text-xs">
-                <thead className="bg-slate-50/50 border-b border-slate-100">
-                  <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="text-left px-4 py-3">Task</th>
-                    <th className="text-left px-4 py-3">Assignee</th>
-                    <th className="text-left px-4 py-3">Dates</th>
-                    <th className="text-left px-4 py-3">Status</th>
-                    <th className="text-right px-4 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+          <div className="flex-1 flex flex-col min-h-0">
+            {list.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 text-center">
+                <EmptyState title="No tasks found" />
+              </div>
+            ) : (
+              <>
+                {/* Mobile Portrait View */}
+                <div className="space-y-3 p-4 md:hidden">
                   {paginated.map(t => {
                     const overdue = isOverdue(t);
                     return (
-                      <tr key={t.id} className={`border-b border-slate-50 hover:bg-slate-50/30 font-semibold text-slate-600 ${overdue ? "bg-rose-50/10" : ""}`}>
-                        <td className="px-4 py-3">
-                          <div className="font-bold text-slate-800 flex gap-2 items-center">
-                            {t.title} 
-                            {overdue && <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase text-rose-600 bg-rose-50 border border-rose-200">Overdue</span>}
+                      <Card key={t.id} className={`rounded-2xl p-4 bg-white shadow-sm flex flex-col gap-3 ${overdue ? "border border-rose-300" : "border-slate-100"}`}>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-bold text-slate-800 text-xs flex gap-1.5 items-center flex-wrap">
+                              {t.title}
+                              {overdue && <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase text-rose-600 bg-rose-50 border border-rose-200">Overdue</span>}
+                            </div>
+                            <div className="text-[10px] text-slate-400 mt-1">{t.id} • <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase ${priorityColor(t.priority)}`}>{t.priority}</span></div>
                           </div>
-                          <div className="text-[10px] text-slate-400 mt-0.5">{t.id} • <span className={`text-[9px] font-extrabold px-1 py-0.5 rounded uppercase ${priorityColor(t.priority)}`}>{t.priority}</span></div>
-                        </td>
-                        <td className="px-4 py-3">{t.assignedTo}</td>
-                        <td className="px-4 py-3 text-[10px]">
-                          <div className="text-slate-400">Assigned: {formatDateTime(t.assignedDate)}</div>
-                          <div className={`font-bold mt-0.5 ${overdue ? "text-rose-600" : "text-slate-700"}`}>Due: {formatDateTime(t.deadline)}</div>
-                        </td>
-                        <td className="px-4 py-3"><StatusBadge status={t.status}/></td>
-                        <td className="px-4 py-3 text-right space-x-1">
-                          <Button variant="ghost" size="icon" onClick={() => { setHistoryTask(t); setHistoryModalOpen(true); }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="History"><History className="w-4 h-4"/></Button>
-                          <Button variant="ghost" size="icon" onClick={() => { setEditTask(t); setForm({ title: t.title, description: t.description, priority: t.priority, assignedTo: t.assignedTo, assignedDate: formatForInputDateTime(t.assignedDate), deadline: formatForInputDateTime(t.deadline), applicantId: t.applicantId || null, applicantName: t.applicantName || null, targetDocument: t.targetDocument || null, notes: t.notes || "", attachmentName: t.attachmentName || "" }); setModal(true); }} className="w-7 h-7 text-blue-500 hover:bg-blue-50 rounded-lg"><CheckSquare className="w-4 h-4"/></Button>
-                          {canDeleteTasks && <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>}
-                        </td>
-                      </tr>
+                          <StatusBadge status={t.status}/>
+                        </div>
+                        <div className="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                          <div><strong>Assignee:</strong> {t.assignedTo}</div>
+                          <div><strong>Assigned Date:</strong> {formatDateTime(t.assignedDate)}</div>
+                          <div className={overdue ? "text-rose-600 font-bold" : ""}><strong>Due Date:</strong> {formatDateTime(t.deadline)}</div>
+                        </div>
+                        <div className="flex justify-between items-center pt-1.5 border-t border-slate-100">
+                          <div className="flex gap-1 flex-wrap">
+                            {(["Pending","Processing","Completed","Incomplete","Reassigned","Cancelled"] as Task["status"][]).filter(s => s !== t.status).map(s => (
+                              <button key={s} onClick={e => { e.stopPropagation(); handleStatusChange(t, s); }} className="text-[8px] font-bold px-1.5 py-0.5 rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">→{s}</button>
+                            ))}
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => { setHistoryTask(t); setHistoryModalOpen(true); }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="History"><History className="w-4 h-4"/></Button>
+                            <Button variant="ghost" size="icon" onClick={() => { setEditTask(t); setForm({ title: t.title, description: t.description, priority: t.priority, assignedTo: t.assignedTo, assignedDate: formatForInputDateTime(t.assignedDate), deadline: formatForInputDateTime(t.deadline), applicantId: t.applicantId || null, applicantName: t.applicantName || null, targetDocument: t.targetDocument || null, notes: t.notes || "", attachmentName: t.attachmentName || "" }); setModal(true); }} className="w-7 h-7 text-blue-500 hover:bg-blue-50 rounded-lg"><CheckSquare className="w-4 h-4"/></Button>
+                            {canDeleteTasks && <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>}
+                          </div>
+                        </div>
+                      </Card>
                     );
                   })}
-                </tbody>
-              </table>
+                </div>
+
+                {/* Desktop View */}
+                <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto flex-1">
+                  <table className="w-full text-xs">
+                    <thead className="bg-slate-50/50 border-b border-slate-100">
+                      <tr className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="text-left px-4 py-3">Task</th>
+                        <th className="text-left px-4 py-3">Assignee</th>
+                        <th className="text-left px-4 py-3">Dates</th>
+                        <th className="text-left px-4 py-3">Status</th>
+                        <th className="text-right px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginated.map(t => {
+                        const overdue = isOverdue(t);
+                        return (
+                          <tr key={t.id} className={`border-b border-slate-50 hover:bg-slate-50/30 font-semibold text-slate-600 ${overdue ? "bg-rose-50/10" : ""}`}>
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-slate-800 flex gap-2 items-center">
+                                {t.title} 
+                                {overdue && <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase text-rose-600 bg-rose-50 border border-rose-200">Overdue</span>}
+                              </div>
+                              <div className="text-[10px] text-slate-400 mt-0.5">{t.id} • <span className={`text-[9px] font-extrabold px-1 py-0.5 rounded uppercase ${priorityColor(t.priority)}`}>{t.priority}</span></div>
+                            </td>
+                            <td className="px-4 py-3">{t.assignedTo}</td>
+                            <td className="px-4 py-3 text-[10px]">
+                              <div className="text-slate-400">Assigned: {formatDateTime(t.assignedDate)}</div>
+                              <div className={`font-bold mt-0.5 ${overdue ? "text-rose-600" : "text-slate-700"}`}>Due: {formatDateTime(t.deadline)}</div>
+                            </td>
+                            <td className="px-4 py-3"><StatusBadge status={t.status}/></td>
+                            <td className="px-4 py-3 text-right space-x-1">
+                              <Button variant="ghost" size="icon" onClick={() => { setHistoryTask(t); setHistoryModalOpen(true); }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="History"><History className="w-4 h-4"/></Button>
+                              <Button variant="ghost" size="icon" onClick={() => { setEditTask(t); setForm({ title: t.title, description: t.description, priority: t.priority, assignedTo: t.assignedTo, assignedDate: formatForInputDateTime(t.assignedDate), deadline: formatForInputDateTime(t.deadline), applicantId: t.applicantId || null, applicantName: t.applicantName || null, targetDocument: t.targetDocument || null, notes: t.notes || "", attachmentName: t.attachmentName || "" }); setModal(true); }} className="w-7 h-7 text-blue-500 hover:bg-blue-50 rounded-lg"><CheckSquare className="w-4 h-4"/></Button>
+                              {canDeleteTasks && <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         )}

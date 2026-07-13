@@ -330,49 +330,38 @@ export default function UsersPage() {
         {paginated.length === 0 ? (
           <EmptyState title="No users found" action={canCreateUsers ? <Button onClick={() => setModal(true)} className="bg-blue-600 text-white rounded-xl text-xs px-4 h-9">Add User</Button> : null} />
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-slate-50/50">
-                <TableRow className="border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <TableHead>User</TableHead><TableHead>Role</TableHead><TableHead>Company / Branch</TableHead>
-                  <TableHead>Last Login</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginated.map(u => (
-                  <TableRow key={u.id} className="border-slate-100 hover:bg-slate-50/30 text-xs font-semibold text-slate-600">
-                    <TableCell>
-                      <div className="flex items-center gap-2.5">
-                        <Avatar className="w-9 h-9 rounded-xl border border-slate-100">
-                          {u.photo ? (
-                            <AvatarImage src={u.photo} alt={u.name} className="object-cover rounded-xl w-9 h-9" />
-                          ) : null}
-                          <AvatarFallback className="rounded-xl bg-blue-50 text-blue-700 font-bold text-sm">{u.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-bold text-slate-800 hover:text-blue-600 cursor-pointer" onClick={() => { setDetailUser(u); setAuditTab("profile"); }}>{u.name}</div>
-                          <div className="text-[10px] text-slate-400">{u.email}</div>
-                        </div>
+          <>
+            {/* Mobile Portrait View */}
+            <div className="space-y-3 md:hidden">
+              {paginated.map(u => (
+                <Card key={u.id} className="rounded-2xl border-slate-100 p-4 bg-white shadow-sm flex flex-col gap-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar className="w-9 h-9 rounded-xl border border-slate-100">
+                        {u.photo ? (
+                          <AvatarImage src={u.photo} alt={u.name} className="object-cover rounded-xl w-9 h-9" />
+                        ) : null}
+                        <AvatarFallback className="rounded-xl bg-blue-50 text-blue-700 font-bold text-sm">{u.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-bold text-slate-800 hover:text-blue-600 cursor-pointer text-xs" onClick={() => { setDetailUser(u); setAuditTab("profile"); }}>{u.name}</div>
+                        <div className="text-[10px] text-slate-400">{u.email}</div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full"><Shield className="w-3 h-3 inline mr-1"/>{u.role}</span>
-                    </TableCell>
-                    <TableCell className="text-[10px]">{u.company}<br/><span className="text-slate-400">{u.branch}</span></TableCell>
-                    <TableCell className="text-[10px]">{formatDate(u.lastLogin)}</TableCell>
-                    <TableCell><span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${getStatusColor(u.status)}`}>{u.status}</span></TableCell>
-                    <TableCell className="text-right space-x-1">
-                      <Button variant="ghost" size="icon" onClick={() => { setDetailUser(u); setAuditTab("profile"); }} className="w-7 h-7 text-slate-500 hover:bg-slate-50 rounded-lg" title="Auditing & Logs"><Eye className="w-4 h-4"/></Button>
-                      {canEditUsers ? (
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${getStatusColor(u.status)}`}>{u.status}</span>
+                  </div>
+                  <div className="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <div><strong>Role:</strong> {u.role}</div>
+                    <div><strong>Company/Branch:</strong> {u.company} / {u.branch}</div>
+                    <div><strong>Last Login:</strong> {formatDate(u.lastLogin)}</div>
+                  </div>
+                  <div className="flex justify-end gap-1 pt-1.5 border-t border-slate-100">
+                    <Button variant="ghost" size="icon" onClick={() => { setDetailUser(u); setAuditTab("profile"); }} className="w-7 h-7 text-slate-500 hover:bg-slate-50 rounded-lg" title="Auditing & Logs"><Eye className="w-4 h-4"/></Button>
+                    {canEditUsers ? (
+                      <>
                         <Button variant="ghost" size="icon" onClick={() => openEdit(u)} className="w-7 h-7 text-blue-500 hover:bg-blue-50 rounded-lg" title="Edit"><UserCheck className="w-4 h-4"/></Button>
-                      ) : null}
-                      {canEditUsers ? (
                         <Button variant="ghost" size="icon" onClick={() => handleStatusToggle(u)} className="w-7 h-7 text-amber-500 hover:bg-amber-50 rounded-lg" title={u.status === "Active" ? "Disable" : "Enable"}>{u.status === "Active" ? <Lock className="w-4 h-4"/> : <Unlock className="w-4 h-4"/>}</Button>
-                      ) : null}
-                      {canEditUsers ? (
                         <Button variant="ghost" size="icon" onClick={() => { setEmailChangeModal(u); setNewEmailValue(u.email); }} className="w-7 h-7 text-slate-600 hover:bg-slate-50 rounded-lg" title="Audit Email Change"><Mail className="w-4 h-4"/></Button>
-                      ) : null}
-                      {canEditUsers ? (
                         <Button variant="ghost" size="icon" onClick={() => {
                           const reqId = `RST-${Date.now()}`;
                           addPasswordResetRequest({
@@ -387,16 +376,85 @@ export default function UsersPage() {
                           addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Password Reset", module: "Users", oldValue: null, newValue: `Reset link sent to ${u.email}`, ipAddress: "192.168.1.102" });
                           toast.success(`Password reset link sent to ${u.email}`);
                         }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="Reset Password"><RefreshCw className="w-4 h-4"/></Button>
-                      ) : null}
-                      {canDeleteUsers ? (
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(u.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>
-                      ) : null}
-                    </TableCell>
+                      </>
+                    ) : null}
+                    {canDeleteUsers ? (
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(u.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>
+                    ) : null}
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-slate-50/50">
+                  <TableRow className="border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    <TableHead>User</TableHead><TableHead>Role</TableHead><TableHead>Company / Branch</TableHead>
+                    <TableHead>Last Login</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {paginated.map(u => (
+                    <TableRow key={u.id} className="border-slate-100 hover:bg-slate-50/30 text-xs font-semibold text-slate-600">
+                      <TableCell>
+                        <div className="flex items-center gap-2.5">
+                          <Avatar className="w-9 h-9 rounded-xl border border-slate-100">
+                            {u.photo ? (
+                              <AvatarImage src={u.photo} alt={u.name} className="object-cover rounded-xl w-9 h-9" />
+                            ) : null}
+                            <AvatarFallback className="rounded-xl bg-blue-50 text-blue-700 font-bold text-sm">{u.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-bold text-slate-800 hover:text-blue-600 cursor-pointer" onClick={() => { setDetailUser(u); setAuditTab("profile"); }}>{u.name}</div>
+                            <div className="text-[10px] text-slate-400">{u.email}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full"><Shield className="w-3 h-3 inline mr-1"/>{u.role}</span>
+                      </TableCell>
+                      <TableCell className="text-[10px]">{u.company}<br/><span className="text-slate-400">{u.branch}</span></TableCell>
+                      <TableCell className="text-[10px]">{formatDate(u.lastLogin)}</TableCell>
+                      <TableCell><span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${getStatusColor(u.status)}`}>{u.status}</span></TableCell>
+                      <TableCell className="text-right space-x-1">
+                        <Button variant="ghost" size="icon" onClick={() => { setDetailUser(u); setAuditTab("profile"); }} className="w-7 h-7 text-slate-500 hover:bg-slate-50 rounded-lg" title="Auditing & Logs"><Eye className="w-4 h-4"/></Button>
+                        {canEditUsers ? (
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(u)} className="w-7 h-7 text-blue-500 hover:bg-blue-50 rounded-lg" title="Edit"><UserCheck className="w-4 h-4"/></Button>
+                        ) : null}
+                        {canEditUsers ? (
+                          <Button variant="ghost" size="icon" onClick={() => handleStatusToggle(u)} className="w-7 h-7 text-amber-500 hover:bg-amber-50 rounded-lg" title={u.status === "Active" ? "Disable" : "Enable"}>{u.status === "Active" ? <Lock className="w-4 h-4"/> : <Unlock className="w-4 h-4"/>}</Button>
+                        ) : null}
+                        {canEditUsers ? (
+                          <Button variant="ghost" size="icon" onClick={() => { setEmailChangeModal(u); setNewEmailValue(u.email); }} className="w-7 h-7 text-slate-600 hover:bg-slate-50 rounded-lg" title="Audit Email Change"><Mail className="w-4 h-4"/></Button>
+                        ) : null}
+                        {canEditUsers ? (
+                          <Button variant="ghost" size="icon" onClick={() => {
+                            const reqId = `RST-${Date.now()}`;
+                            addPasswordResetRequest({
+                              id: reqId,
+                              userId: u.id,
+                              email: u.email,
+                              requestedAt: new Date().toISOString().replace("T", " ").slice(0, 19),
+                              status: "Sent",
+                              requestedBy: currentUser.name,
+                              note: "Password reset triggered from User Management table"
+                            });
+                            addActivityLog({ id: `LOG-${Date.now()}`, dateTime: new Date().toISOString().replace("T"," ").slice(0,19), userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch, action: "Password Reset", module: "Users", oldValue: null, newValue: `Reset link sent to ${u.email}`, ipAddress: "192.168.1.102" });
+                            toast.success(`Password reset link sent to ${u.email}`);
+                          }} className="w-7 h-7 text-indigo-500 hover:bg-indigo-50 rounded-lg" title="Reset Password"><RefreshCw className="w-4 h-4"/></Button>
+                        ) : null}
+                        {canDeleteUsers ? (
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(u.id)} className="w-7 h-7 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 className="w-4 h-4"/></Button>
+                        ) : null}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </div>
       <Pagination moduleKey="users" totalItems={totalItems} />
