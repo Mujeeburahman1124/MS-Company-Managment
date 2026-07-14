@@ -58,6 +58,23 @@ export async function POST(request: Request) {
       );
     }
 
+    // Security: Super Admin cannot record personal attendance for themselves
+    if (user.role === "Super Admin") {
+      // Check if the staffId being written belongs to the Super Admin themselves
+      const targetStaff = await prisma.staff.findFirst({
+        where: { id: data.staffId }
+      });
+      if (targetStaff && (
+        targetStaff.email?.toLowerCase() === user.email?.toLowerCase() ||
+        targetStaff.name?.toLowerCase() === user.name?.toLowerCase()
+      )) {
+        return NextResponse.json(
+          { error: "Forbidden: Super Admin cannot record personal attendance. Use the admin panel to mark employee attendance." },
+          { status: 403 }
+        );
+      }
+    }
+
     let company = data.company || user.company;
     let branch = data.branch || user.branch;
 
@@ -69,6 +86,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Forbidden: Cannot access other branch" }, { status: 403 });
       }
     }
+
 
     // Find if record already exists for this staff, month and year
     const existing = await prisma.staffAttendance.findFirst({

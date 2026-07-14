@@ -10,10 +10,11 @@ export default function AttendanceDashboard() {
   const { currentRole, currentUser, staff, staffAttendance } = useAuthStore();
   const today = new Date().toISOString().slice(0, 10);
 
+  const isSuperAdmin = currentRole === "Super Admin";
   const isSystemUser = currentUser.company === "System";
-  const allowedStaff = (currentRole === "Super Admin" || isSystemUser) ? staff : staff.filter(s => s.company === currentUser.company);
+  const allowedStaff = (isSuperAdmin || isSystemUser) ? staff : staff.filter(s => s.company === currentUser.company);
 
-  const isAdmin = currentRole === "Super Admin" || 
+  const isAdmin = isSuperAdmin || 
                   currentRole === "Company Admin" || 
                   currentRole === "Branch Admin" || 
                   currentRole === "HR Manager" || 
@@ -93,13 +94,16 @@ export default function AttendanceDashboard() {
         </div>
       </Card>
 
-      {/* Embedded Check-in/Out & Quick mark Panel */}
-      <Card className="p-6 rounded-2xl border-slate-100 shadow-sm bg-slate-50/50">
-        <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-blue-600" /> Daily Attendance Operations
-        </h3>
-        <AttendanceWidget />
-      </Card>
+      {/* Daily Attendance Operations — shown only for non-Super-Admin admins */}
+      {!isSuperAdmin && (
+        <Card className="p-6 rounded-2xl border-slate-100 shadow-sm bg-slate-50/50">
+          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-blue-600" /> Daily Attendance Operations
+          </h3>
+          <AttendanceWidget />
+        </Card>
+      )}
     </div>
   );
 }
+

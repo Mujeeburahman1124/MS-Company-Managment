@@ -11,38 +11,56 @@ import PayrollHistory from "./components/PayrollHistory";
 import { useAuthStore } from "@/store/authStore";
 import AccessDenied from "@/components/shared/AccessDenied";
 
-const ALL_TABS = [
-  "Dashboard",
-  "Salary Setup",
-  "Process Payroll",
-  "Payslips",
-  "Reports",
-  "History"
-];
-
 export default function PayrollPage() {
-  const { currentUser, hasPermission } = useAuthStore();
+  const { currentRole, hasPermission } = useAuthStore();
 
   const canView = hasPermission("payroll", "view");
   if (!canView) {
     return <AccessDenied />;
   }
-  const isStaff = currentUser?.role === "Staff";
-  const availableTabs = isStaff ? ["Payslips"] : ALL_TABS;
-  
-  const [activeTab, setActiveTab] = useState(isStaff ? "Payslips" : "Dashboard");
+
+  // Role-based access levels
+  const isStaff = currentRole === "Staff";
+  const isSuperAdmin = currentRole === "Super Admin";
+  const isAdminLevel = isSuperAdmin ||
+    currentRole === "Company Admin" ||
+    currentRole === "Branch Admin" ||
+    currentRole === "HR Manager" ||
+    currentRole === "Admin" ||
+    currentRole === "HR" ||
+    currentRole === "Accountant";
+
+  // Staff can only see Payslips — their own
+  // Admin-level: all tabs, but Process Payroll requires create permission
+  const canProcess = hasPermission("payroll", "create");
+
+  const availableTabs = isStaff
+    ? ["Payslips"]
+    : isAdminLevel
+      ? [
+          "Dashboard",
+          "Salary Setup",
+          ...(canProcess ? ["Process Payroll"] : []),
+          "Payslips",
+          "Reports",
+          "History"
+        ]
+      : ["Payslips"]; // fallback for unknown roles
+
+  const [activeTab, setActiveTab] = useState(availableTabs[0]);
 
   useEffect(() => {
-    if (isStaff && activeTab !== "Payslips") {
-      setActiveTab("Payslips");
+    // Reset to first available tab if current tab is no longer available
+    if (!availableTabs.includes(activeTab)) {
+      setActiveTab(availableTabs[0]);
     }
-  }, [isStaff, activeTab]);
+  }, [currentRole]);
 
   return (
     <div className="flex flex-col min-h-full">
       <PageHeader
         title="Payroll Management"
-        subtitle="Manage salaries, deductions, and issue payslips"
+        subtitle={isStaff ? "View your payslips and salary history" : "Manage salaries, deductions, and issue payslips"}
       />
 
       <div className="px-4 md:px-6 pt-2 pb-4">
@@ -64,12 +82,12 @@ export default function PayrollPage() {
       </div>
 
       <div className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto space-y-6">
-        {activeTab === "Dashboard" && !isStaff && <PayrollDashboard />}
-        {activeTab === "Salary Setup" && !isStaff && <SalarySetup />}
-        {activeTab === "Process Payroll" && !isStaff && <ProcessPayroll />}
+        {activeTab === "Dashboard" && isAdminLevel && <PayrollDashboard />}
+        {activeTab === "Salary Setup" && isAdminLevel && <SalarySetup />}
+        {activeTab === "Process Payroll" && isAdminLevel && canProcess && <ProcessPayroll />}
         {activeTab === "Payslips" && <Payslips />}
-        {activeTab === "Reports" && !isStaff && <PayrollReports />}
-        {activeTab === "History" && !isStaff && <PayrollHistory />}
+        {activeTab === "Reports" && isAdminLevel && <PayrollReports />}
+        {activeTab === "History" && isAdminLevel && <PayrollHistory />}
       </div>
     </div>
   );

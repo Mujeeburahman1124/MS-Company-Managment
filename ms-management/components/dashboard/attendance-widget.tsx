@@ -303,6 +303,7 @@ export function AttendanceWidget() {
     }
   };
 
+  const isSuperAdmin = currentRole === "Super Admin";
   const isAdmin = currentRole === "Super Admin" || 
                   currentRole === "Company Admin" || 
                   currentRole === "Branch Admin" || 
@@ -313,10 +314,10 @@ export function AttendanceWidget() {
   return (
     <div className={cn(
       "grid gap-6 w-full",
-      isAdmin && currentStaff ? "grid-cols-1 lg:grid-cols-12" : "grid-cols-1"
+      isAdmin && currentStaff && !isSuperAdmin ? "grid-cols-1 lg:grid-cols-12" : "grid-cols-1"
     )}>
-      {/* ── Personal Workday Panel (Staff Mode) ── */}
-      {currentStaff && (
+      {/* ── Personal Workday Panel — Hidden for Super Admin ── */}
+      {currentStaff && !isSuperAdmin && (
         <Card className={cn(
           "relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between",
           isAdmin ? "lg:col-span-5" : "w-full"
@@ -412,7 +413,7 @@ export function AttendanceWidget() {
       {isAdmin && (
         <Card className={cn(
           "relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm hover:shadow-md transition-all duration-300",
-          currentStaff ? "lg:col-span-7" : "w-full"
+          currentStaff && !isSuperAdmin ? "lg:col-span-7" : "w-full"
         )}>
           {/* Header */}
           <div className="flex items-center justify-between mb-4 border-b border-slate-50 pb-3">
