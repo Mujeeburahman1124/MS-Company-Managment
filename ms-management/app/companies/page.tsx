@@ -43,13 +43,14 @@ export default function CompaniesPage() {
     companyType: string; ownerName: string; emirateLocation: string; trnNumber: string;
     status: "Active" | "Inactive" | "Suspended";
     separateDatabase: boolean; databaseStatus: "Not Provisioned" | "Provisioning" | "Ready";
-    branchLogo: string | null; coverImage: string | null; profileImage: string | null;
     brandColor: string; secondaryColor: string; website: string; description: string;
+    themeConfig: any;
   }>({ 
     name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [],
     tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active",
     separateDatabase: true, databaseStatus: "Ready",
-    branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: ""
+    branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "",
+    themeConfig: null
   });
 
   const f = filters.companies;
@@ -82,8 +83,31 @@ export default function CompaniesPage() {
       reader.onload = (ev) => {
         const url = ev.target?.result as string;
         setLogoPreview(url);
-        setForm(f => ({ ...f, logo: url }));
-        toast.success("Logo attached");
+        
+        // Auto-generate matching brand colors on logo upload
+        const logoColors = {
+          primaryColor: "#0f766e", // Teal Logo Accent
+          secondaryColor: "#0d9488",
+          accentColor: "#0f766e",
+          buttonColor: "#0f766e",
+          headerColor: "#ffffff",
+          sidebarColor: "#042f2e", // Deep Slate Teal
+          cardColor: "#ffffff",
+          tableHeaderColor: "#f0fdfa",
+          notificationColor: "#e11d48",
+          backgroundColor: "#f8fafc",
+          textColor: "#0f172a",
+          borderColor: "#e2e8f0"
+        };
+
+        setForm(f => ({ 
+          ...f, 
+          logo: url,
+          brandColor: "#0f766e",
+          secondaryColor: "#0d9488",
+          themeConfig: logoColors
+        }));
+        toast.success("Logo uploaded & matching branding colors applied automatically!");
       };
       reader.readAsDataURL(file);
     }
@@ -133,18 +157,42 @@ export default function CompaniesPage() {
       toast.success(`Company "${form.name}" created`);
     }
     setAddModal(false); setEditCompany(null); setLogoPreview(null);
-    setForm({ name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [], tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active", separateDatabase: true, databaseStatus: "Ready", branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "" });
+    setForm({ name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [], tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active", separateDatabase: true, databaseStatus: "Ready", branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "", themeConfig: null });
   };
 
   const openEdit = (c: any) => {
     setEditCompany(c);
     setLogoPreview(c.logo || null);
+    
+    // Parse themeConfig safely
+    let tc = c.themeConfig;
+    if (tc && typeof tc === "string") {
+      try { tc = JSON.parse(tc); } catch(e) { tc = null; }
+    }
+    if (!tc) {
+      tc = {
+        primaryColor: c.brandColor || "#3B82F6",
+        secondaryColor: c.secondaryColor || "#64748b",
+        accentColor: c.brandColor || "#3B82F6",
+        buttonColor: c.brandColor || "#3B82F6",
+        headerColor: "#ffffff",
+        sidebarColor: "#0A0F1C",
+        cardColor: "#ffffff",
+        tableHeaderColor: "#f8fafc",
+        notificationColor: "#ef4444",
+        backgroundColor: "#f8fafc",
+        textColor: "#0f172a",
+        borderColor: "#e2e8f0"
+      };
+    }
+
     setForm({ 
       name: c.name, telephone: c.telephone, hrMobile: c.hrMobile, ownerMobile: c.ownerMobile, whatsapp: c.whatsapp, email: c.email, address: c.address, notes: c.notes || "", googleMapLink: c.googleMapLink || "", logo: c.logo || null, documents: c.documents || [],
       tradeLicenseNumber: c.tradeLicenseNumber || "", licenseIssueDate: c.licenseIssueDate || "", licenseExpiryDate: c.licenseExpiryDate || "", companyType: c.companyType || "", ownerName: c.ownerName || "", emirateLocation: c.emirateLocation || "", trnNumber: c.trnNumber || "", status: c.status || "Active",
       separateDatabase: c.separateDatabase !== false, databaseStatus: c.databaseStatus || (c.separateDatabase !== false ? "Ready" : "Not Provisioned"),
       branchLogo: c.branchLogo || null, coverImage: c.coverImage || null, profileImage: c.profileImage || null,
-      brandColor: c.brandColor || "#1e293b", secondaryColor: c.secondaryColor || "#3b82f6", website: c.website || "", description: c.description || ""
+      brandColor: c.brandColor || "#1e293b", secondaryColor: c.secondaryColor || "#3b82f6", website: c.website || "", description: c.description || "",
+      themeConfig: tc
     });
     setAddModal(true);
   };
@@ -515,6 +563,84 @@ export default function CompaniesPage() {
                   </div>
                 </div>
               )}
+              {/* ── Custom Theme Branding Colors ── */}
+              <div className="space-y-2 sm:col-span-2 border-t border-slate-100 pt-3 mt-1">
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Custom Theme Branding</h4>
+                <p className="text-[10px] text-slate-400 font-semibold">Customize company-specific theme colors. Theme changes instantly apply to this company's users.</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                  {[
+                    { label: "Primary Theme Color", key: "primaryColor", def: "#3B82F6" },
+                    { label: "Secondary Theme Color", key: "secondaryColor", def: "#64748b" },
+                    { label: "Accent Color", key: "accentColor", def: "#3B82F6" },
+                    { label: "Button Color", key: "buttonColor", def: "#3b82f6" },
+                    { label: "Header Color", key: "headerColor", def: "#ffffff" },
+                    { label: "Sidebar Color", key: "sidebarColor", def: "#0A0F1C" },
+                    { label: "Card Color", key: "cardColor", def: "#ffffff" },
+                    { label: "Table Header Color", key: "tableHeaderColor", def: "#f8fafc" },
+                    { label: "Notification Color", key: "notificationColor", def: "#ef4444" },
+                  ].map(({ label, key, def }) => {
+                    const currentVal = (form.themeConfig && form.themeConfig[key]) || def;
+                    return (
+                      <div key={key} className="space-y-1">
+                        <Label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="color" 
+                            value={currentVal}
+                            onChange={e => {
+                              const tc = form.themeConfig || {
+                                primaryColor: form.brandColor || "#3B82F6",
+                                secondaryColor: form.secondaryColor || "#64748b",
+                                accentColor: form.brandColor || "#3B82F6",
+                                buttonColor: form.brandColor || "#3B82F6",
+                                headerColor: "#ffffff",
+                                sidebarColor: "#0A0F1C",
+                                cardColor: "#ffffff",
+                                tableHeaderColor: "#f8fafc",
+                                notificationColor: "#ef4444",
+                                backgroundColor: "#f8fafc",
+                                textColor: "#0f172a",
+                                borderColor: "#e2e8f0"
+                              };
+                              setForm(f => ({
+                                ...f,
+                                themeConfig: { ...tc, [key]: e.target.value }
+                              }));
+                            }}
+                            className="w-9 h-9 rounded-lg cursor-pointer border border-slate-200 p-0 overflow-hidden" 
+                          />
+                          <Input 
+                            value={currentVal}
+                            onChange={e => {
+                              const tc = form.themeConfig || {
+                                primaryColor: form.brandColor || "#3B82F6",
+                                secondaryColor: form.secondaryColor || "#64748b",
+                                accentColor: form.brandColor || "#3B82F6",
+                                buttonColor: form.brandColor || "#3B82F6",
+                                headerColor: "#ffffff",
+                                sidebarColor: "#0A0F1C",
+                                cardColor: "#ffffff",
+                                tableHeaderColor: "#f8fafc",
+                                notificationColor: "#ef4444",
+                                backgroundColor: "#f8fafc",
+                                textColor: "#0f172a",
+                                borderColor: "#e2e8f0"
+                              };
+                              setForm(f => ({
+                                ...f,
+                                themeConfig: { ...tc, [key]: e.target.value }
+                              }));
+                            }}
+                            className="bg-white border-slate-200 rounded-xl font-mono text-[10px] h-9 uppercase flex-1" 
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="space-y-1 sm:col-span-2">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Notes</Label>
                 <textarea rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="w-full bg-white border border-slate-200 rounded-xl text-xs p-3 outline-none focus:border-blue-400 resize-none" />

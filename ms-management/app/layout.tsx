@@ -60,13 +60,26 @@ export default async function RootLayout({
 
     // Tenant Overrides
     if (companySettings) {
-      if (companySettings.brandColor) {
-        primaryColor = companySettings.brandColor;
-        buttonColor = companySettings.brandColor;
-      }
-      if (companySettings.secondaryColor) {
-        sidebarColor = companySettings.secondaryColor;
-        headerColor = companySettings.secondaryColor;
+      const tc = companySettings.themeConfig ? (typeof companySettings.themeConfig === "string" ? JSON.parse(companySettings.themeConfig) : companySettings.themeConfig) : null;
+      if (tc) {
+        if (tc.primaryColor) primaryColor = tc.primaryColor;
+        if (tc.sidebarColor) sidebarColor = tc.sidebarColor;
+        if (tc.backgroundColor) backgroundColor = tc.backgroundColor;
+        if (tc.cardColor) cardColor = tc.cardColor;
+        if (tc.textColor) textColor = tc.textColor;
+        if (tc.borderColor) borderColor = tc.borderColor;
+        if (tc.buttonColor) buttonColor = tc.buttonColor;
+        if (tc.headerColor) headerColor = tc.headerColor;
+        if (tc.fontFamily) fontFamily = tc.fontFamily;
+      } else {
+        if (companySettings.brandColor) {
+          primaryColor = companySettings.brandColor;
+          buttonColor = companySettings.brandColor;
+        }
+        if (companySettings.secondaryColor) {
+          sidebarColor = companySettings.secondaryColor;
+          headerColor = companySettings.secondaryColor;
+        }
       }
     }
   } catch (err) {

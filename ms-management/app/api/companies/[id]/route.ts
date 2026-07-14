@@ -58,7 +58,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
         emirateLocation: data.emirateLocation !== undefined ? data.emirateLocation : undefined,
         trnNumber: data.trnNumber !== undefined ? data.trnNumber : undefined,
         separateDatabase: data.separateDatabase !== undefined ? data.separateDatabase : undefined,
-        databaseStatus: data.databaseStatus !== undefined ? data.databaseStatus : undefined
+        databaseStatus: data.databaseStatus !== undefined ? data.databaseStatus : undefined,
+        themeConfig: data.themeConfig !== undefined ? data.themeConfig : undefined
       }
     });
 

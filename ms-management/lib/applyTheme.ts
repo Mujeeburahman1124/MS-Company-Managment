@@ -27,6 +27,10 @@ export interface ThemeSettings {
   buttonColor?: string | null;
   headerColor?: string | null;
   fontFamily?: string | null;
+  secondaryColor?: string | null;
+  accentColor?: string | null;
+  tableHeaderColor?: string | null;
+  notificationColor?: string | null;
 }
 
 /**
@@ -52,11 +56,66 @@ function injectDynamicStyleTag(settings: ThemeSettings): void {
   const primary = settings.primaryColor || "#3B82F6";
   const sidebar = settings.sidebarColor || "#0A0F1C";
   const header  = settings.headerColor  || "#ffffff";
+  const button  = settings.buttonColor  || primary;
 
   // Derive a slightly darker variant of sidebar for gradient mid-stop
   // We'll just use the sidebar colour directly for simplicity / correctness.
   const css = `
     /* ── Dynamically generated brand styles ── */
+    :root {
+      --background: ${settings.backgroundColor || "#f8fafc"};
+      --foreground: ${settings.textColor || "#0f172a"};
+      --border: ${settings.borderColor || "#e2e8f0"};
+    }
+
+    /* Global Dynamic Color Overrides */
+    .bg-blue-600, .bg-blue-500, .bg-primary, [data-state=active] {
+      background-color: var(--button-color) !important;
+    }
+    .hover\:bg-blue-700:hover, .hover\:bg-blue-600:hover, .bg-blue-600:hover, .bg-primary:hover {
+      background-color: var(--button-color) !important;
+      filter: brightness(0.9) !important;
+    }
+    .text-blue-600, .text-blue-500, .text-primary {
+      color: var(--primary) !important;
+    }
+    .hover\:text-blue-700:hover, .hover\:text-blue-600:hover {
+      color: var(--primary) !important;
+      filter: brightness(0.9) !important;
+    }
+    .border-blue-600, .border-blue-500, .border-blue-400 {
+      border-color: var(--primary) !important;
+    }
+    .bg-blue-50, .bg-blue-50\/50, .bg-blue-50\/30 {
+      background-color: var(--primary)1a !important; /* 10% opacity hex code format */
+    }
+    .text-blue-700, .text-blue-800 {
+      color: var(--primary) !important;
+    }
+    
+    /* Card, Sidebar & Header Overrides */
+    .bg-card, .bg-white, .bg-white\/50, [class*="bg-white"] {
+      background-color: var(--card) !important;
+    }
+    .bg-sidebar, [class*="bg-slate-900"], [class*="bg-slate-950"] {
+      background-color: var(--sidebar) !important;
+    }
+    .bg-slate-50\/50, .bg-slate-50, thead, th, thead tr, .bg-slate-100 {
+      background-color: var(--table-header-color) !important;
+    }
+    
+    /* Accent & Notification Color Overrides */
+    .border-indigo-100, .bg-indigo-50, .text-indigo-600, .bg-indigo-100 {
+      border-color: var(--accent-color) !important;
+      color: var(--accent-color) !important;
+    }
+    .bg-indigo-50 {
+      background-color: var(--accent-color)14 !important;
+    }
+    .bg-rose-500, .bg-rose-600, .bg-red-500, .bg-red-600, .bg-destructive {
+      background-color: var(--notification-color) !important;
+    }
+
     .ms-sidebar-gradient {
       background: linear-gradient(180deg, ${sidebar} 0%, ${sidebar}ee 50%, ${sidebar}cc 100%) !important;
     }
@@ -109,6 +168,10 @@ export function applyThemeCssVars(settings: ThemeSettings): void {
   const button     = settings.buttonColor     || primary;
   const header     = settings.headerColor     || "#ffffff";
   const font       = settings.fontFamily      || "Inter";
+  const secondary  = settings.secondaryColor   || "#64748b";
+  const accent     = settings.accentColor      || primary;
+  const tableHeader = settings.tableHeaderColor || "#f8fafc";
+  const notification = settings.notificationColor || primary;
 
   const primaryRgb = hexToRgbComponents(primary);
   const sidebarRgb = hexToRgbComponents(sidebar);
@@ -127,6 +190,10 @@ export function applyThemeCssVars(settings: ThemeSettings): void {
   root.style.setProperty("--input",            border);
   root.style.setProperty("--button-color",     button);
   root.style.setProperty("--header-color",     header);
+  root.style.setProperty("--secondary-color",  secondary);
+  root.style.setProperty("--accent-color",     accent);
+  root.style.setProperty("--table-header-color", tableHeader);
+  root.style.setProperty("--notification-color", notification);
 
   // ── Sidebar sub-tokens ──────────────────────────────────────────────────
   root.style.setProperty("--sidebar-foreground",           "#f8fafc");

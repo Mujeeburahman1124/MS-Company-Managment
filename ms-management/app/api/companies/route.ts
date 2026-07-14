@@ -93,7 +93,8 @@ export async function POST(request: Request) {
         brandColor: data.brandColor || "#1e293b",
         secondaryColor: data.secondaryColor || "#3b82f6",
         website: data.website || null,
-        description: data.description || null
+        description: data.description || null,
+        themeConfig: data.themeConfig || null
       }
     });
 

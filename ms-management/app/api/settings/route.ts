@@ -4,13 +4,14 @@ import { getSessionUser } from "@/lib/auth-helpers";
 
 export async function GET() {
   try {
-    const settings = await prisma.siteSettings.findUnique({
+    const user = await getSessionUser();
+    let settings = await prisma.siteSettings.findUnique({
       where: { id: "SETTINGS" }
     });
 
     if (!settings) {
       // Fallback default settings if seed didn't run or table is empty
-      return NextResponse.json({
+      settings = {
         id: "SETTINGS",
         siteName: "MS Horizon F.Z.E",
         email: "info@mshorizon.ae",
@@ -35,8 +36,28 @@ export async function GET() {
         consultancyDeclaration: "We declare that we will act as the authorized placement agent, coordinating the scheduling, interview processing, and document management in compliance with MoHRE policies and UAE Federal Labour Laws.",
         companyLicense: "2013854/FZE",
         companyWebsite: "www.mshorizon.ae",
-        printFooter: "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement"
+        printFooter: "MS Horizon F.Z.E - Recruitment Consultancy Placement Agreement",
+        linkedin: "",
+        twitter: "",
+        facebook: "",
+        instagram: "",
+        logo: ""
+      };
+    }
+
+    if (user && user.company && user.company !== "System") {
+      const company = await prisma.company.findFirst({
+        where: { name: user.company }
       });
+      if (company) {
+        const themeConfig = company.themeConfig ? (typeof company.themeConfig === "string" ? JSON.parse(company.themeConfig) : company.themeConfig) : {};
+        return NextResponse.json({
+          ...settings,
+          ...themeConfig,
+          logo: company.logo || settings.logo,
+          siteName: company.name || settings.siteName,
+        });
+      }
     }
 
     return NextResponse.json(settings);

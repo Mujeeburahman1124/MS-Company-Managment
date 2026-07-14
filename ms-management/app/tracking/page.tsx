@@ -54,6 +54,10 @@ export default function TrackingPage() {
   const statusFilter = f.status || "all";
   const startDate = f.fromDate || "";
   const endDate = f.toDate || "";
+  
+  const positionFilter = f.position || "all";
+  const visaStatusFilter = f.visaStatus || "all";
+  const interviewDateFilter = f.interviewDate || "";
 
   const [selectedApp, setSelectedApp] = useState<Applicant | null>(null);
 
@@ -72,7 +76,10 @@ export default function TrackingPage() {
     f.nationality,
     f.status,
     f.fromDate,
-    f.toDate
+    f.toDate,
+    f.position,
+    f.visaStatus,
+    f.interviewDate
   ]);
 
   // Status progression validations state
@@ -125,6 +132,33 @@ export default function TrackingPage() {
       (a.applyingPositions && a.applyingPositions.join(", ").toLowerCase().includes(q))
     );
   }
+
+  // 1. Position Filter
+  if (positionFilter !== "all") {
+    filteredList = filteredList.filter(a => a.applyingPositions && Array.isArray(a.applyingPositions) && (a.applyingPositions as string[]).includes(positionFilter));
+  }
+
+  // 2. Visa Status / Visa Type Filter
+  if (visaStatusFilter !== "all") {
+    filteredList = filteredList.filter(a => a.visaType === visaStatusFilter);
+  }
+
+  // 3. Interview Date Filter
+  if (interviewDateFilter) {
+    const matchingAppIds = interviews
+      .filter(i => i.dateTime && i.dateTime.slice(0, 10) === interviewDateFilter)
+      .map(i => i.applicantId);
+    filteredList = filteredList.filter(a => matchingAppIds.includes(a.id));
+  }
+
+  // Derive unique values for filters
+  const allPositions = Array.from(
+    new Set(baseApplicants.flatMap(a => Array.isArray(a.applyingPositions) ? a.applyingPositions : []))
+  ).sort();
+
+  const allVisaTypes = Array.from(
+    new Set(baseApplicants.map(a => a.visaType).filter(Boolean))
+  ).sort();
 
   // Derive paginated list
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
@@ -289,9 +323,10 @@ export default function TrackingPage() {
     "Pending",
     "Processing",
     "Interview Scheduled",
+    "Interview Completed",
     "Selected",
     "Visa Processing",
-    "Ready To Travel",
+    "Ready to Travel",
     "Placed",
     "Rejected",
     "Returned"
@@ -426,8 +461,10 @@ export default function TrackingPage() {
       case "Pending": return "bg-slate-50 border-slate-200 text-slate-700";
       case "Processing": return "bg-sky-50 border-sky-200 text-sky-700";
       case "Interview Scheduled": return "bg-purple-50 border-purple-200 text-purple-700";
+      case "Interview Completed": return "bg-violet-50 border-violet-200 text-violet-700";
       case "Selected": return "bg-blue-50 border-blue-200 text-blue-700";
       case "Visa Processing": return "bg-amber-50 border-amber-200 text-amber-700";
+      case "Ready to Travel":
       case "Ready To Travel": return "bg-teal-50 border-teal-200 text-teal-700";
       case "Placed": return "bg-emerald-50 border-emerald-200 text-emerald-700";
       case "Returned": return "bg-orange-50 border-orange-200 text-orange-700";
@@ -477,6 +514,78 @@ export default function TrackingPage() {
   const resetFilters = () => {
     clearFilter("tracking");
     toast.success("Filters cleared");
+  };
+
+  const getChronologicalTimeline = () => {
+    if (!selectedApp) return [];
+    
+    // Parse status history safely
+    let historyList: any[] = [];
+    if (selectedApp.statusHistory) {
+      historyList = Array.isArray(selectedApp.statusHistory)
+        ? selectedApp.statusHistory
+        : (typeof selectedApp.statusHistory === "string" 
+            ? (() => { try { return JSON.parse(selectedApp.statusHistory); } catch { return []; } })()
+            : []);
+    }
+    
+    const events: any[] = [];
+    
+    // 1. Registration
+    events.push({
+      date: selectedApp.createdAt || selectedApp.applicationDate,
+      type: "Registration",
+      title: "Registration Date",
+      desc: `Profile registered by consultant ${selectedApp.createdBy || "System"}`,
+      notes: `Company: ${selectedApp.company} · Branch: ${selectedApp.branch}`
+    });
+    
+    // 2. Status History changes
+    historyList.forEach((h: any, idx: number) => {
+      events.push({
+        date: h.date || new Date().toISOString(),
+        type: "StatusChange",
+        title: `Status Stage: ${h.newStatus}`,
+        desc: `Status updated by ${h.changedBy || "Manager"} (Previous: ${h.oldStatus})`,
+        notes: h.reason || ""
+      });
+    });
+    
+    // 3. Interview History
+    selectedAppInterviews.forEach((i: any) => {
+      events.push({
+        date: i.dateTime,
+        type: "Interview",
+        title: `${i.type || "Interview"} scheduled: ${i.onlinePhysical || "Online"}`,
+        desc: `Position: ${i.interviewPosition || selectedApp.applyingPositions?.[0] || "N/A"} · Conducted by: ${i.conductPersonName} (${i.meetingMode || "Phone Call"})`,
+        notes: `Status: ${i.status} · Feedback: ${i.feedback || "Pending"} · Result: ${i.interviewResult || "Awaiting Result"}`
+      });
+    });
+
+    // 4. Visa Status
+    if (selectedApp.visaExpiry) {
+      events.push({
+        date: selectedApp.visaExpiry,
+        type: "Visa",
+        title: "Visa Status Checkpoint",
+        desc: `Visa Category: ${selectedApp.visaType} · Expiry: ${formatDate(selectedApp.visaExpiry)}`,
+        notes: `Visa expiration remaining: ${selectedVisaDays !== null ? `${selectedVisaDays} days` : "N/A"}`
+      });
+    }
+
+    // 5. Placement Details
+    if (selectedAppPlacement) {
+      events.push({
+        date: selectedAppPlacement.placementDate || selectedAppPlacement.createdAt || new Date().toISOString(),
+        type: "Placement",
+        title: `Placement Confirmed`,
+        desc: `Placed with company ${selectedAppPlacement.companyName} as ${selectedAppPlacement.position}`,
+        notes: `Monthly Salary: AED ${selectedAppPlacement.salary?.toLocaleString()} · Start Date: ${selectedAppPlacement.joiningDate || "N/A"} · Agreement: ${selectedAppPlacement.agreementStatus}`
+      });
+    }
+    
+    // Sort chronological order (oldest to newest)
+    return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   };
 
   return (
@@ -573,7 +682,23 @@ export default function TrackingPage() {
             </Card>
 
             {STAGES.map(stage => {
-              const count = baseApplicants.filter(a => a.status === stage).length;
+              let stageFiltered = [...baseApplicants];
+              if (companyFilter !== "all") stageFiltered = stageFiltered.filter(a => a.company === companyFilter);
+              if (branchFilter !== "all") stageFiltered = stageFiltered.filter(a => a.branch === branchFilter);
+              if (nationalityFilter !== "all") stageFiltered = stageFiltered.filter(a => a.nationality === nationalityFilter);
+              if (positionFilter !== "all") stageFiltered = stageFiltered.filter(a => a.applyingPositions && Array.isArray(a.applyingPositions) && (a.applyingPositions as string[]).includes(positionFilter));
+              if (visaStatusFilter !== "all") stageFiltered = stageFiltered.filter(a => a.visaType === visaStatusFilter);
+              if (startDate) stageFiltered = stageFiltered.filter(a => a.applicationDate >= startDate);
+              if (endDate) stageFiltered = stageFiltered.filter(a => a.applicationDate <= endDate);
+              if (search) {
+                const q = search.toLowerCase();
+                stageFiltered = stageFiltered.filter(a =>
+                  a.fullName.toLowerCase().includes(q) ||
+                  a.id.toLowerCase().includes(q) ||
+                  (a.applyingPositions && a.applyingPositions.join(", ").toLowerCase().includes(q))
+                );
+              }
+              const count = stageFiltered.filter(a => a.status === stage).length;
               const isSelected = statusFilter === stage;
               
               return (
@@ -603,7 +728,7 @@ export default function TrackingPage() {
       {/* Filter Row with Advanced Controls */}
       <div className="bg-white border-b border-slate-100 p-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 flex-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10 gap-3 flex-1">
             {/* Search Input */}
             <div className="relative col-span-2 md:col-span-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -677,6 +802,46 @@ export default function TrackingPage() {
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Position Filter */}
+            <div className="space-y-0.5">
+              <select
+                value={positionFilter}
+                onChange={e => setFilter("tracking", { position: e.target.value, page: 1 })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+              >
+                <option value="all">Position</option>
+                {allPositions.map(pos => (
+                  <option key={pos} value={pos}>{pos}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Visa Status Filter */}
+            <div className="space-y-0.5">
+              <select
+                value={visaStatusFilter}
+                onChange={e => setFilter("tracking", { visaStatus: e.target.value, page: 1 })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-9 px-3 focus:border-blue-400 focus:bg-white font-medium outline-none text-slate-700"
+              >
+                <option value="all">Visa Status</option>
+                {allVisaTypes.map(visa => (
+                  <option key={visa} value={visa}>{visa}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Interview Date Filter */}
+            <div className="relative">
+              <Input
+                type="date"
+                value={interviewDateFilter}
+                onChange={e => setFilter("tracking", { interviewDate: e.target.value, page: 1 })}
+                className="bg-slate-50 border-slate-200 rounded-xl text-xs h-9 focus:border-blue-400 focus:bg-white w-full px-3"
+                title="Scheduled Interview Date"
+              />
+              <span className="absolute -top-3.5 left-1 text-[8px] font-bold text-slate-400 uppercase">Int. Date</span>
             </div>
 
             {/* Start Date */}
@@ -1015,8 +1180,24 @@ export default function TrackingPage() {
                   <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.passportNumber || "N/A"}</strong>
                 </div>
                 <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Mobile Number</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.mobile || "N/A"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Email Address</span>
+                  <strong className="text-slate-800 font-bold text-[10px] truncate block">{selectedApp.email || "N/A"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
                   <span className="text-[8px] text-slate-400 font-bold uppercase block">Passport Expiry</span>
                   <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.passportExpiry ? formatDate(selectedApp.passportExpiry) : "N/A"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Internal Company</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.company || "N/A"}</strong>
+                </div>
+                <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[8px] text-slate-400 font-bold uppercase block">Branch</span>
+                  <strong className="text-slate-800 font-bold text-[10px]">{selectedApp.branch || "N/A"}</strong>
                 </div>
                 <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
                   <span className="text-[8px] text-slate-400 font-bold uppercase block">Client Company</span>
@@ -1033,8 +1214,8 @@ export default function TrackingPage() {
                 <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
                   <span className="text-[8px] text-slate-400 font-bold uppercase block">Last Activity</span>
                   <strong className="text-slate-800 font-bold text-[10px] truncate block">
-                    {selectedApp.statusHistory && selectedApp.statusHistory[0] 
-                      ? `${selectedApp.statusHistory[0].newStatus} (${selectedApp.statusHistory[0].date.slice(0, 10)})` 
+                    {selectedApp.statusHistory && (selectedApp.statusHistory as any[])[0] 
+                      ? `${(selectedApp.statusHistory as any[])[0].newStatus} (${(selectedApp.statusHistory as any[])[0].date.slice(0, 10)})` 
                       : "Registered"}
                   </strong>
                 </div>
@@ -1060,6 +1241,40 @@ export default function TrackingPage() {
                       Full Profile
                     </Button>
                   </Link>
+                </div>
+              </div>
+
+              {/* Chronological Tracking History Timeline */}
+              <div className="border border-slate-100 rounded-2xl p-4 bg-white space-y-3">
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                  <CalendarRange className="w-4 h-4 text-purple-600" /> Tracking History Timeline
+                </h4>
+                <div className="relative pl-6 border-l-2 border-slate-100 space-y-4 pt-1 max-h-[300px] overflow-y-auto scrollbar-thin">
+                  {getChronologicalTimeline().map((evt: any, i: number) => (
+                    <div key={i} className="relative">
+                      {/* Timeline dot */}
+                      <div className={cn(
+                        "absolute -left-[31px] top-1 w-3 h-3 rounded-full border-2 bg-white",
+                        evt.type === "Registration" ? "border-indigo-500" :
+                        evt.type === "StatusChange" ? "border-purple-500" :
+                        evt.type === "Interview" ? "border-blue-500" :
+                        evt.type === "Visa" ? "border-amber-500" :
+                        evt.type === "Placement" ? "border-emerald-500" : "border-slate-400"
+                      )} />
+                      
+                      <div className="text-[10px] text-slate-400 font-bold font-mono">{formatDate(evt.date.slice(0, 10))} {evt.date.length > 10 ? `· ${evt.date.slice(11, 16)}` : ""}</div>
+                      <div className="text-[11px] font-extrabold text-slate-800 mt-0.5">{evt.title}</div>
+                      <div className="text-[10px] font-semibold text-slate-500 leading-normal mt-0.5">{evt.desc}</div>
+                      {evt.notes && (
+                        <div className="text-[9px] bg-slate-50 border border-slate-100 rounded-lg p-1.5 mt-1 font-medium text-slate-600 leading-relaxed italic">
+                          {evt.notes}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {getChronologicalTimeline().length === 0 && (
+                    <p className="text-[10px] text-slate-400 italic">No tracking events logged yet.</p>
+                  )}
                 </div>
               </div>
 
