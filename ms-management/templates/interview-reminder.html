@@ -1,55 +1,71 @@
-{{> header companyPrimaryColor="#2563eb" bannerBg="#eff6ff" bannerBorder="#bfdbfe" bannerColor="#1d4ed8" bannerIcon="⏰" bannerText="INTERVIEW REMINDER"}}
+{{> header companyPrimaryColor="#7c3aed" bannerBg="#f5f3ff" bannerBorder="#ddd6fe" bannerColor="#6d28d9" bannerIcon="⏰" bannerText="INTERVIEW REMINDER"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #1e3a8a; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
-      Reminder: Upcoming Interview Session
+    <td style="color: #6d28d9; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      Interview Appointment Reminder
     </td>
   </tr>
   <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      This is a friendly reminder that you have an upcoming interview session scheduled with our recruitment panel.
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      This is a friendly reminder of your upcoming interview session. Please review the schedule and join on time:
     </td>
   </tr>
   <tr>
     <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
+      <!-- Schedule Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
         <tr>
-          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
-            <strong>Scheduled Slot Reminder:</strong><br/>
-            • <strong>Applied Position:</strong> {{position}}<br/>
-            • <strong>Date &amp; Time:</strong> <span style="font-weight: 800; color: #1d4ed8;">{{interviewDateTime}}</span><br/>
-            • <strong>Interviewer Host:</strong> {{conductorName}}<br/>
-            • <strong>Format/Platform:</strong> {{format}}
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #6d28d9; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            🗓️ Session Details
           </td>
         </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Interview Position:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{role}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Date &amp; Time:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{dateTime}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Format:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{onlinePhysical}} ({{meetingMode}})</td>
+        </tr>
+        {{#if meetingLink}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Online Meeting Link:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #7c3aed; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{meetingLink}}" target="_blank" style="color: #7c3aed;">{{meetingLink}}</a></td>
+        </tr>
+        {{/if}}
+        {{#if googleMapLink}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Location Map:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #7c3aed; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{googleMapLink}}" target="_blank" style="color: #7c3aed;">View Map Directions</a></td>
+        </tr>
+        {{/if}}
+        {{#if notes}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Special Guidelines:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #b45309; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{notes}}</td>
+        </tr>
+        {{/if}}
       </table>
     </td>
   </tr>
   {{#if meetingLink}}
   <tr>
-    <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe; padding: 16px; margin-bottom: 24px;">
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
         <tr>
-          <td style="font-size: 13px; color: #1e40af; font-family: Arial, sans-serif;">
-            🖥️ <strong>Digital Meeting Sync Room:</strong><br/>
-            Click below to join the online assessment room:<br/>
-            <a href="{{meetingLink}}" target="_blank" style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px; font-size: 11px;">Join Meeting Room</a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  {{/if}}
-  {{#if locationLink}}
-  <tr>
-    <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fffbeb; border-radius: 8px; border: 1px solid #fef3c7; padding: 16px; margin-bottom: 24px;">
-        <tr>
-          <td style="font-size: 13px; color: #92400e; font-family: Arial, sans-serif;">
-            📍 <strong>Physical Assessment Location:</strong><br/>
-            Please review the maps to reach the center on time:<br/>
-            <a href="{{locationLink}}" target="_blank" style="display: inline-block; background-color: #d97706; color: #ffffff; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px; font-size: 11px;">View Map Location</a>
+          <td align="center" style="background-color: #7c3aed; border-radius: 8px;">
+            <a href="{{meetingLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif;">
+              💻 Join Online Interview Room
+            </a>
           </td>
         </tr>
       </table>
@@ -57,8 +73,12 @@
   </tr>
   {{/if}}
   <tr>
-    <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Please ensure you have a stable internet connection and are in a quiet room if joining digitally. Good luck with your assessment!
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      Please join the room 5 minutes prior to the scheduled start time. Ensure your video camera and microphone are operational.
+      <br/><br/>
+      Best Regards,<br/>
+      <strong>Recruitment Operations Committee</strong><br/>
+      {{companyName}}
     </td>
   </tr>
 </table>

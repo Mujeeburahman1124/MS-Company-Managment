@@ -190,7 +190,14 @@ ${updated.company} HR Team`;
         body: emailBody,
         candidateName: updated.name,
         company: updated.company,
-        branch: updated.branch
+        branch: updated.branch,
+        templateType: "Status_Changed",
+        templateData: {
+          recipientName: updated.name,
+          newStatus: updated.status,
+          previousStatus: existing.status,
+          notes: `Your employment record status has been officially updated to: ${updated.status}.`
+        }
       }).catch(err => console.error("Async staff status update email error:", err));
     } else if (updated.email && Object.keys(data).some(key => data[key] !== undefined && data[key] !== (existing as any)[key])) {
       // General profile update
@@ -214,7 +221,13 @@ ${updated.company} HR Team`;
         body: emailBody,
         candidateName: updated.name,
         company: updated.company,
-        branch: updated.branch
+        branch: updated.branch,
+        templateType: "Staff_Updated",
+        templateData: {
+          recipientName: updated.name,
+          newStatus: "Profile Updated",
+          notes: `Your employee profile has been updated. Position: ${updated.position}, Branch: ${updated.branch}. If you did not request this update, contact HR.`
+        }
       }).catch(err => console.error("Async general staff update email error:", err));
     }
 
@@ -307,7 +320,17 @@ ${data.company || existing.company} HR Team`;
             body: emailBody,
             candidateName: data.name || existing.name,
             company: data.company || existing.company,
-            branch: data.branch || existing.branch
+            branch: data.branch || existing.branch,
+            templateType: "Welcome_Employee",
+            templateData: {
+              recipientName: data.name || existing.name,
+              position: existing.position,
+              employerName: data.company || existing.company,
+              startDate: existing.joiningDate,
+              workLocation: data.branch || existing.branch || "Main Branch",
+              tempPassword: temporaryPassword,
+              portalUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://portal.mshorizon.ae"
+            }
           }).catch(err => console.error("Async staff updated email sending error:", err));
         }
       }

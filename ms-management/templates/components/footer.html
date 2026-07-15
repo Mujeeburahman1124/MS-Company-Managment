@@ -7,7 +7,7 @@
             <td style="padding: 0 28px 32px 28px; background-color: #ffffff;">
               <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #334155; line-height: 1.6;">
                 <tr>
-                  <td colspan="2" style="font-weight: 800; text-transform: uppercase; color: {{companyPrimaryColor}}; font-size: 11px; letter-spacing: 1px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; font-family: 'Outfit', 'Inter', sans-serif;">
+                  <td colspan="2" style="font-weight: 800; text-transform: uppercase; color: {{#if companyPrimaryColor}}{{companyPrimaryColor}}{{else}}#6366f1{{/if}}; font-size: 11px; letter-spacing: 1px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; font-family: 'Outfit', 'Inter', sans-serif;">
                     📋 Candidate Profile & Application Checkpoint
                   </td>
                 </tr>
@@ -43,7 +43,7 @@
                           {{#if meetingLink}}
                             {{#if (ne meetingLink "N/A")}}
                               <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(22, 101, 52, 0.2);">
-                                🔗 <strong>Meeting Link:</strong> <a href="{{meetingLink}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: underline; font-weight: 800;">Join Digital Interview Platform</a>
+                                🔗 <strong>Meeting Link:</strong> <a href="{{meetingLink}}" target="_blank" style="color: {{#if companyPrimaryColor}}{{companyPrimaryColor}}{{else}}#6366f1{{/if}}; text-decoration: underline; font-weight: 800;">Join Digital Interview Platform</a>
                               </div>
                             {{/if}}
                           {{/if}}
@@ -78,7 +78,7 @@
                       <tr>
                         <td>
                           Representing Consultant: <strong style="color: #334155;">{{consultantName}}</strong><br />
-                          Assigned HR Officer: <strong style="color: #334155;">{{hrName}}</strong> (<a href="mailto:{{hrEmail}}" style="color: {{companyPrimaryColor}}; text-decoration: none; font-weight: bold;">{{hrEmail}}</a>)
+                          Assigned HR Officer: <strong style="color: #334155;">{{hrName}}</strong> (<a href="mailto:{{hrEmail}}" style="color: {{#if companyPrimaryColor}}{{companyPrimaryColor}}{{else}}#6366f1{{/if}}; text-decoration: none; font-weight: bold;">{{hrEmail}}</a>)
                         </td>
                         <td align="right" style="vertical-align: bottom; font-size: 9px; color: #94a3b8;">
                           Processed on {{currentDate}} at {{currentTime}}
@@ -94,7 +94,7 @@
 
           <!-- Premium Corporate Footer -->
           <tr>
-            <td style="background-color: #0f172a; padding: 40px 32px; color: #94a3b8; font-size: 11px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 4px solid {{companyPrimaryColor}};">
+            <td style="background-color: #0f172a; padding: 44px 32px; color: #94a3b8; font-size: 11px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 4px solid {{#if companyPrimaryColor}}{{companyPrimaryColor}}{{else}}#6366f1{{/if}};">
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 
                 <!-- Logo & Contacts -->
@@ -113,7 +113,7 @@
                                   <span style="font-size: 16px; font-weight: 900; color: #ffffff; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">{{logoText}}</span>
                                 {{/if}}
                               </td>
-                              <td style="padding-left: 8px; font-size: 14px; font-weight: 800; color: #ffffff; font-family: 'Outfit', sans-serif;">
+                              <td style="padding-left: 8px; font-size: 14px; font-weight: 800; color: #ffffff; font-family: 'Outfit', sans-serif; vertical-align: middle;">
                                 {{companyName}}
                               </td>
                             </tr>
@@ -135,7 +135,7 @@
 
                 <!-- Social Media Icons (Text-Graphic badges) -->
                 <tr>
-                  <td align="center" style="border-top: 1px solid #334155; padding: 20px 0; text-align: center;">
+                  <td align="center" style="border-top: 1px solid #1e293b; padding: 20px 0; text-align: center;">
                     <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
                       <tr>
                         <td align="center" style="padding: 0 8px;">
@@ -157,19 +157,19 @@
 
                 <!-- Confidentiality and Auto-Generated Notice -->
                 <tr>
-                  <td style="border-top: 1px solid #334155; padding-top: 20px; text-align: justify; font-size: 9px; color: #64748b; line-height: 1.5;">
+                  <td style="border-top: 1px solid #1e293b; padding-top: 20px; text-align: justify; font-size: 9px; color: #64748b; line-height: 1.5;">
                     <strong>CONFIDENTIALITY NOTICE:</strong> This email transmission, and any documents, files or previous email messages attached to it, may contain confidential information that is legally privileged and owned by <strong>{{companyName}}</strong>. If you are not the intended recipient, or a person responsible for delivering it to the intended recipient, you are hereby notified that any disclosure, copying, distribution or use of any of the information contained in or attached to this transmission is <strong>STRICTLY PROHIBITED</strong>. If you have received this transmission in error, please immediately notify the sender by reply email and destroy the original transmission and its attachments without reading or saving in any manner.
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding-top: 10px; font-size: 9px; color: #64748b;">
-                    ℹ️ <strong>Auto-generated Email Notice:</strong> This is an automatically generated email from the {{companyName}} Recruitment Management System. Please do not reply directly to this email address. If you need assistance, please reach out to our help desk at <a href="mailto:{{companyEmail}}" style="color: #38bdf8; text-decoration: none;">{{companyEmail}}</a> or call the numbers listed above.
+                  <td style="padding-top: 10px; font-size: 10px; color: #f43f5e; font-weight: bold; text-align: center;">
+                    ⚠️ This is an automated email. Please do not reply.
                   </td>
                 </tr>
 
                 <!-- Copyright -->
                 <tr>
-                  <td align="left" style="border-top: 1px solid #334155; margin-top: 20px; padding-top: 16px;">
+                  <td align="left" style="border-top: 1px solid #1e293b; margin-top: 20px; padding-top: 16px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td style="color: #475569; font-size: 10px;">

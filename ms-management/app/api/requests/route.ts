@@ -115,7 +115,14 @@ export async function POST(request: Request) {
         body: `Dear HR Team,\n\nA new staff request has been submitted.\n\nRequest Details:\n- Employee Name: ${user.name}\n- Company: ${user.company}\n- Request Type: ${newRequest.requestType}\n- Date: ${newRequest.date}\n- Description: ${newRequest.description}\n\nPlease review this request in the system dashboard.\n\nBest regards,\nMS Horizon System Support`,
         candidateName: user.name,
         company: user.company,
-        branch: user.branch
+        branch: user.branch,
+        templateType: "General_Announcement",
+        templateData: {
+          recipientName: "HR Team",
+          announcementTitle: `New Staff Request: ${newRequest.requestType}`,
+          announcementMessage: `A new staff request has been submitted by **${user.name}**.\n\n**Request Type:** ${newRequest.requestType}\n**Date:** ${newRequest.date}\n**Description:** ${newRequest.description}`,
+          notes: "Please review this request on the system admin dashboard."
+        }
       });
 
       await prisma.notification.create({

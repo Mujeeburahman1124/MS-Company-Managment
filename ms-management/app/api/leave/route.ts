@@ -196,7 +196,14 @@ ${newRequest.company} HR Department`;
         body: emailBody,
         candidateName: staffMember.name,
         company: newRequest.company,
-        branch: newRequest.branch
+        branch: newRequest.branch,
+        templateType: "General_Announcement",
+        templateData: {
+          recipientName: staffMember.name,
+          announcementTitle: `Leave Request Submitted: ${newRequest.type}`,
+          announcementMessage: `Your leave request for **${newRequest.type}** leave has been successfully submitted.\n\n**Duration:** ${newRequest.startDate} to ${newRequest.endDate} (${newRequest.days} days)\n**Reason:** ${newRequest.reason || "N/A"}`,
+          notes: "Status: Pending approval. We will notify you once a decision is made."
+        }
       }).catch(err => console.error("Async leave submit email error:", err));
 
       try {

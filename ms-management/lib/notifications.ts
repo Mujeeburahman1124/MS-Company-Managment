@@ -181,33 +181,48 @@ export async function sendEmail({
     // Interview templates
     Interview: "interview-scheduled",
     Interview_Initial: "interview-scheduled",
-    Interview_Online: "interview-scheduled",
-    Interview_Physical: "interview-scheduled",
+    Interview_Online: "interview-online",
+    Interview_Physical: "interview-physical",
     Interview_Scheduled: "interview-scheduled",
     Interview_Cancelled: "interview-cancelled",
-    Interview_Completed: "interview-scheduled",
+    Interview_Completed: "interview-selected",
     Interview_Rescheduled: "interview-rescheduled",
     Interview_Reminder: "interview-reminder",
     Interview_Selected: "interview-selected",
     Interview_Rejected: "interview-rejected",
-    
+
     // Application & Registration templates
-    Registration: "applicant-registration",
-    Applicant_Registration: "applicant-registration",
+    Registration: "applicant-registration-confirmation",
+    Applicant_Registration: "applicant-registration-confirmation",
     Registration_Successful: "registration-successful",
-    Application_Received: "application-received",
+    Application_Received: "applicant-registration-confirmation",
     Status_Changed: "status-changed",
-    Pending: "applicant-pending",
-    Under_Review: "under-review",
+    Pending: "status-changed",
+    Under_Review: "status-changed",
     Applicant_Approved: "applicant-approved",
     Applicant_Rejected: "applicant-rejected",
-    Applicant_Returned: "applicant-returned",
-    Applicant_Processing: "applicant-processing",
-    
+    Applicant_Returned: "status-changed",
+    Applicant_Processing: "status-changed",
+
+    // Medical templates
+    Medical_Test_Reminder: "medical-test-reminder",
+    Medical_Reminder: "medical-test-reminder",
+    Medical_Passed: "medical-passed",
+    Medical_Failed: "medical-failed",
+    Medical: "medical-test-reminder",
+
+    // Emirates ID & Labour Contract
+    Emirates_ID_Update: "emirates-id-update",
+    Emirates_ID: "emirates-id-update",
+    Labour_Contract_Update: "labour-contract-update",
+    Labour_Contract: "labour-contract-update",
+
     // Placement & Visa templates
     Offer: "offer-letter",
-    Placement: "placement-confirmed",
-    Placement_Confirmed: "placement-confirmed",
+    Offer_Letter: "offer-letter",
+    Placement: "placement-confirmation",
+    Placement_Confirmed: "placement-confirmation",
+    Placement_Confirmation: "placement-confirmation",
     Placement_Agreement: "placement-agreement",
     Placement_Agreement_Generated: "placement-agreement-generated",
     Visa: "visa-expiry-reminder",
@@ -215,40 +230,47 @@ export async function sendEmail({
     Passport_Expiry: "passport-expiry-reminder",
     Passport_Expiry_Reminder: "passport-expiry-reminder",
     Visa_Processing_Started: "visa-processing-started",
+    Visa_Processing: "visa-processing-started",
     Visa_Approved: "visa-approved",
     Visa_Rejected: "visa-rejected",
     Joining_Confirmation: "joining-confirmation",
-    
-    // Staff & Payroll templates
-    Staff_Registration: "staff-registration",
-    Staff_Updated: "staff-updated",
-    User_Account_Created: "user-account-created",
-    Account_Created: "account-created",
-    Account_Disabled: "account-disabled",
-    Welcome_Email: "welcome-employee",
+    Joining: "joining-confirmation",
     Welcome_Employee: "welcome-employee",
-    Password_Reset: "password-reset",
-    
+    Welcome_Email: "welcome-employee",
+
+    // Account templates
+    Account_Activated: "account-activated",
+    Account_Created: "account-activated",
+    User_Account_Created: "account-activated",
+    Account_Locked: "account-locked",
+    Account_Disabled: "account-locked",
+    Password_Reset: "account-locked",
+
+    // Staff & Payroll templates
+    Staff_Registration: "registration-successful",
+    Staff_Updated: "status-changed",
+
     // HR & Shift & Tasks templates
-    Leave: "leave-application-submitted",
-    Leave_Approved: "leave-approved",
-    Leave_Rejected: "leave-rejected",
-    Staff_Request_Submitted: "staff-request-submitted",
-    Staff_Request_Approved: "staff-request-approved",
-    Staff_Request_Rejected: "staff-request-rejected",
-    Task_Assigned: "task-assigned",
-    Task_Completed: "task-completed",
-    Task_Deadline_Reminder: "task-deadline-reminder",
-    Shift_Assigned: "shift-assigned",
-    Attendance_Reminder: "attendance-reminder",
-    Payroll: "payroll-generated",
-    Payslip: "payslip-ready",
-    Payslip_Ready: "payslip-ready",
-    Birthday: "birthday-wishes",
+    Leave: "general-announcement",
+    Leave_Approved: "general-announcement",
+    Leave_Rejected: "general-announcement",
+    Staff_Request_Submitted: "general-announcement",
+    Staff_Request_Approved: "general-announcement",
+    Staff_Request_Rejected: "general-announcement",
+    Task_Assigned: "general-announcement",
+    Task_Completed: "general-announcement",
+    Task_Deadline_Reminder: "general-announcement",
+    Shift_Assigned: "general-announcement",
+    Attendance_Reminder: "general-announcement",
+    Payroll: "general-announcement",
+    Payslip: "general-announcement",
+    Payslip_Ready: "general-announcement",
+    Birthday: "general-announcement",
+    Vehicle_Assigned: "general-announcement",
+    Vehicle_Returned: "general-announcement",
+    Document_Uploaded: "general-announcement",
+    General_Announcement: "general-announcement",
     System: "system-notification",
-    Vehicle_Assigned: "vehicle-assigned",
-    Vehicle_Returned: "vehicle-returned",
-    Document_Uploaded: "document-uploaded",
   };
 
   const selectedTemplate = templateType ? (map[templateType] || templateType) : "system-notification";
@@ -262,7 +284,7 @@ export async function sendEmail({
       const compiled = Handlebars.compile(tpl);
 
     const recipientName = templateData?.recipientName || candidateName || templateData?.applicantName || "Recipient";
-    const logoText = (company || "").toUpperCase().split(" ").slice(0, 2).map(s => s.charAt(0)).join("") || "MS";
+    const logoText = (company || "").toUpperCase().split(" ").slice(0, 2).map((s: string) => s.charAt(0)).join("") || "MS";
 
     // Auto-populate all required dynamic fields with fallbacks
     const safeData = {
@@ -289,6 +311,44 @@ export async function sendEmail({
       currentDate: templateData?.currentDate || new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
       currentTime: templateData?.currentTime || new Date().toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' }),
       companyLogo: companyLogo || "",
+      // Visa & passport expiry fields
+      visaExpiry: templateData?.visaExpiry || templateData?.visaExpiryDate || "N/A",
+      passportExpiry: templateData?.passportExpiry || templateData?.passportExpiryDate || "N/A",
+      daysRemaining: templateData?.daysRemaining || templateData?.days || "N/A",
+      // Placement / employment fields
+      employerName: templateData?.employerName || templateData?.clientCompany || templateData?.clientName || "N/A",
+      workLocation: templateData?.workLocation || templateData?.location || templateData?.branch || "N/A",
+      startDate: templateData?.startDate || templateData?.joiningDate || templateData?.placedDate || "N/A",
+      allowances: templateData?.allowances || templateData?.benefits || "",
+      agreementDate: templateData?.agreementDate || new Date().toLocaleDateString("en-US"),
+      agreementLink: templateData?.agreementLink || templateData?.documentLink || "",
+      documentLink: templateData?.documentLink || templateData?.fileUrl || "",
+      offerLetterLink: templateData?.offerLetterLink || templateData?.documentLink || "",
+      generatedDate: templateData?.generatedDate || new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
+      reportingTime: templateData?.reportingTime || templateData?.reportTime || "8:00 AM",
+      reportingLocation: templateData?.reportingLocation || templateData?.workLocation || "N/A",
+      portalUrl: templateData?.portalUrl || process.env.NEXT_PUBLIC_SITE_URL || "",
+      tempPassword: templateData?.tempPassword || "",
+      // Medical test fields
+      testDate: templateData?.testDate || templateData?.medicalDate || "N/A",
+      testTime: templateData?.testTime || templateData?.medicalTime || "N/A",
+      testLocation: templateData?.testLocation || templateData?.clinicName || "N/A",
+      clinicName: templateData?.clinicName || templateData?.testLocation || "N/A",
+      clinicPhone: templateData?.clinicPhone || companyPhone || "N/A",
+      medicalStatus: templateData?.medicalStatus || templateData?.status || "N/A",
+      // Emirates ID & Labour contract
+      emiratesIdStatus: templateData?.emiratesIdStatus || templateData?.status || "Processing",
+      emiratesIdExpiry: templateData?.emiratesIdExpiry || templateData?.idExpiry || "N/A",
+      labourContractStatus: templateData?.labourContractStatus || templateData?.status || "Processing",
+      contractExpiryDate: templateData?.contractExpiryDate || templateData?.expiryDate || "N/A",
+      // General fields
+      role: templateData?.role || templateData?.position || "N/A",
+      notes: templateData?.notes || templateData?.remarks || "",
+      reason: templateData?.reason || templateData?.notes || "",
+      newStatus: templateData?.newStatus || templateData?.status || "N/A",
+      previousStatus: templateData?.previousStatus || templateData?.oldStatus || "N/A",
+      announcementTitle: templateData?.announcementTitle || subject || "General Notice",
+      announcementMessage: templateData?.announcementMessage || templateData?.message || body || "",
     };
 
     const hasApplicantDetails = !!(

@@ -208,7 +208,14 @@ ${updated.company} HR Department`;
           body: emailBody,
           candidateName: staffMember.name,
           company: updated.company,
-          branch: updated.branch
+          branch: updated.branch,
+          templateType: "General_Announcement",
+          templateData: {
+            recipientName: staffMember.name,
+            announcementTitle: `Leave Request: ${updated.status}`,
+            announcementMessage: `Your request for **${updated.type}** leave has been **${updated.status}**.\n\n**Duration:** ${updated.startDate} to ${updated.endDate} (${updated.days} days)\n**Reason:** ${updated.reason || "N/A"}`,
+            notes: `Decided By: ${updated.approvedBy || user.name}. Please contact the HR department if you have any questions.`
+          }
         }).catch(err => console.error("Async leave status update email error:", err));
         
         try {

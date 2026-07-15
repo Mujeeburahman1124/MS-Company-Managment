@@ -300,7 +300,17 @@ export async function POST(request: Request) {
         body: emailBody,
         candidateName: newStaff.name,
         company: newStaff.company,
-        branch: newStaff.branch
+        branch: newStaff.branch,
+        templateType: temporaryPassword ? "Welcome_Employee" : "Registration_Successful",
+        templateData: {
+          recipientName: newStaff.name,
+          position: newStaff.position,
+          employerName: newStaff.company,
+          startDate: newStaff.joiningDate,
+          workLocation: newStaff.branch || "Main Branch",
+          tempPassword: temporaryPassword || "",
+          portalUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://portal.mshorizon.ae"
+        }
       }).catch(err => console.error("Async staff email sending error:", err));
     }
 

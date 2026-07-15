@@ -1,151 +1,58 @@
-{{> header companyPrimaryColor="#059669" bannerBg="#ecfdf5" bannerBorder="#d1fae5" bannerColor="#047857" bannerIcon="💼" bannerText="PLACEMENT CONFIRMED"}}
+{{> header companyPrimaryColor="#10b981" bannerBg="#ecfdf5" bannerBorder="#d1fae5" bannerColor="#047857" bannerIcon="📋" bannerText="PLACEMENT CONFIRMED"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #065f46; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
-      PAYMENT & PLACEMENT SERVICE AGREEMENT
+    <td style="color: #047857; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      Job Placement Confirmation
     </td>
   </tr>
   <tr>
-    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      We are delighted to confirm your placement details. Below is the comprehensive structural overview of your Placement and Employment Agreement under <strong>{{companyName}}</strong>:
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      We are pleased to confirm your successful job placement! Your profile has been approved and you have been officially assigned to the following employer. Below is a summary of your placement details.
     </td>
   </tr>
   <tr>
     <td>
-      <!-- Section 1: Employee Information -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px;">
+      <!-- Placement Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
         <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            1. Employee Information
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            🏢 Placement Details
           </td>
         </tr>
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Full Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{recipientName}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
         </tr>
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Passport Number:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{passportNumber}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Employer / Company:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{employerName}}</td>
         </tr>
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Nationality:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{nationality}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Job Title:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{position}}</td>
         </tr>
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Contact Details:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{mobile}} | {{email}}</td>
-        </tr>
-        {{#if currentAddress}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Address:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{currentAddress}}</td>
-        </tr>
-        {{/if}}
-      </table>
-
-      <!-- Section 2: Recruitment Consultancy Details -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px;">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            2. Recruitment Consultancy Details
-          </td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Work Location:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{workLocation}}</td>
         </tr>
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Company Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{companyName}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Starting Date:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #047857; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{startDate}}</td>
         </tr>
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Office Address:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{companyAddress}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Monthly Salary:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #047857; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">AED {{salary}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Contact Number:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{companyPhone}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Email Address:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{companyEmail}}</td>
-        </tr>
-      </table>
-
-      <!-- Section 3: Placed Company Details -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px;">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            3. Placed Company Details
-          </td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Company Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{clientName}}</td>
-        </tr>
-        {{#if clientAddress}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Office Address:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{clientAddress}}</td>
-        </tr>
-        {{/if}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Contact Details:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{clientMobile}} | {{clientEmail}}</td>
-        </tr>
-      </table>
-
-      <!-- Section 4: Employment Details -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px;">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            4. Employment Specifications
-          </td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Job Title/Position:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{position}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Joining Date:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{placementDate}}</td>
-        </tr>
-        {{#if contractDuration}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Contract Duration:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{contractDuration}}</td>
-        </tr>
-        {{/if}}
-        {{#if probationPeriod}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Probation Period:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{probationPeriod}}</td>
-        </tr>
-        {{/if}}
-      </table>
-
-      <!-- Section 5: Salary & Benefits -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            5. Salary & Benefits structure (AED)
-          </td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Basic Monthly Salary:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{salary}} AED</td>
-        </tr>
-        {{#if allowances}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Allowances & Benefits:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{allowances}}</td>
-        </tr>
-        {{/if}}
       </table>
     </td>
   </tr>
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      Welcome on board! Please sign and return the placement agreement portal link details if requested.<br/><br/>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      Your HR coordinator will contact you with further instructions on visa processing, document collection, and your reporting schedule. You are required to be ready with all original documents.
+      <br/><br/>
       Best Regards,<br/>
-      <strong>Recruitment & Placement Committee</strong><br/>
+      <strong>Placement Operations Team</strong><br/>
       {{companyName}}
     </td>
   </tr>

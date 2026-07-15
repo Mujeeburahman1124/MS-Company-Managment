@@ -340,8 +340,206 @@ const EMAIL_TEMPLATES = [
       { name: "body", label: "Email Body Message", placeholder: "Write your email message here...", required: true },
       { name: "actionLink", label: "Action Link (Optional)", placeholder: "e.g. https://portal.mshorizon.ae/dashboard", required: false },
     ]
-  }
+  },
+  // ─── New Templates ────────────────────────────────────────────────────────
+  {
+    id: "interview-selected",
+    type: "Interview_Selected",
+    label: "Interview Selected (Passed)",
+    icon: "🎉",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "role", label: "Position / Role", placeholder: "e.g. Sales Executive", required: true },
+      { name: "notes", label: "HR Feedback (Optional)", placeholder: "e.g. Excellent performance", required: false },
+    ]
+  },
+  {
+    id: "interview-rejected",
+    type: "Interview_Rejected",
+    label: "Interview Rejected (Not Selected)",
+    icon: "❌",
+    color: "bg-rose-50 text-rose-700 border-rose-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "role", label: "Position / Role", placeholder: "e.g. Sales Executive", required: true },
+    ]
+  },
+  {
+    id: "medical-test-reminder",
+    type: "Medical_Test_Reminder",
+    label: "Medical Test Reminder",
+    icon: "🏥",
+    color: "bg-orange-50 text-orange-700 border-orange-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "testDate", label: "Medical Test Date", placeholder: "e.g. 2026-07-20", required: true },
+      { name: "testTime", label: "Appointment Time", placeholder: "e.g. 9:00 AM", required: true },
+      { name: "clinicName", label: "Clinic / Medical Center", placeholder: "e.g. Al Zahra Medical Center", required: true },
+      { name: "testLocation", label: "Clinic Address", placeholder: "e.g. Industrial Area 2, Ajman", required: true },
+      { name: "clinicPhone", label: "Clinic Phone", placeholder: "e.g. +971 6 123 4567", required: false },
+    ]
+  },
+  {
+    id: "medical-passed",
+    type: "Medical_Passed",
+    label: "Medical Test Passed",
+    icon: "✅",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "testDate", label: "Test Date", placeholder: "e.g. 2026-07-15", required: true },
+      { name: "clinicName", label: "Medical Center", placeholder: "e.g. Al Zahra Medical Center", required: true },
+      { name: "notes", label: "Additional Notes (Optional)", placeholder: "e.g. Report collected", required: false },
+    ]
+  },
+  {
+    id: "medical-failed",
+    type: "Medical_Failed",
+    label: "Medical Test Failed",
+    icon: "⚠️",
+    color: "bg-rose-50 text-rose-700 border-rose-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "testDate", label: "Test Date", placeholder: "e.g. 2026-07-15", required: true },
+      { name: "clinicName", label: "Medical Center", placeholder: "e.g. Al Zahra Medical Center", required: true },
+      { name: "notes", label: "Reason / Findings (Optional)", placeholder: "e.g. Positive TB test", required: false },
+    ]
+  },
+  {
+    id: "emirates-id-update",
+    type: "Emirates_ID_Update",
+    label: "Emirates ID Status Update",
+    icon: "🪪",
+    color: "bg-teal-50 text-teal-700 border-teal-200/50",
+    fields: [
+      { name: "recipientName", label: "Employee Name", placeholder: "e.g. Ahmed Ali", required: true },
+      { name: "emiratesIdStatus", label: "Emirates ID Status", placeholder: "e.g. Processing, Approved, Collected", required: true },
+      { name: "emiratesIdExpiry", label: "Emirates ID Expiry Date (Optional)", placeholder: "e.g. 2029-07-15", required: false },
+      { name: "notes", label: "Additional Information (Optional)", placeholder: "e.g. Ready for collection", required: false },
+    ]
+  },
+  {
+    id: "labour-contract-update",
+    type: "Labour_Contract_Update",
+    label: "Labour Contract Status Update",
+    icon: "📜",
+    color: "bg-teal-50 text-teal-700 border-teal-200/50",
+    fields: [
+      { name: "recipientName", label: "Employee Name", placeholder: "e.g. Ahmed Ali", required: true },
+      { name: "labourContractStatus", label: "Contract Status", placeholder: "e.g. Processing, Approved, Stamped", required: true },
+      { name: "contractExpiryDate", label: "Contract Expiry Date (Optional)", placeholder: "e.g. 2028-07-15", required: false },
+      { name: "notes", label: "Additional Information (Optional)", placeholder: "e.g. MOL stamped", required: false },
+    ]
+  },
+  {
+    id: "visa-processing-started",
+    type: "Visa_Processing_Started",
+    label: "Visa Processing Started",
+    icon: "🛂",
+    color: "bg-blue-50 text-blue-700 border-blue-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "passportNumber", label: "Passport Number", placeholder: "e.g. N1234567A", required: true },
+      { name: "position", label: "Position / Job Title", placeholder: "e.g. Sales Executive", required: true },
+      { name: "visaStatus", label: "Visa Type", placeholder: "e.g. Employment Visa, Tourist Visa", required: false },
+    ]
+  },
+  {
+    id: "visa-approved",
+    type: "Visa_Approved",
+    label: "Visa Approved",
+    icon: "✅",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "passportNumber", label: "Passport Number", placeholder: "e.g. N1234567A", required: true },
+      { name: "visaExpiry", label: "Visa Expiry Date", placeholder: "e.g. 2028-07-15", required: true },
+    ]
+  },
+  {
+    id: "visa-rejected",
+    type: "Visa_Rejected",
+    label: "Visa Rejected",
+    icon: "❌",
+    color: "bg-rose-50 text-rose-700 border-rose-200/50",
+    fields: [
+      { name: "recipientName", label: "Candidate Name", placeholder: "e.g. John Doe", required: true },
+      { name: "passportNumber", label: "Passport Number", placeholder: "e.g. N1234567A", required: true },
+      { name: "notes", label: "Rejection Reason (Optional)", placeholder: "e.g. Invalid documents", required: false },
+    ]
+  },
+  {
+    id: "joining-confirmation",
+    type: "Joining_Confirmation",
+    label: "Joining Confirmation",
+    icon: "🚀",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+    fields: [
+      { name: "recipientName", label: "Employee Name", placeholder: "e.g. John Doe", required: true },
+      { name: "position", label: "Position / Job Title", placeholder: "e.g. Sales Executive", required: true },
+      { name: "employerName", label: "Employer / Company", placeholder: "e.g. Al Futtaim Group", required: true },
+      { name: "joiningDate", label: "Joining Date", placeholder: "e.g. 2026-08-01", required: true },
+      { name: "reportingTime", label: "Reporting Time", placeholder: "e.g. 8:00 AM", required: true },
+      { name: "reportingLocation", label: "Reporting Location / Address", placeholder: "e.g. Al Futtaim HQ, Dubai", required: true },
+    ]
+  },
+  {
+    id: "welcome-employee",
+    type: "Welcome_Employee",
+    label: "Welcome New Employee",
+    icon: "🌟",
+    color: "bg-purple-50 text-purple-700 border-purple-200/50",
+    fields: [
+      { name: "recipientName", label: "Employee Name", placeholder: "e.g. John Doe", required: true },
+      { name: "position", label: "Job Title", placeholder: "e.g. Sales Executive", required: true },
+      { name: "employerName", label: "Employer / Company", placeholder: "e.g. Al Futtaim Group", required: true },
+      { name: "startDate", label: "Start Date", placeholder: "e.g. 2026-08-01", required: true },
+      { name: "workLocation", label: "Work Location", placeholder: "e.g. Dubai Office", required: true },
+      { name: "portalUrl", label: "HR Portal URL (Optional)", placeholder: "e.g. https://portal.mshorizon.ae", required: false },
+      { name: "tempPassword", label: "Temporary Password (Optional)", placeholder: "e.g. Welcome@2026", required: false },
+    ]
+  },
+  {
+    id: "account-activated",
+    type: "Account_Activated",
+    label: "Account Activated",
+    icon: "🔓",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+    fields: [
+      { name: "recipientName", label: "User Name", placeholder: "e.g. John Doe", required: true },
+      { name: "role", label: "System Role", placeholder: "e.g. Recruiter, HR Manager", required: true },
+      { name: "portalUrl", label: "Portal / Login URL", placeholder: "e.g. https://portal.mshorizon.ae", required: true },
+      { name: "tempPassword", label: "Temporary Password (Optional)", placeholder: "e.g. Welcome@2026", required: false },
+    ]
+  },
+  {
+    id: "account-locked",
+    type: "Account_Locked",
+    label: "Account Locked / Suspended",
+    icon: "🔒",
+    color: "bg-rose-50 text-rose-700 border-rose-200/50",
+    fields: [
+      { name: "recipientName", label: "User Name", placeholder: "e.g. John Doe", required: true },
+      { name: "reason", label: "Reason for Lock / Suspension", placeholder: "e.g. Multiple failed login attempts", required: true },
+      { name: "notes", label: "Next Steps (Optional)", placeholder: "e.g. Contact HR to unlock", required: false },
+    ]
+  },
+  {
+    id: "general-announcement",
+    type: "General_Announcement",
+    label: "General Announcement / Notice",
+    icon: "📢",
+    color: "bg-violet-50 text-violet-700 border-violet-200/50",
+    fields: [
+      { name: "recipientName", label: "Recipient Name", placeholder: "e.g. All Staff / John Doe", required: true },
+      { name: "announcementTitle", label: "Announcement Title", placeholder: "e.g. Office Closure Notice", required: true },
+      { name: "announcementMessage", label: "Announcement Message", placeholder: "e.g. Dear Team, the office will be closed on...", required: true },
+      { name: "notes", label: "Additional Notes (Optional)", placeholder: "e.g. Contact HR for queries", required: false },
+    ]
+  },
 ];
+
 
 type Contact = {
   name: string;

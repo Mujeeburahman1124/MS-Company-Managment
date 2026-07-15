@@ -311,11 +311,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
           candidateName: updated.fullName,
           company: companyName,
           branch: updated.branch,
-          templateType: "System",
+          templateType: "Status_Changed",
           templateData: {
             recipientName: updated.fullName,
-            body: emailBody,
-            actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`
+            newStatus: "Profile Updated",
+            notes: "Your general application profile details have been successfully updated in our recruitment system.",
+            actionLink: `http://localhost:3000/apply?code=${updated.trackingCode}`,
+            trackingCode: updated.trackingCode
           }
         });
       } catch (err) {

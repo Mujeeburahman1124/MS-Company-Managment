@@ -1,59 +1,70 @@
-{{> header companyPrimaryColor="#d97706" bannerBg="#fffbeb" bannerBorder="#fef3c7" bannerColor="#b45309" bannerIcon="📅" bannerText="INTERVIEW RESCHEDULED"}}
+{{> header companyPrimaryColor="#d97706" bannerBg="#fffbeb" bannerBorder="#fef3c7" bannerColor="#b45309" bannerIcon="⏰" bannerText="INTERVIEW RESCHEDULED"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #78350f; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+    <td style="color: #b45309; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
       Interview Rescheduled Notice
     </td>
   </tr>
   <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      Please be informed that your scheduled interview slot has been adjusted. We have updated the time slot to match our hiring team's updated availability.
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      Please be advised that your scheduled interview for the position of <strong>{{role}}</strong> has been rescheduled. Please review the updated logistics details:
     </td>
   </tr>
   <tr>
     <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fffbeb; border-radius: 12px; border: 1px solid #fde68a; padding: 20px; margin-bottom: 24px;">
+      <!-- Schedule Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
         <tr>
-          <td style="font-size: 13px; color: #78350f; line-height: 1.8; font-family: Arial, sans-serif;">
-            <strong>New Assessment Schedule:</strong><br/>
-            • <strong>Position:</strong> {{position}}<br/>
-            • <strong>New Date &amp; Time:</strong> <span style="font-weight: 800; color: #b45309;">{{interviewDateTime}}</span><br/>
-            • <strong>Format:</strong> {{format}}<br/>
-            • <strong>Interviewer:</strong> {{conductorName}}
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #b45309; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            🗓️ New Interview Logistics
           </td>
         </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Target Role:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{role}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">New Date & Time:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{dateTime}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Assessment Format:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{onlinePhysical}} ({{meetingMode}})</td>
+        </tr>
+        {{#if meetingLink}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Meeting Link:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #d97706; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{meetingLink}}" target="_blank" style="color: #d97706;">{{meetingLink}}</a></td>
+        </tr>
+        {{/if}}
+        {{#if googleMapLink}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Location Map:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #d97706; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{googleMapLink}}" target="_blank" style="color: #d97706;">View on Google Maps</a></td>
+        </tr>
+        {{/if}}
+        {{#if notes}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Reason / Remarks:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #ea580c; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{notes}}</td>
+        </tr>
+        {{/if}}
       </table>
     </td>
   </tr>
-  {{#if meetingLink}}
   <tr>
-    <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe; padding: 16px; margin-bottom: 24px;">
-        <tr>
-          <td style="font-size: 13px; color: #1e40af; font-family: Arial, sans-serif;">
-            🖥️ <strong>Digital Meeting Lobby Link:</strong><br/>
-            Use the following URL button to join on the rescheduled date/time:<br/>
-            <a href="{{meetingLink}}" target="_blank" style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px; font-size: 11px;">Join Meeting Room</a>
-          </td>
-        </tr>
-      </table>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      Please reply to this email to confirm your availability for this rescheduled time slot.
+      <br/><br/>
+      Best Regards,<br/>
+      <strong>Recruitment Operations Committee</strong><br/>
+      {{companyName}}
     </td>
   </tr>
-  {{/if}}
-  {{#if notes}}
-  <tr>
-    <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left: 4px solid #d97706; background-color: #f8fafc; padding: 12px 16px; margin-bottom: 24px;">
-        <tr>
-          <td style="font-size: 13px; color: #475569; font-style: italic; font-family: Arial, sans-serif;">
-            <strong>Interviewer Rescheduling Remarks:</strong><br/>
-            "{{notes}}"
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  {{/if}}
 </table>
 {{> footer}}

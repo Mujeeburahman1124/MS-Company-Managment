@@ -68,7 +68,22 @@ ${interview.company} HR Department`;
         await sendEmail({
           to: interview.emailId,
           subject: `Interview Reminder: Tomorrow at ${interview.dateTime.replace("T", " ")}`,
-          body: emailBody
+          body: emailBody,
+          candidateName: interview.personName,
+          company: interview.company,
+          branch: interview.branch,
+          templateType: "Interview_Reminder",
+          templateData: {
+            recipientName: interview.personName,
+            role: interview.interviewPosition || "Candidate",
+            dateTime: interview.dateTime.replace("T", " "),
+            onlinePhysical: interview.onlinePhysical,
+            meetingMode: interview.meetingMode,
+            conductPersonName: interview.conductPersonName,
+            meetingLink: interview.meetingLink,
+            googleMapLink: interview.googleMapLink,
+            notes: interview.notes,
+          }
         }).catch(e => console.error(e));
         
         logs.push(`Sent Interview reminder for ${interview.personName}`);
@@ -128,7 +143,16 @@ Best wishes from all of us at ${staff.company}!`;
           await sendEmail({
             to: staff.email,
             subject: `Happy Birthday from ${staff.company}! 🎂`,
-            body: emailBody
+            body: emailBody,
+            candidateName: staff.name,
+            company: staff.company,
+            branch: staff.branch,
+            templateType: "Birthday",
+            templateData: {
+              recipientName: staff.name,
+              announcementTitle: `Happy Birthday, ${staff.name}! 🎂`,
+              announcementMessage: `On behalf of everyone at ${staff.company || "our organization"}, we wish you a wonderful birthday filled with joy, success, and happiness. Thank you for your valuable contributions to our team!`,
+            }
           }).catch(e => console.error(e));
         }
 
@@ -188,7 +212,16 @@ Best wishes from all of us at ${staff.company}!`;
               await sendEmail({
                 to: admin.email,
                 subject: `Action Required: Vehicle ${expiryType} - ${vehicle.plateNumber}`,
-                body: `Dear ${admin.name},\n\n${message}\n\nPlease take the necessary actions.\n\nBest regards,\nSystem Notifications`
+                body: `Dear ${admin.name},\n\n${message}\n\nPlease take the necessary actions.\n\nBest regards,\nSystem Notifications`,
+                company: vehicle.company,
+                branch: vehicle.branch,
+                templateType: "General_Announcement",
+                templateData: {
+                  recipientName: admin.name,
+                  announcementTitle: `Vehicle Expiry Warning: ${expiryType}`,
+                  announcementMessage: `This is to notify you that the vehicle **${vMake}** (Plate Number: **${vehicle.plateNumber}**) has a **${expiryType}** expiring on **${expiryDateStr}**. Please coordinate the renewal immediately.`,
+                  notes: `Days Remaining: ${daysDiff}`
+                }
               }).catch(e => console.error(e));
             }
           }

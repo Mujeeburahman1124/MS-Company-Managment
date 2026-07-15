@@ -109,7 +109,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
               body: `Dear ${staffMember.name},\n\nYour payslip for ${updated.month} ${updated.year} is now marked as ${data.status}.\nNet Salary: ${updated.netSalary}\n\nPlease check your dashboard for full details.\n\nBest regards,\n${updated.company} HR & Finance`,
               candidateName: staffMember.name,
               company: updated.company,
-              branch: updated.branch
+              branch: updated.branch,
+              templateType: "General_Announcement",
+              templateData: {
+                recipientName: staffMember.name,
+                announcementTitle: `Payslip Status: ${data.status}`,
+                announcementMessage: `Your payslip for **${updated.month} ${updated.year}** has been marked as **${data.status}**.\n\n**Net Salary:** AED ${updated.netSalary}\n**Basic Salary:** AED ${updated.basicSalary}\n**Allowances:** AED ${updated.allowances}\n**Deductions:** AED ${updated.deductions}`,
+                notes: `Please check your employee portal dashboard for full details.`
+              }
             }).catch(e => console.error(e));
           }
         }

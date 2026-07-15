@@ -116,7 +116,14 @@ export async function POST(request: Request) {
         body: `Dear ${newUser.name},\n\nYour user account has been successfully created by the administrator.\n\nHere are your login credentials:\n- Login Email: ${newUser.email}\n- Default Password: ${defaultPassword}\n- Assigned Role: ${newUser.role}\n\nPlease log in and update your password immediately.`,
         candidateName: newUser.name,
         company: newUser.company,
-        branch: newUser.branch
+        branch: newUser.branch,
+        templateType: "User_Account_Created",
+        templateData: {
+          recipientName: newUser.name,
+          role: newUser.role,
+          tempPassword: defaultPassword,
+          portalUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://portal.mshorizon.ae"
+        }
       });
     } catch (mailErr) {
       console.error("Welcome email failed:", mailErr);

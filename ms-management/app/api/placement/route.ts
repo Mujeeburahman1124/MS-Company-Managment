@@ -213,13 +213,14 @@ export async function POST(request: Request) {
           candidateName: placement.applicantName,
           company: placement.company,
           branch: placement.branch,
-          templateType: "Placement_Agreement",
+          templateType: "Placement_Confirmed",
           templateData: {
-            applicantName: placement.applicantName,
-            registrationDate: placement.registrationDate,
-            registrationFee: placement.registrationFee,
-            placementDeadline: placement.placementDeadline,
+            recipientName: placement.applicantName,
+            employerName: placement.companyName,
             position: placement.position,
+            workLocation: placement.workLocation || "N/A",
+            startDate: placement.joiningDate || "N/A",
+            salary: placement.salary || 0,
             company: placement.company
           }
         });

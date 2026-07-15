@@ -184,6 +184,13 @@ ${updated.company} HR Department`;
         candidateName: updated.name,
         company: updated.company,
         branch: updated.branch,
+        templateType: "General_Announcement",
+        templateData: {
+          recipientName: updated.name,
+          announcementTitle: `Request Update: ${updated.requestType}`,
+          announcementMessage: `Your request for **${updated.requestType}** has been updated to status: **${data.status}**.`,
+          notes: data.reply || ""
+        }
       }).catch(err => console.error("Async staff request email error:", err));
 
       if (existing.staffId) {

@@ -1,70 +1,65 @@
-{{> header}}
+{{> header companyPrimaryColor="#10b981" bannerBg="#ecfdf5" bannerBorder="#d1fae5" bannerColor="#047857" bannerIcon="📄" bannerText="PLACEMENT AGREEMENT"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #1e3a8a; font-size: 16px; font-weight: 600; padding-bottom: 12px; font-family: Arial, sans-serif;">
-      Placement Agreement Action Required
+    <td style="color: #047857; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      Placement Agreement Ready for Signing
     </td>
   </tr>
   <tr>
-    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      Your placement terms have been finalized. Please review the placement agreement details below. You are required to review, sign, and accept the terms of this agreement online.
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      Your Placement Agreement is now ready. This agreement outlines the terms of your employment placement, including your salary, allowances, responsibilities, and legal obligations. Please review and sign at your earliest convenience.
     </td>
   </tr>
   <tr>
     <td>
-      <!-- Details Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
         <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: 700; color: #1e293b; padding-bottom: 12px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            Agreement Details
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            📋 Agreement Reference
           </td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #64748b; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Position Offered:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{position}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Salary Offered:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">AED {{salary}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Employer:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{employerName}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Company:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{clientName}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Position:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{position}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #64748b; padding: 6px 0; font-family: Arial, sans-serif;">Placement Date:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #1e293b; padding: 6px 0; font-family: Arial, sans-serif;">{{placementDate}}</td>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Agreement Date:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #047857; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{agreementDate}}</td>
         </tr>
-        {{#if termsAndConditions}}
-        <tr>
-          <td colspan="2" style="font-size: 12px; color: #475569; padding-top: 12px; border-top: 1px solid #e2e8f0; font-family: Arial, sans-serif;">
-            <strong>Additional Terms:</strong><br/>
-            {{termsAndConditions}}
-          </td>
-        </tr>
-        {{/if}}
       </table>
     </td>
   </tr>
+  {{#if agreementLink}}
   <tr>
     <td align="center" style="padding-bottom: 24px;">
       <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
         <tr>
-          <td align="center" style="background-color: {{companyPrimaryColor}}; border-radius: 8px;">
-            <a href="{{website}}/placement/{{placementId}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
-              Review & Sign Agreement
+          <td align="center" style="background-color: #10b981; border-radius: 8px;">
+            <a href="{{agreementLink}}" target="_blank" style="display: inline-block; padding: 12px 28px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif;">
+              ✍️ Review &amp; Sign Agreement
             </a>
           </td>
         </tr>
       </table>
     </td>
   </tr>
+  {{/if}}
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.5; font-family: Arial, sans-serif;">
-      If you face any issues while signing, please write to HR support.<br/><br/>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      This agreement must be signed within 48 hours. If you have questions or concerns, please contact your assigned HR coordinator before signing.
+      <br/><br/>
       Best Regards,<br/>
-      <strong>The HR Operations Team</strong>
+      <strong>Contracts &amp; Placement Division</strong><br/>
+      {{companyName}}
     </td>
   </tr>
 </table>

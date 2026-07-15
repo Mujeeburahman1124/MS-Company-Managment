@@ -1,0 +1,72 @@
+{{> header companyPrimaryColor="#0d9488" bannerBg="#f0fdfa" bannerBorder="#ccfbf1" bannerColor="#0f766e" bannerIcon="🆔" bannerText="EMIRATES ID STATUS UPDATE"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #0f766e; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      Emirates ID Application Update
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      We have received an update from the Federal Authority for Identity, Citizenship, Customs and Port Security (ICP) regarding your Emirates ID application. Below are the current details and instructions:
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <!-- Status Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+        <tr>
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #0f766e; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            📋 Emirates ID Details
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 8px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Current Stage:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #0d9488; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">
+            <span style="background-color: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; border: 1px solid #99f6e4;">{{#if status}}{{status}}{{else}}Processing{{/if}}</span>
+          </td>
+        </tr>
+        {{#if applicationNumber}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Application Number:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif; font-family: monospace;">{{applicationNumber}}</td>
+        </tr>
+        {{/if}}
+        {{#if biometricsDateTime}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Biometrics Appointment:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{biometricsDateTime}}</td>
+        </tr>
+        {{/if}}
+        {{#if biometricsCenter}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Biometrics Center:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{biometricsCenter}}</td>
+        </tr>
+        {{/if}}
+        {{#if notes}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Instructions / Notes:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #334155; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{notes}}</td>
+        </tr>
+        {{/if}}
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      <strong>Important Reminder:</strong> If biometrics schedule is mentioned above, you MUST attend in person carrying your original passport and printed registration receipt. Our PRO representative will meet you at the venue.
+      <br/><br/>
+      For query updates, please contact our helpline at {{companyPhone}}.
+      <br/><br/>
+      Best Regards,<br/>
+      <strong>Visa Operations Committee</strong><br/>
+      {{companyName}}
+    </td>
+  </tr>
+</table>
+{{> footer}}

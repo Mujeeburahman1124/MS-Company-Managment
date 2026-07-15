@@ -1,45 +1,46 @@
-{{> header}}
+{{> header companyPrimaryColor="#f97316" bannerBg="#fff7ed" bannerBorder="#ffedd5" bannerColor="#c2410c" bannerIcon="🛂" bannerText="VISA EXPIRY ALERT"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #dc2626; font-size: 16px; font-weight: 600; padding-bottom: 12px; font-family: Arial, sans-serif;">
-      Visa Expiry Renewal Reminder
+    <td style="color: #c2410c; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      UAE Visa Expiry Reminder
     </td>
   </tr>
   <tr>
-    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      This is an automated notification to inform you that your residency visa is approaching its expiration date. Please initiate the renewal process immediately to avoid legal fines or work disruptions.
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      This is an automated alert to notify you that your UAE residence visa is approaching its expiry date. Immediate action is required to avoid overstaying penalties under UAE Immigration Law.
     </td>
   </tr>
   <tr>
     <td>
-      <!-- Details Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fef2f2; border-radius: 12px; border: 1px solid #fecaca; padding: 20px; margin-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff7ed; border-radius: 12px; border: 1px solid #ffedd5; padding: 20px; margin-bottom: 24px;">
         <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: 700; color: #991b1b; padding-bottom: 12px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            Visa Info
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #c2410c; border-bottom: 1px solid #fed7aa; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            ⚠️ Expiry Information
           </td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #b91c1c; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Employee Name:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #991b1b; padding: 6px 0; font-family: Arial, sans-serif;">{{recipientName}}</td>
+          <td style="font-size: 12px; color: #78350f; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Employee Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #431407; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #b91c1c; padding: 6px 0; font-family: Arial, sans-serif;">Visa Expiry Date:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #991b1b; padding: 6px 0; font-family: Arial, sans-serif;">{{visaExpiry}}</td>
+          <td style="font-size: 12px; color: #78350f; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Visa Expiry Date:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #b91c1c; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{visaExpiry}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #b91c1c; padding: 6px 0; font-family: Arial, sans-serif;">Days Remaining:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #991b1b; padding: 6px 0; font-family: Arial, sans-serif;">{{daysRemaining}} days</td>
+          <td style="font-size: 12px; color: #78350f; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Days Remaining:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #b91c1c; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{daysRemaining}} days</td>
         </tr>
       </table>
     </td>
   </tr>
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.5; font-family: Arial, sans-serif;">
-      Please submit the updated renewal documents to the HR department as soon as possible.<br/><br/>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      Please contact our PRO / HR desk immediately to initiate the visa renewal process. Failure to renew before expiry may result in government fines and deportation proceedings.
+      <br/><br/>
       Best Regards,<br/>
-      <strong>The HR Operations Team</strong>
+      <strong>PRO Visa Compliance Team</strong><br/>
+      {{companyName}}
     </td>
   </tr>
 </table>

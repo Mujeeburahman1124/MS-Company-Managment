@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 
     const processEntity = async (entity: any, entityType: "Applicant" | "Staff") => {
       const logs: string[] = [];
-      const { id, company, branch, visaExpiry, passportExpiry, email, status, clientName } = entity;
+      const { id, company, branch, visaExpiry, passportExpiry, passportNumber, email, status, clientName } = entity;
       const name = entityType === "Applicant" ? entity.fullName : entity.name;
 
       const checkExpiry = async (expiryDateStr: string, expiryType: "Visa" | "Passport") => {
@@ -106,7 +106,18 @@ export async function GET(request: Request) {
             await sendEmail({
               to: email,
               subject: `Action Required: Your ${expiryType} Expiry Notice`,
-              body: emailBody
+              body: emailBody,
+              candidateName: name,
+              company: company,
+              branch: branch,
+              templateType: expiryType === "Visa" ? "Visa" : "Passport_Expiry",
+              templateData: {
+                recipientName: name,
+                visaExpiry: expiryDateStr,
+                passportExpiry: expiryDateStr,
+                passportNumber: passportNumber || "N/A",
+                daysRemaining: daysDiff,
+              }
             });
           }
 
@@ -119,7 +130,17 @@ export async function GET(request: Request) {
               await sendEmail({
                 to: cCompany.email,
                 subject: `Action Required: ${expiryType} Expiry for Placed Applicant ${name}`,
-                body: `<p>Dear ${clientName} Management,</p><p>This is a notification that your placed applicant, ${name}, has a ${expiryType} that ${reminderLevel === "Expired" ? "has EXPIRED on " + expiryDateStr : "will expire in " + daysDiff + " days on " + expiryDateStr}. Please coordinate with the applicant.</p>`
+                body: `<p>Dear ${clientName} Management,</p><p>This is a notification that your placed applicant, ${name}, has a ${expiryType} that ${reminderLevel === "Expired" ? "has EXPIRED on " + expiryDateStr : "will expire in " + daysDiff + " days on " + expiryDateStr}. Please coordinate with the applicant.</p>`,
+                candidateName: name,
+                company: company,
+                branch: branch,
+                templateType: "General_Announcement",
+                templateData: {
+                  recipientName: `${clientName} Management`,
+                  announcementTitle: `Urgent: ${expiryType} Expiry Alert - ${name}`,
+                  announcementMessage: `Please be notified that the ${expiryType} for your placed employee, ${name}, ${reminderLevel === "Expired" ? "has EXPIRED on " + expiryDateStr : "is expiring in " + daysDiff + " days on " + expiryDateStr}. Please coordinate renewal actions immediately.`,
+                  notes: `Employee Passport: ${passportNumber || "N/A"}`
+                }
               });
             }
           }
@@ -141,12 +162,12 @@ export async function GET(request: Request) {
           { status: "Visa Processing" }
         ]
       },
-      select: { id: true, fullName: true, visaExpiry: true, passportExpiry: true, company: true, branch: true, email: true, status: true, clientName: true }
+      select: { id: true, fullName: true, visaExpiry: true, passportExpiry: true, passportNumber: true, company: true, branch: true, email: true, status: true, clientName: true }
     });
 
     const staff = await prisma.staff.findMany({
       where: { status: "Active" },
-      select: { id: true, name: true, visaExpiry: true, passportExpiry: true, company: true, branch: true, email: true }
+      select: { id: true, name: true, visaExpiry: true, passportExpiry: true, passportNumber: true, company: true, branch: true, email: true }
     });
 
     const results: string[] = [];

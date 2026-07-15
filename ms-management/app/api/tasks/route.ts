@@ -181,7 +181,14 @@ ${task.company} HR & Management System`;
           body: emailBody,
           candidateName: assigneeName,
           company: task.company,
-          branch: task.branch
+          branch: task.branch,
+          templateType: "Task_Assigned",
+          templateData: {
+            recipientName: assigneeName,
+            announcementTitle: `New Task Assigned: ${task.title}`,
+            announcementMessage: `You have been assigned a new task: **${task.title}**.\n\n**Description:** ${task.description || "No description provided."}\n\n**Priority:** ${task.priority}\n\n**Due Date:** ${task.dueDate || "N/A"}`,
+            notes: `Assigned By: ${user.name}`
+          }
         }).catch(err => console.error("Async task email error:", err));
         
         if (userMember) {

@@ -1,43 +1,77 @@
-{{> header companyPrimaryColor="#4f46e5" bannerBg="#e0e7ff" bannerBorder="#c7d2fe" bannerColor="#4338ca" bannerIcon="👋" bannerText="WELCOME EMPLOYEE"}}
+{{> header companyPrimaryColor="#7c3aed" bannerBg="#f5f3ff" bannerBorder="#ede9fe" bannerColor="#5b21b6" bannerIcon="🌟" bannerText="WELCOME TO THE TEAM"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #312e81; font-size: 20px; font-weight: 800; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Welcome to the Team, {{recipientName}}!
+    <td style="color: #5b21b6; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      Welcome Aboard, {{recipientName}}!
     </td>
   </tr>
   <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      We are thrilled to officially welcome you to the <strong>{{companyName}}</strong> family! You are joining us at an exciting period of growth, and we are confident your skills will make a valuable addition to our staff force.
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      On behalf of the entire team at <strong>{{companyName}}</strong>, we warmly welcome you as our newest employee! We are excited to have you with us and look forward to growing together. Your onboarding journey starts now.
     </td>
   </tr>
   <tr>
     <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f3ff; border-radius: 12px; border: 1px solid #ddd6fe; padding: 20px; margin-bottom: 24px;">
+      <!-- Welcome Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-radius: 12px; border: 1px solid #ddd6fe; padding: 20px; margin-bottom: 20px;">
         <tr>
-          <td style="font-size: 13px; color: #4c1d95; line-height: 1.8; font-family: Arial, sans-serif;">
-            <strong>Your Employee Onboarding File:</strong><br/>
-            • <strong>Employee Name:</strong> {{recipientName}}<br/>
-            • <strong>Corporate Role:</strong> {{position}}<br/>
-            • <strong>Joining Company:</strong> {{company}}<br/>
-            • <strong>Joining Date:</strong> {{joiningDate}}
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #5b21b6; border-bottom: 1px solid #ddd6fe; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            👤 Employee Profile
           </td>
         </tr>
+        <tr>
+          <td style="font-size: 12px; color: #4c1d95; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #2e1065; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #4c1d95; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Job Title:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #2e1065; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{position}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #4c1d95; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Employer:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #2e1065; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{employerName}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #4c1d95; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Start Date:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #7c3aed; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{startDate}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #4c1d95; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Work Location:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #2e1065; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{workLocation}}</td>
+        </tr>
+      </table>
+
+      <!-- HR Portal Card -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+        <tr>
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #7c3aed; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            🔐 Portal Access
+          </td>
+        </tr>
+        {{#if portalUrl}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">HR Portal:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #7c3aed; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{portalUrl}}" style="color: #7c3aed;">{{portalUrl}}</a></td>
+        </tr>
+        {{/if}}
+        {{#if tempPassword}}
+        <tr>
+          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Temp Password:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: monospace;">{{tempPassword}}</td>
+        </tr>
+        {{/if}}
       </table>
     </td>
   </tr>
-  <tr>
-    <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Your line manager or HR representative will connect with you on your first day to hand over your workstation, email credentials, and conduct a brief introductory session with the team.
-    </td>
-  </tr>
-  {{#if actionLink}}
+  {{#if portalUrl}}
   <tr>
     <td align="center" style="padding-bottom: 24px;">
       <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
         <tr>
-          <td align="center" style="background-color: #4f46e5; border-radius: 8px;">
-            <a href="{{actionLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
-              Access Employee Handbook
+          <td align="center" style="background-color: #7c3aed; border-radius: 8px;">
+            <a href="{{portalUrl}}" target="_blank" style="display: inline-block; padding: 12px 28px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif;">
+              🚀 Access Employee Portal
             </a>
           </td>
         </tr>
@@ -45,5 +79,14 @@
     </td>
   </tr>
   {{/if}}
+  <tr>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      We are committed to supporting your growth and success. Do not hesitate to reach out to your HR coordinator for any questions. We look forward to an amazing journey together!
+      <br/><br/>
+      With Warm Regards,<br/>
+      <strong>Human Resources Department</strong><br/>
+      {{companyName}}
+    </td>
+  </tr>
 </table>
 {{> footer}}

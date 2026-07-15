@@ -188,7 +188,14 @@ ${updated.company} HR & Management System`;
             body: emailBody,
             candidateName: assigneeName,
             company: updated.company,
-            branch: updated.branch
+            branch: updated.branch,
+            templateType: "Task_Assigned",
+            templateData: {
+              recipientName: assigneeName,
+              announcementTitle: `Task Reassigned: ${updated.title}`,
+              announcementMessage: `A task has been reassigned to you: **${updated.title}**.\n\n**Description:** ${updated.description || "No description provided."}\n\n**Priority:** ${updated.priority}\n\n**Due Date:** ${updated.dueDate || "N/A"}`,
+              notes: `Reassigned By: ${user.name}`
+            }
           }).catch(err => console.error("Async task reassign email error:", err));
           
           if (userMember) {

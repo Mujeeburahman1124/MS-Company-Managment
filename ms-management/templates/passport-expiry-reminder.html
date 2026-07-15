@@ -1,45 +1,52 @@
-{{> header}}
+{{> header companyPrimaryColor="#ef4444" bannerBg="#fef2f2" bannerBorder="#fee2e2" bannerColor="#b91c1c" bannerIcon="📔" bannerText="PASSPORT EXPIRY ALERT"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #dc2626; font-size: 16px; font-weight: 600; padding-bottom: 12px; font-family: Arial, sans-serif;">
+    <td style="color: #b91c1c; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
       Passport Expiry Reminder
     </td>
   </tr>
   <tr>
-    <td style="color: #475569; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      This is a friendly reminder that your passport is approaching its expiry date. Please ensure your passport is renewed in a timely manner to maintain valid immigration and work status.
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      This is an urgent notification that your passport is approaching its expiry date. An expired passport affects your legal residency status, travel rights, and employment continuity in the UAE.
     </td>
   </tr>
   <tr>
     <td>
-      <!-- Details Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fef2f2; border-radius: 12px; border: 1px solid #fecaca; padding: 20px; margin-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fef2f2; border-radius: 12px; border: 1px solid #fee2e2; padding: 20px; margin-bottom: 24px;">
         <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: 700; color: #991b1b; padding-bottom: 12px; text-transform: uppercase; font-family: Arial, sans-serif;">
-            Passport Info
+          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #b91c1c; border-bottom: 1px solid #fecaca; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
+            🚨 Passport Status Alert
           </td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #b91c1c; padding: 6px 0; width: 40%; font-family: Arial, sans-serif;">Passport Number:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #991b1b; padding: 6px 0; font-family: Arial, sans-serif;">{{passportNumber}}</td>
+          <td style="font-size: 12px; color: #7f1d1d; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Employee Name:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #450a0a; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #b91c1c; padding: 6px 0; font-family: Arial, sans-serif;">Passport Expiry Date:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #991b1b; padding: 6px 0; font-family: Arial, sans-serif;">{{passportExpiry}}</td>
+          <td style="font-size: 12px; color: #7f1d1d; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Passport Number:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #450a0a; padding: 6px 0; font-family: 'Inter', Arial, sans-serif; font-family: monospace;">{{passportNumber}}</td>
         </tr>
         <tr>
-          <td style="font-size: 13px; color: #b91c1c; padding: 6px 0; font-family: Arial, sans-serif;">Days Remaining:</td>
-          <td style="font-size: 13px; font-weight: 600; color: #991b1b; padding: 6px 0; font-family: Arial, sans-serif;">{{daysRemaining}} days</td>
+          <td style="font-size: 12px; color: #7f1d1d; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Expiry Date:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #b91c1c; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{passportExpiry}}</td>
+        </tr>
+        <tr>
+          <td style="font-size: 12px; color: #7f1d1d; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Days Remaining:</td>
+          <td style="font-size: 12px; font-weight: bold; color: #b91c1c; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{daysRemaining}} days</td>
         </tr>
       </table>
     </td>
   </tr>
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.5; font-family: Arial, sans-serif;">
-      Please upload the new passport copies in the employee portal once renewed, or submit them directly to HR.<br/><br/>
+    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+      <strong>Immediate Action Required:</strong> Please visit your country's consulate or embassy to initiate passport renewal. Once renewed, submit a copy of your new passport to HR for record update.
+      <br/><br/>
+      Contact HR for assistance: {{companyPhone}} | {{companyEmail}}
+      <br/><br/>
       Best Regards,<br/>
-      <strong>The HR Operations Team</strong>
+      <strong>Compliance & PRO Department</strong><br/>
+      {{companyName}}
     </td>
   </tr>
 </table>
