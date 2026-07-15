@@ -1,0 +1,36 @@
+{{> header companyPrimaryColor="#2563eb" bannerBg="#eff6ff" bannerBorder="#bfdbfe" bannerColor="#1d4ed8" bannerIcon="📅" bannerText="SHIFT ASSIGNED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #1e3a8a; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      New Work Shift Assigned
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear {{recipientName}},<br/><br/>
+      Please be informed that your work schedule has been updated. A new shift profile has been assigned to you.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Shift Parameters:</strong><br/>
+            • <strong>Shift Name:</strong> {{shiftName}}<br/>
+            • <strong>Clock In / Start:</strong> {{startTime}}<br/>
+            • <strong>Clock Out / End:</strong> {{endTime}}<br/>
+            • <strong>Weekly Off Days:</strong> {{weeklyOff}}<br/>
+            • <strong>Effective Date:</strong> {{effectiveDate}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Please ensure you clock in on time using the mobile app or fingerprint scanners at your designated site. For shift disputes or overrides, please contact your shift supervisor.
+    </td>
+  </tr>
+</table>
+{{> footer}}

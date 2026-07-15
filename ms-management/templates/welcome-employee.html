@@ -1,0 +1,49 @@
+{{> header companyPrimaryColor="#4f46e5" bannerBg="#e0e7ff" bannerBorder="#c7d2fe" bannerColor="#4338ca" bannerIcon="👋" bannerText="WELCOME EMPLOYEE"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #312e81; font-size: 20px; font-weight: 800; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
+      Welcome to the Team, {{recipientName}}!
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      We are thrilled to officially welcome you to the <strong>{{companyName}}</strong> family! You are joining us at an exciting period of growth, and we are confident your skills will make a valuable addition to our staff force.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f3ff; border-radius: 12px; border: 1px solid #ddd6fe; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #4c1d95; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Your Employee Onboarding File:</strong><br/>
+            • <strong>Employee Name:</strong> {{recipientName}}<br/>
+            • <strong>Corporate Role:</strong> {{position}}<br/>
+            • <strong>Joining Company:</strong> {{company}}<br/>
+            • <strong>Joining Date:</strong> {{joiningDate}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Your line manager or HR representative will connect with you on your first day to hand over your workstation, email credentials, and conduct a brief introductory session with the team.
+    </td>
+  </tr>
+  {{#if actionLink}}
+  <tr>
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+        <tr>
+          <td align="center" style="background-color: #4f46e5; border-radius: 8px;">
+            <a href="{{actionLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
+              Access Employee Handbook
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</table>
+{{> footer}}

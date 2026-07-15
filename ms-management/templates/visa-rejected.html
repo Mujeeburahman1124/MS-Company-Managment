@@ -1,24 +1,24 @@
-{{> header companyPrimaryColor="#dc2626" bannerBg="#fef2f2" bannerBorder="#fecaca" bannerColor="#b91c1c" bannerIcon="❌" bannerText="INTERVIEW CANCELLED"}}
+{{> header companyPrimaryColor="#dc2626" bannerBg="#fef2f2" bannerBorder="#fecaca" bannerColor="#b91c1c" bannerIcon="⚠️" bannerText="VISA REJECTED"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
     <td style="color: #991b1b; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
-      Interview Session Cancelled
+      Visa Application Status Update
     </td>
   </tr>
   <tr>
     <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
       Dear {{recipientName}},<br/><br/>
-      Please be informed that your interview session for the position of <strong>{{position}}</strong> has been cancelled.
+      We regret to inform you that your visa application has been returned/rejected by the immigration authorities during the security clearance review phase.
     </td>
   </tr>
-  {{#if notes}}
+  {{#if reason}}
   <tr>
     <td>
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left: 4px solid #dc2626; background-color: #fef2f2; padding: 14px 18px; margin-bottom: 24px;">
         <tr>
           <td style="font-size: 13px; color: #991b1b; font-style: italic; line-height: 1.6; font-family: Arial, sans-serif;">
-            <strong>Reason for Cancellation:</strong><br/>
-            "{{notes}}"
+            <strong>Immigration Notes / Rejection Reason:</strong><br/>
+            "{{reason}}"
           </td>
         </tr>
       </table>
@@ -27,7 +27,7 @@
   {{/if}}
   <tr>
     <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
-      Our recruitment team will review alternative schedules or active vacancies. If we intend to reschedule this session, we will reach out with a new invitation card. Thank you for your understanding.
+      Our PRO department is review the exact code and criteria. We may re-apply with clarified records, or seek alternative options. A consultant will contact you shortly to guide you.
     </td>
   </tr>
 </table>

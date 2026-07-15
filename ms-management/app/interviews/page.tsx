@@ -172,8 +172,11 @@ HR Department`;
   if (f.toDate) list = list.filter(i => i.dateTime.slice(0,10) <= f.toDate);
 
   const sortBy = f.sortBy || "newest";
-  list = [...list].sort((a,b) => sortBy === "oldest" ? a.dateTime.localeCompare(b.dateTime) : b.dateTime.localeCompare(a.dateTime));
-
+  list = [...list].sort((a, b) => {
+    const dtA = a.dateTime || "";
+    const dtB = b.dateTime || "";
+    return sortBy === "oldest" ? dtA.localeCompare(dtB) : dtB.localeCompare(dtA);
+  });
   const totalItems = list.length;
   const page = f.page || 1;
   const pageSize = f.pageSize || 10;
@@ -332,8 +335,8 @@ HR Department`;
                           <AvatarImage src={linkedApp.photo} className="object-cover rounded-xl" />
                         ) : null}
                         <AvatarFallback className="rounded-xl font-bold bg-slate-100 text-slate-700 text-xs">
-                          {int.personName.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase()}
-                        </AvatarFallback>
+                        {(int.personName || "").trim().split(" ").filter(Boolean).map(n => n[0]).join("").slice(0,2).toUpperCase() || "INT"}
+                      </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 mb-0.5">
@@ -358,8 +361,14 @@ HR Department`;
                   )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600">
-                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"><Calendar className="w-3.5 h-3.5 text-slate-400"/>{int.dateTime.split("T")[0] || int.dateTime.split(" ")[0]}</div>
-                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100"><Clock className="w-3.5 h-3.5 text-slate-400"/>{int.dateTime.split("T")[1] || int.dateTime.split(" ")[1]}</div>
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400"/>
+                      {int.dateTime ? (int.dateTime.split("T")[0] || int.dateTime.split(" ")[0]) : "N/A"}
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                      <Clock className="w-3.5 h-3.5 text-slate-400"/>
+                      {int.dateTime ? (int.dateTime.split("T")[1] || int.dateTime.split(" ")[1] || "N/A") : "N/A"}
+                    </div>
                     <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border col-span-2 ${int.isOnline ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-amber-50 text-amber-600 border-amber-100"}`}>{modeIcon(int.mode)}{int.isOnline ? `Online (${int.mode})` : "Physical Assessment"}</div>
                   </div>
 
@@ -490,7 +499,7 @@ HR Department`;
                       <button key={s} onClick={() => handleStatusChange(int, s)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">→ {s}</button>
                     ))}
                     <button type="button" onClick={() => { setSelectedGreetingCard(int); setIsGreetingCardOpen(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-indigo-150 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-200 transition-colors flex items-center gap-1 ml-auto">🎴 Card</button>
-                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:int.dateTime.replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true, scheduledBy: int.scheduledBy || "", interviewResult: int.interviewResult || "", feedback: int.feedback || "", remarks: int.remarks || "", candidateResponse: int.candidateResponse || "" }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors">Edit</button>
+                    <button onClick={() => { setEditInt(int); setForm({ applicantId:int.applicantId || "", type:int.type, conductPerson:int.conductPerson, personName:int.personName, mobile:int.mobile||"", whatsapp:int.whatsapp||"", email:int.email||"", nationality:int.nationality||"India", position:int.position||"", meetingType:int.meetingType||"", isOnline: int.isOnline ?? true, dateTime:(int.dateTime || "").replace(" ","T"), mode:int.mode, meetingLink:int.meetingLink||"", locationLink:int.locationLink||"", notes:int.notes||"", company:int.company||"", branch:int.branch||"", autoEmail: true, autoWhatsapp: true, scheduledBy: int.scheduledBy || "", interviewResult: int.interviewResult || "", feedback: int.feedback || "", remarks: int.remarks || "", candidateResponse: int.candidateResponse || "" }); setModal(true); }} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-colors">Edit</button>
                     <button onClick={() => setDeleteId(int.id)} className="text-[9px] font-bold px-2.5 py-1 rounded-lg border border-rose-100 bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
                   </div>
                 </Card>
@@ -1017,7 +1026,7 @@ HR Department`;
                 </div>
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Date & Time</span>
-                  <span className="font-extrabold text-white">{selectedGreetingCard?.dateTime.replace("T", " ")}</span>
+                  <span className="font-extrabold text-white">{(selectedGreetingCard?.dateTime || "").replace("T", " ")}</span>
                 </div>
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <span className="text-slate-400 uppercase text-[9px] tracking-wider font-bold">Format</span>
@@ -1104,7 +1113,7 @@ HR Department`;
     <div class="candidate-role">${card.position || card.meetingType || ""}</div>
     <div class="info-box">
       <div class="info-row"><span class="info-key">Interviewer</span><span class="info-val">${card.conductPerson}</span></div>
-      <div class="info-row"><span class="info-key">Date &amp; Time</span><span class="info-val">${card.dateTime.replace("T", " ")}</span></div>
+      <div class="info-row"><span class="info-key">Date &amp; Time</span><span class="info-val">${(card.dateTime || "").replace("T", " ")}</span></div>
       <div class="info-row"><span class="info-key">Format</span><span class="info-val">${card.isOnline ? `Online (${card.mode})` : "Physical Assessment"}</span></div>
       ${card.meetingLink ? `<div class="info-row"><span class="info-key">Meeting Link</span><span class="info-val" style="color:#93c5fd;font-size:9px;">${card.meetingLink}</span></div>` : ""}
       ${card.locationLink ? `<div class="info-row"><span class="info-key">Location</span><span class="info-val" style="color:#fbbf24;font-size:9px;">${card.locationLink}</span></div>` : ""}

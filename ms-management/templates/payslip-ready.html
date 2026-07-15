@@ -1,0 +1,50 @@
+{{> header companyPrimaryColor="#059669" bannerBg="#d1fae5" bannerBorder="#a7f3d0" bannerColor="#065f46" bannerIcon="💵" bannerText="PAYSLIP AVAILABLE"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #065f46; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Your Monthly Payslip is Available
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Dear {{recipientName}},<br/><br/>
+      We are pleased to inform you that your payslip for the current payroll cycle has been processed and is now available in your employee dashboard.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ecfdf5; border-radius: 12px; border: 1px solid #a7f3d0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #065f46; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Payslip Summary:</strong><br/>
+            • <strong>Pay Period:</strong> {{payPeriod}}<br/>
+            • <strong>Employee Name:</strong> {{recipientName}}<br/>
+            • <strong>Basic Monthly Salary:</strong> AED {{basicSalary}}<br/>
+            • <strong>Net Bank Transfer:</strong> AED {{netSalary}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Please click the button below to log in, review the breakdown of allowances, deductions, and overtime parameters, and download the official signed PDF copy.
+    </td>
+  </tr>
+  {{#if actionLink}}
+  <tr>
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+        <tr>
+          <td align="center" style="background-color: #059669; border-radius: 8px;">
+            <a href="{{actionLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
+              View Payslip Breakdown
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</table>
+{{> footer}}

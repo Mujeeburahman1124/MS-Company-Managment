@@ -1,46 +1,50 @@
             </td>
           </tr>
 
-          <!-- Candidate Tracking details summary (Only shown for candidate context) -->
+          <!-- Candidate Profile Summary Checkpoint (If applicable) -->
           {{#if hasApplicantDetails}}
           <tr>
-            <td style="padding: 0 24px 28px 24px; background-color: #ffffff;">
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; font-family: Arial, sans-serif; font-size: 12px; color: #334155; line-height: 1.6;">
+            <td style="padding: 0 28px 32px 28px; background-color: #ffffff;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #334155; line-height: 1.6;">
                 <tr>
-                  <td colspan="2" style="font-weight: 800; text-transform: uppercase; color: {{companyPrimaryColor}}; font-size: 10px; letter-spacing: 1px; padding-bottom: 12px; border-b: 1px solid #e2e8f0;">
-                    📌 Candidate Tracking & Profile Summary Checkpoint
+                  <td colspan="2" style="font-weight: 800; text-transform: uppercase; color: {{companyPrimaryColor}}; font-size: 11px; letter-spacing: 1px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; font-family: 'Outfit', 'Inter', sans-serif;">
+                    📋 Candidate Profile & Application Checkpoint
                   </td>
                 </tr>
                 <tr>
-                  <td width="50%" style="padding: 10px 10px 4px 0; vertical-align: top; font-family: Arial, sans-serif;">
-                    <strong style="color: #64748b;">Candidate Name:</strong><br /> <span style="font-size: 13px; font-weight: bold; color: #0f172a;">{{recipientName}}</span><br />
-                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Passport Number:</strong><br /> {{passportNumber}}<br />
-                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Nationality:</strong><br /> {{nationality}}<br />
-                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Applying Position:</strong><br /> {{position}}
+                  <td width="50%" style="padding: 16px 12px 4px 0; vertical-align: top;">
+                    <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Candidate Identity</div>
+                    <strong style="font-size: 14px; color: #0f172a;">{{recipientName}}</strong><br />
+                    <span style="display: block; margin-top: 6px; font-size: 12px; color: #475569;">✈️ <strong>Nationality:</strong> {{nationality}}</span>
+                    <span style="display: block; margin-top: 4px; font-size: 12px; color: #475569;">💳 <strong>Passport Number:</strong> {{passportNumber}}</span>
+                    <span style="display: block; margin-top: 4px; font-size: 12px; color: #475569;">💼 <strong>Applied Position:</strong> {{position}}</span>
                   </td>
-                  <td width="50%" style="padding: 10px 0 4px 10px; vertical-align: top; border-left: 1px solid #e2e8f0; font-family: Arial, sans-serif;">
-                    <strong style="color: #64748b;">Assigned Company:</strong><br /> {{company}} ({{branch}})<br />
+                  <td width="50%" style="padding: 16px 0 4px 12px; vertical-align: top; border-left: 1px solid #e2e8f0;">
+                    <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Recruitment Details</div>
+                    <span style="display: block; font-size: 12px; color: #475569;">🏢 <strong>Agency:</strong> {{company}} ({{branch}})</span>
                     {{#if showClientCompany}}
-                      <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Client / Hirer Company:</strong><br /> {{clientCompany}}<br />
+                      <span style="display: block; margin-top: 4px; font-size: 12px; color: #475569;">🤝 <strong>Employer Client:</strong> {{clientCompany}}</span>
                     {{/if}}
-                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Application Status:</strong><br /> 
-                    <span style="background-color: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; display: inline-block; margin-top: 2px;">{{status}}</span><br />
-                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Tracking ID:</strong><br /> <span style="font-family: monospace; font-weight: bold;">{{trackingNumber}}</span>
+                    <span style="display: block; margin-top: 6px; font-size: 12px; color: #475569;">📌 <strong>Current Status:</strong> <span style="background-color: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase; border: 1px solid #bae6fd;">{{status}}</span></span>
+                    <span style="display: block; margin-top: 6px; font-size: 12px; color: #475569;">🔑 <strong>Tracking ID:</strong> <span style="font-family: monospace; font-weight: bold; color: #0f172a;">{{trackingNumber}}</span></span>
                   </td>
                 </tr>
                 
-                <!-- Interview Schedule Details -->
+                <!-- Interview Specific Addon in Checkpoint -->
                 {{#if showInterviewDetails}}
                 <tr>
-                  <td colspan="2" style="border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 10px; font-family: Arial, sans-serif;">
+                  <td colspan="2" style="border-top: 1px solid #e2e8f0; margin-top: 12px; padding-top: 16px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="left" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; padding: 12px; color: #14532d; font-size: 12px;">
-                          <strong>🗓️ Interview Date:</strong> {{interviewDate}} &nbsp;|&nbsp; <strong>Time:</strong> {{interviewTime}}<br />
-                          <strong>📍 Interview Location:</strong> {{interviewLocation}} <br />
+                        <td align="left" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; color: #14532d; font-size: 12px;">
+                          <div style="font-weight: 800; text-transform: uppercase; font-size: 10px; color: #166534; letter-spacing: 0.5px; margin-bottom: 6px;">🗓️ Scheduled Assessment Sync</div>
+                          <strong>Date &amp; Time:</strong> {{interviewDate}} at {{interviewTime}}<br />
+                          <strong>Assessment Mode:</strong> {{interviewLocation}} <br />
                           {{#if meetingLink}}
                             {{#if (ne meetingLink "N/A")}}
-                              <div style="margin-top: 6px;"><strong>🔗 Online Meeting Link:</strong> <a href="{{meetingLink}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: underline; font-weight: bold;">Join Video Assessment Meeting</a></div>
+                              <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(22, 101, 52, 0.2);">
+                                🔗 <strong>Meeting Link:</strong> <a href="{{meetingLink}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: underline; font-weight: 800;">Join Digital Interview Platform</a>
+                              </div>
                             {{/if}}
                           {{/if}}
                         </td>
@@ -50,15 +54,16 @@
                 </tr>
                 {{/if}}
 
-                <!-- Placement Schedule Details -->
+                <!-- Placement Specific Addon in Checkpoint -->
                 {{#if showPlacementDetails}}
                 <tr>
-                  <td colspan="2" style="border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 10px; font-family: Arial, sans-serif;">
+                  <td colspan="2" style="border-top: 1px solid #e2e8f0; margin-top: 12px; padding-top: 16px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="left" style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 12px; color: #1e3a8a; font-size: 12px;">
-                          <strong>💼 Offered Salary:</strong> AED {{salary}} &nbsp;|&nbsp; <strong>Expected Joining:</strong> {{joiningDate}}<br />
-                          <strong>🛡️ Visa Status:</strong> {{visaStatus}}
+                        <td align="left" style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 16px; color: #075985; font-size: 12px;">
+                          <div style="font-weight: 800; text-transform: uppercase; font-size: 10px; color: #0369a1; letter-spacing: 0.5px; margin-bottom: 6px;">💼 Placement & Employment Terms</div>
+                          <strong>Offered Salary:</strong> AED {{salary}} &nbsp;|&nbsp; <strong>Expected Joining Date:</strong> {{joiningDate}}<br />
+                          <strong>Visa Status:</strong> {{visaStatus}}
                         </td>
                       </tr>
                     </table>
@@ -66,10 +71,20 @@
                 </tr>
                 {{/if}}
 
+                <!-- Consultant Signature Footnote -->
                 <tr>
-                  <td colspan="2" style="border-top: 1px dashed #e2e8f0; margin-top: 10px; padding-top: 10px; font-size: 11px; color: #64748b; font-family: Arial, sans-serif;">
-                    Representing Consultant: <strong style="color: #475569;">{{consultantName}}</strong> &nbsp;|&nbsp; HR Officer: <strong style="color: #475569;">{{hrName}}</strong> (<a href="mailto:{{hrEmail}}" style="color: {{companyPrimaryColor}}; text-decoration: none;">{{hrEmail}}</a>)<br />
-                    <span style="font-size: 9px; color: #94a3b8; display: inline-block; margin-top: 4px;">Audited on {{currentDate}} at {{currentTime}} (System Standard Timezone)</span>
+                  <td colspan="2" style="border-top: 1px dashed #e2e8f0; margin-top: 14px; padding-top: 14px; font-size: 11px; color: #64748b;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          Representing Consultant: <strong style="color: #334155;">{{consultantName}}</strong><br />
+                          Assigned HR Officer: <strong style="color: #334155;">{{hrName}}</strong> (<a href="mailto:{{hrEmail}}" style="color: {{companyPrimaryColor}}; text-decoration: none; font-weight: bold;">{{hrEmail}}</a>)
+                        </td>
+                        <td align="right" style="vertical-align: bottom; font-size: 9px; color: #94a3b8;">
+                          Processed on {{currentDate}} at {{currentTime}}
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -77,31 +92,97 @@
           </tr>
           {{/if}}
 
-          <!-- Footer Area -->
+          <!-- Premium Corporate Footer -->
           <tr>
-            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px; color: #64748b; font-size: 11px; line-height: 1.6; font-family: Arial, sans-serif;">
+            <td style="background-color: #0f172a; padding: 40px 32px; color: #94a3b8; font-size: 11px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 4px solid {{companyPrimaryColor}};">
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                
+                <!-- Logo & Contacts -->
                 <tr>
-                  <td align="left" style="padding-bottom: 12px;">
-                    <strong style="color: #334155; font-size: 12px;">{{companyName}} Support Operations</strong><br />
-                    {{companyAddress}}<br />
-                    Phone Support: {{companyPhone}} | Email Inquiry: <a href="mailto:{{companyEmail}}" style="color: {{companyPrimaryColor}}; text-decoration: none;">{{companyEmail}}</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="left" style="border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                  <td align="left" style="padding-bottom: 24px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="left" style="color: #94a3b8; font-size: 10px;">
-                          &copy; {{year}} {{companyName}}. All rights reserved.
+                        <td style="vertical-align: top; width: 60%;">
+                          <!-- Logo/Branding inside footer -->
+                          <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
+                            <tr>
+                              <td>
+                                {{#if companyLogo}}
+                                  <img src="{{companyLogo}}" alt="{{companyName}} Logo" style="max-height: 32px; max-width: 100px; display: block; border-radius: 4px; filter: brightness(0) invert(1);" />
+                                {{else}}
+                                  <span style="font-size: 16px; font-weight: 900; color: #ffffff; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">{{logoText}}</span>
+                                {{/if}}
+                              </td>
+                              <td style="padding-left: 8px; font-size: 14px; font-weight: 800; color: #ffffff; font-family: 'Outfit', sans-serif;">
+                                {{companyName}}
+                              </td>
+                            </tr>
+                          </table>
+                          <span style="color: #cbd5e1; font-weight: 600;">{{companyName}} Support Operations Hub</span><br />
+                          📍 {{~companyAddress}}<br />
+                          📞 Hotline: {{companyPhone}} &nbsp;|&nbsp; ✉️ Email: <a href="mailto:{{companyEmail}}" style="color: #38bdf8; text-decoration: none; font-weight: bold;">{{companyEmail}}</a>
                         </td>
-                        <td align="right">
-                          <a href="{{website}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: none; font-weight: 700; font-size: 11px;">Visit Official Portal</a>
+                        <td style="vertical-align: top; width: 40%; text-align: right; font-size: 11px;">
+                          <strong style="color: #ffffff; display: block; margin-bottom: 6px; font-size: 12px; font-family: 'Outfit', sans-serif;">🕒 Working Hours</strong>
+                          Monday - Friday: 9:00 AM - 6:00 PM<br />
+                          Saturday: 9:00 AM - 1:00 PM<br />
+                          Sunday / UAE Holidays: Closed
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
+
+                <!-- Social Media Icons (Text-Graphic badges) -->
+                <tr>
+                  <td align="center" style="border-top: 1px solid #334155; padding: 20px 0; text-align: center;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+                      <tr>
+                        <td align="center" style="padding: 0 8px;">
+                          <a href="https://linkedin.com" target="_blank" style="background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block;">🔗 LinkedIn</a>
+                        </td>
+                        <td align="center" style="padding: 0 8px;">
+                          <a href="https://facebook.com" target="_blank" style="background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block;">📘 Facebook</a>
+                        </td>
+                        <td align="center" style="padding: 0 8px;">
+                          <a href="https://instagram.com" target="_blank" style="background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block;">📸 Instagram</a>
+                        </td>
+                        <td align="center" style="padding: 0 8px;">
+                          <a href="https://twitter.com" target="_blank" style="background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block;">🐦 Twitter</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Confidentiality and Auto-Generated Notice -->
+                <tr>
+                  <td style="border-top: 1px solid #334155; padding-top: 20px; text-align: justify; font-size: 9px; color: #64748b; line-height: 1.5;">
+                    <strong>CONFIDENTIALITY NOTICE:</strong> This email transmission, and any documents, files or previous email messages attached to it, may contain confidential information that is legally privileged and owned by <strong>{{companyName}}</strong>. If you are not the intended recipient, or a person responsible for delivering it to the intended recipient, you are hereby notified that any disclosure, copying, distribution or use of any of the information contained in or attached to this transmission is <strong>STRICTLY PROHIBITED</strong>. If you have received this transmission in error, please immediately notify the sender by reply email and destroy the original transmission and its attachments without reading or saving in any manner.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-top: 10px; font-size: 9px; color: #64748b;">
+                    ℹ️ <strong>Auto-generated Email Notice:</strong> This is an automatically generated email from the {{companyName}} Recruitment Management System. Please do not reply directly to this email address. If you need assistance, please reach out to our help desk at <a href="mailto:{{companyEmail}}" style="color: #38bdf8; text-decoration: none;">{{companyEmail}}</a> or call the numbers listed above.
+                  </td>
+                </tr>
+
+                <!-- Copyright -->
+                <tr>
+                  <td align="left" style="border-top: 1px solid #334155; margin-top: 20px; padding-top: 16px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="color: #475569; font-size: 10px;">
+                          &copy; {{year}} <strong>{{companyName}}</strong>. All rights reserved. Registered Consultancy & HR Firm, UAE.
+                        </td>
+                        <td align="right">
+                          <a href="{{website}}" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: bold; font-size: 11px;">Visit Official Portal</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
               </table>
             </td>
           </tr>

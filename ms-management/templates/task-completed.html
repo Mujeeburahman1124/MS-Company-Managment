@@ -1,0 +1,44 @@
+{{> header companyPrimaryColor="#10b981" bannerBg="#ecfdf5" bannerBorder="#a7f3d0" bannerColor="#047857" bannerIcon="✓" bannerText="TASK COMPLETED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #065f46; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Task Marked as Completed
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Hello {{recipientName}},<br/><br/>
+      We are writing to notify you that the task assigned to you has been marked as **Completed**.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #1e293b; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Task Summary:</strong><br/>
+            • <strong>Task Title:</strong> {{taskTitle}}<br/>
+            • <strong>Task ID:</strong> {{taskId}}<br/>
+            • <strong>Assigned By:</strong> {{assignedBy}}<br/>
+            • <strong>Completed On:</strong> {{currentDate}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{#if feedback}}
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left: 4px solid #10b981; background-color: #f8fafc; padding: 12px 16px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #475569; font-style: italic; font-family: Arial, sans-serif;">
+            <strong>Task Resolution / Feedback:</strong><br/>
+            "{{feedback}}"
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</table>
+{{> footer}}

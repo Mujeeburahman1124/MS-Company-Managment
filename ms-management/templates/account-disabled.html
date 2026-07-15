@@ -1,0 +1,49 @@
+{{> header companyPrimaryColor="#475569" bannerBg="#f8fafc" bannerBorder="#cbd5e1" bannerColor="#1e293b" bannerIcon="🔒" bannerText="ACCOUNT DISABLED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #1e293b; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Portal Account Deactivated
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Hello {{recipientName}},<br/><br/>
+      Please be informed that your administrative access account for the <strong>{{companyName}}</strong> Recruitment and Management Portal has been **Disabled** or suspended.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; border-radius: 12px; border: 1px solid #cbd5e1; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #334155; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Suspension Incident Summary:</strong><br/>
+            • <strong>Portal User:</strong> {{recipientName}}<br/>
+            • <strong>Associated Email:</strong> {{email}}<br/>
+            • <strong>Deactivation Date:</strong> {{currentDate}}<br/>
+            • <strong>Status:</strong> Suspended / Disabled
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{#if reason}}
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left: 4px solid #475569; background-color: #f8fafc; padding: 12px 16px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #475569; font-style: italic; font-family: Arial, sans-serif;">
+            <strong>Administrative Reason / Notes:</strong><br/>
+            "{{reason}}"
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+  <tr>
+    <td style="color: #64748b; font-size: 12px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      If you believe this suspension is in error or need your account re-enabled, please contact your company's IT Support department or assigned Super Administrator.
+    </td>
+  </tr>
+</table>
+{{> footer}}

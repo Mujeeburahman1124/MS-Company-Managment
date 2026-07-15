@@ -5,64 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{subject}}</title>
   <style type="text/css">
-    /* Reset styles */
+    /* Core Reset Styles */
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
     table { border-collapse: collapse !important; }
-    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f1f5f9; font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-    /* Client-specific styles */
+    /* Client-Specific Classes */
     img[class="img-max"] { max-width: 100% !important; width: 100% !important; height: auto !important; }
 
-    /* Mobile styles */
-    @media screen and (max-width: 600px) {
-      .container { width: 100% !important; max-width: 100% !important; }
-      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
-      .card { padding: 20px 16px !important; }
-      .header-text { font-size: 20px !important; }
-      .button-wrapper { width: 100% !important; }
+    /* Responsive Breakpoints */
+    @media screen and (max-width: 620px) {
+      .container { width: 100% !important; max-width: 100% !important; border-radius: 0px !important; }
+      .mobile-padding { padding-left: 12px !important; padding-right: 12px !important; padding-top: 12px !important; }
+      .card { padding: 24px 16px !important; border-radius: 12px !important; }
+      .header-logo-td { text-align: center !important; width: 100% !important; display: block !important; padding-bottom: 12px !important; }
+      .header-info-td { text-align: center !important; width: 100% !important; display: block !important; }
       .button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; }
     }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc;">
-  <!-- Double-open tag wrapping for some email clients -->
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; table-layout: fixed;">
+<body style="margin: 0; padding: 0; background-color: #f1f5f9;">
+  <!-- Main Wrapper -->
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; table-layout: fixed;">
     <tr>
-      <td align="center" style="padding: 24px 0 40px 0;" class="mobile-padding">
-        <!-- Main Email Container -->
-        <table border="0" cellpadding="0" cellspacing="0" width="600" class="container" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);">
+      <td align="center" style="padding: 32px 0 40px 0;" class="mobile-padding">
+        <!-- Mail Card Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" class="container" style="background-color: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.05);">
           
-          <!-- Banner / Header Image Badge -->
+          <!-- Banner / Brand Header -->
           <tr>
-            <td align="center" style="background: linear-gradient(135deg, {{companyPrimaryColor}} 0%, #0f172a 100%); padding: 28px 24px; color: #ffffff;">
+            <td align="center" style="background: linear-gradient(135deg, {{companyPrimaryColor}} 0%, #0f172a 100%); padding: 32px 28px; color: #ffffff;">
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                  <!-- Left: Branding & Logo -->
-                  <td align="left" style="vertical-align: middle; width: 60%;">
-                    {{#if companyLogo}}
-                      <img src="{{companyLogo}}" alt="{{companyName}} Logo" style="max-height: 48px; max-width: 140px; display: inline-block; vertical-align: middle; border-radius: 6px;" />
-                    {{else}}
-                      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block; vertical-align: middle; background-color: rgba(255, 255, 255, 0.15); border-radius: 8px;">
-                        <tr>
-                          <td align="center" style="width: 44px; height: 44px; font-size: 16px; font-weight: 900; color: #ffffff; font-family: Arial, sans-serif;">
-                            {{logoText}}
-                          </td>
-                        </tr>
-                      </table>
-                    {{/if}}
-                    <span style="vertical-align: middle; margin-left: 10px; font-size: 20px; font-weight: 800; font-family: Arial, sans-serif; letter-spacing: -0.5px;">{{companyName}}</span>
-                    <div style="font-size: 10px; color: #cbd5e1; margin-top: 6px; font-family: Arial, sans-serif; line-height: 1.4;">
-                      {{companyAddress}}
+                  <!-- Brand Logo and Name -->
+                  <td align="left" class="header-logo-td" style="vertical-align: middle; width: 55%;">
+                    <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block; vertical-align: middle;">
+                      <tr>
+                        <td>
+                          {{#if companyLogo}}
+                            <img src="{{companyLogo}}" alt="{{companyName}}" style="max-height: 48px; max-width: 140px; display: block; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15);" />
+                          {{else}}
+                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: rgba(255, 255, 255, 0.18); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                              <tr>
+                                <td align="center" style="width: 46px; height: 46px; font-size: 18px; font-weight: 900; color: #ffffff; font-family: 'Outfit', 'Inter', Arial, sans-serif; text-shadow: 0 1px 2px rgba(0,0,0,0.15);">
+                                  {{logoText}}
+                                </td>
+                              </tr>
+                            </table>
+                          {{/if}}
+                        </td>
+                        <td style="padding-left: 12px;">
+                          <div style="font-size: 20px; font-weight: 800; font-family: 'Outfit', 'Inter', Arial, sans-serif; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">{{companyName}}</div>
+                          <div style="font-size: 9px; color: #cbd5e1; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; font-weight: 700;">Recruitment Solutions</div>
+                        </td>
+                      </tr>
+                    </table>
+                    <div style="font-size: 10px; color: #cbd5e1; margin-top: 14px; font-family: Arial, sans-serif; line-height: 1.5; font-weight: 500; opacity: 0.95;">
+                      📍 {{companyAddress}}
                     </div>
                   </td>
-                  <!-- Right: Contact info -->
-                  <td align="right" style="vertical-align: middle; width: 40%; font-size: 11px; color: #e2e8f0; font-family: Arial, sans-serif; line-height: 1.5;">
-                    <div style="font-weight: 700;">{{companyEmail}}</div>
-                    <div style="margin-top: 2px;">{{companyPhone}}</div>
-                    <div style="margin-top: 4px;">
-                      <a href="{{website}}" target="_blank" style="color: #67e8f9; text-decoration: none; font-weight: bold;">{{website}}</a>
+                  <!-- Company Contact and Portal -->
+                  <td align="right" class="header-info-td" style="vertical-align: middle; width: 45%; font-size: 11px; color: #e2e8f0; font-family: 'Inter', Arial, sans-serif; line-height: 1.6;">
+                    <div style="font-weight: 700; color: #ffffff; font-size: 12px;">✉️ {{companyEmail}}</div>
+                    <div style="margin-top: 4px; font-weight: 600;">📞 {{companyPhone}}</div>
+                    <div style="margin-top: 8px;">
+                      <a href="{{website}}" target="_blank" style="background-color: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); text-decoration: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; display: inline-block; font-size: 10px; letter-spacing: 0.2px; transition: all 0.2s ease;">🌐 Visit Website</a>
                     </div>
                   </td>
                 </tr>
@@ -70,15 +79,15 @@
             </td>
           </tr>
           
-          <!-- Colored Alert Section (Dynamic Indicator) -->
+          <!-- Banner Alert Box (Optional) -->
           {{#if bannerText}}
           <tr>
-            <td style="background-color: {{bannerBg}}; border-bottom: 1px solid {{bannerBorder}}; padding: 12px 24px; text-align: center; font-size: 12px; font-weight: 700; color: {{bannerColor}}; letter-spacing: 1px; text-transform: uppercase;">
-              {{bannerIcon}} {{bannerText}}
+            <td style="background-color: {{bannerBg}}; border-bottom: 1px solid {{bannerBorder}}; padding: 14px 28px; text-align: center; font-size: 11px; font-weight: 800; color: {{bannerColor}}; letter-spacing: 1.2px; text-transform: uppercase; font-family: 'Outfit', 'Inter', Arial, sans-serif;">
+              {{bannerIcon}} &nbsp; {{bannerText}}
             </td>
           </tr>
           {{/if}}
 
-          <!-- Body Content Area -->
+          <!-- Email Content Body -->
           <tr>
-            <td class="card" style="padding: 32px 24px; background-color: #ffffff;">
+            <td class="card" style="padding: 36px 28px; background-color: #ffffff;">

@@ -1,0 +1,49 @@
+{{> header companyPrimaryColor="#10b981" bannerBg="#ecfdf5" bannerBorder="#a7f3d0" bannerColor="#047857" bannerIcon="🎉" bannerText="INTERVIEW SELECTED"}}
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td style="color: #065f46; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: Arial, sans-serif;">
+      Congratulations, {{recipientName}}!
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      We are thrilled to inform you that you have been **Selected** based on your performance in the interview rounds for the position of <strong>{{position}}</strong>.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0; padding: 20px; margin-bottom: 24px;">
+        <tr>
+          <td style="font-size: 13px; color: #14532d; line-height: 1.8; font-family: Arial, sans-serif;">
+            <strong>Selection Terms Summary:</strong><br/>
+            • <strong>Selected Position:</strong> {{position}}<br/>
+            • <strong>Candidate Name:</strong> {{recipientName}}<br/>
+            • <strong>Tracking Code:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; color: #047857;">{{trackingCode}}</span><br/>
+            • <strong>Status:</strong> Selected / Progressing to Offer Letter
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="color: #475569; font-size: 13px; line-height: 1.6; padding-bottom: 24px; font-family: Arial, sans-serif;">
+      Our visa processing and HR coordinators are preparing your official Offer Letter and Employment Agreement. We will send the documents shortly.
+    </td>
+  </tr>
+  {{#if actionLink}}
+  <tr>
+    <td align="center" style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+        <tr>
+          <td align="center" style="background-color: #10b981; border-radius: 8px;">
+            <a href="{{actionLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;">
+              Track My Onboarding Status
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {{/if}}
+</table>
+{{> footer}}
