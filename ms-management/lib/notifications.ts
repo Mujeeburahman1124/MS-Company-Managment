@@ -231,6 +231,51 @@ export async function sendEmail({
     const recipientName = templateData?.recipientName || candidateName || templateData?.applicantName || "Recipient";
     const logoText = (company || "").toUpperCase().split(" ").slice(0, 2).map(s => s.charAt(0)).join("") || "MS";
 
+    // Auto-populate all required dynamic fields with fallbacks
+    const safeData = {
+      applicantName: recipientName,
+      recipientName,
+      passportNumber: templateData?.passportNumber || templateData?.passport || "N/A",
+      nationality: templateData?.nationality || "N/A",
+      position: templateData?.position || (templateData?.applyingPositions ? (Array.isArray(templateData.applyingPositions) ? templateData.applyingPositions.join(", ") : templateData.applyingPositions) : "N/A"),
+      company: company || templateData?.company || "MS Horizon F.Z.E",
+      branch: branch || templateData?.branch || "Main Branch",
+      clientCompany: templateData?.clientCompany || templateData?.clientName || "N/A",
+      interviewDate: templateData?.interviewDate || templateData?.dateTime || "N/A",
+      interviewTime: templateData?.interviewTime || "N/A",
+      interviewLocation: templateData?.interviewLocation || templateData?.location || "N/A",
+      meetingLink: templateData?.meetingLink || templateData?.link || "N/A",
+      hrName: templateData?.hrName || "HR Operations Team",
+      hrEmail: templateData?.hrEmail || companyEmail || "hr@safayar-msjobs.com",
+      consultantName: templateData?.consultantName || templateData?.createdBy || sentBy || "System Admin",
+      salary: templateData?.salary || "N/A",
+      joiningDate: templateData?.joiningDate || templateData?.placedDate || "N/A",
+      visaStatus: templateData?.visaStatus || templateData?.visaType || "N/A",
+      status: templateData?.status || "N/A",
+      trackingNumber: templateData?.trackingNumber || templateData?.trackingCode || "N/A",
+      currentDate: templateData?.currentDate || new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
+      currentTime: templateData?.currentTime || new Date().toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' }),
+      companyLogo: companyLogo || "",
+    };
+
+    const hasApplicantDetails = !!(
+      (templateData?.passportNumber && templateData.passportNumber !== "N/A") ||
+      (templateData?.passport && templateData.passport !== "N/A") ||
+      (templateData?.nationality && templateData.nationality !== "N/A") ||
+      (templateType && (
+        templateType.startsWith("Interview") ||
+        templateType.startsWith("Applicant") ||
+        templateType.startsWith("Placement") ||
+        templateType === "Offer" ||
+        templateType === "Registration" ||
+        templateType === "Visa"
+      ))
+    );
+
+    const showInterviewDetails = hasApplicantDetails && safeData.interviewDate !== "N/A";
+    const showPlacementDetails = hasApplicantDetails && safeData.salary !== "N/A";
+    const showClientCompany = hasApplicantDetails && safeData.clientCompany !== "N/A";
+
     const context = {
       recipientName,
       companyName: company || "MS Management",
@@ -244,6 +289,11 @@ export async function sendEmail({
       companyPrimaryColor: templateData?.companyPrimaryColor || companyPrimaryColor || process.env.PRIMARY_COLOR || '#2563eb',
       body,
       subject,
+      ...safeData,
+      hasApplicantDetails,
+      showInterviewDetails,
+      showPlacementDetails,
+      showClientCompany,
       ...templateData,
     };
 

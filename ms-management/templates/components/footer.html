@@ -1,26 +1,102 @@
             </td>
           </tr>
 
-          <!-- Footer Area -->
+          <!-- Candidate Tracking details summary (Only shown for candidate context) -->
+          {{#if hasApplicantDetails}}
           <tr>
-            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 32px 24px; color: #64748b; font-size: 12px; line-height: 1.6;">
-              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <td style="padding: 0 24px 28px 24px; background-color: #ffffff;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; font-family: Arial, sans-serif; font-size: 12px; color: #334155; line-height: 1.6;">
                 <tr>
-                  <td align="left" style="padding-bottom: 16px;">
-                    <strong style="color: #334155; font-size: 13px;">{{companyName}}</strong><br />
-                    {{companyAddress}}<br />
-                    Phone: {{companyPhone}} | Email: {{companyEmail}}
+                  <td colspan="2" style="font-weight: 800; text-transform: uppercase; color: {{companyPrimaryColor}}; font-size: 10px; letter-spacing: 1px; padding-bottom: 12px; border-b: 1px solid #e2e8f0;">
+                    📌 Candidate Tracking & Profile Summary Checkpoint
                   </td>
                 </tr>
                 <tr>
-                  <td align="left" style="border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                  <td width="50%" style="padding: 10px 10px 4px 0; vertical-align: top; font-family: Arial, sans-serif;">
+                    <strong style="color: #64748b;">Candidate Name:</strong><br /> <span style="font-size: 13px; font-weight: bold; color: #0f172a;">{{recipientName}}</span><br />
+                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Passport Number:</strong><br /> {{passportNumber}}<br />
+                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Nationality:</strong><br /> {{nationality}}<br />
+                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Applying Position:</strong><br /> {{position}}
+                  </td>
+                  <td width="50%" style="padding: 10px 0 4px 10px; vertical-align: top; border-left: 1px solid #e2e8f0; font-family: Arial, sans-serif;">
+                    <strong style="color: #64748b;">Assigned Company:</strong><br /> {{company}} ({{branch}})<br />
+                    {{#if showClientCompany}}
+                      <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Client / Hirer Company:</strong><br /> {{clientCompany}}<br />
+                    {{/if}}
+                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Application Status:</strong><br /> 
+                    <span style="background-color: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; display: inline-block; margin-top: 2px;">{{status}}</span><br />
+                    <strong style="color: #64748b; display: inline-block; margin-top: 6px;">Tracking ID:</strong><br /> <span style="font-family: monospace; font-weight: bold;">{{trackingNumber}}</span>
+                  </td>
+                </tr>
+                
+                <!-- Interview Schedule Details -->
+                {{#if showInterviewDetails}}
+                <tr>
+                  <td colspan="2" style="border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 10px; font-family: Arial, sans-serif;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td align="left">
+                        <td align="left" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; padding: 12px; color: #14532d; font-size: 12px;">
+                          <strong>🗓️ Interview Date:</strong> {{interviewDate}} &nbsp;|&nbsp; <strong>Time:</strong> {{interviewTime}}<br />
+                          <strong>📍 Interview Location:</strong> {{interviewLocation}} <br />
+                          {{#if meetingLink}}
+                            {{#if (ne meetingLink "N/A")}}
+                              <div style="margin-top: 6px;"><strong>🔗 Online Meeting Link:</strong> <a href="{{meetingLink}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: underline; font-weight: bold;">Join Video Assessment Meeting</a></div>
+                            {{/if}}
+                          {{/if}}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {{/if}}
+
+                <!-- Placement Schedule Details -->
+                {{#if showPlacementDetails}}
+                <tr>
+                  <td colspan="2" style="border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 10px; font-family: Arial, sans-serif;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="left" style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 12px; color: #1e3a8a; font-size: 12px;">
+                          <strong>💼 Offered Salary:</strong> AED {{salary}} &nbsp;|&nbsp; <strong>Expected Joining:</strong> {{joiningDate}}<br />
+                          <strong>🛡️ Visa Status:</strong> {{visaStatus}}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {{/if}}
+
+                <tr>
+                  <td colspan="2" style="border-top: 1px dashed #e2e8f0; margin-top: 10px; padding-top: 10px; font-size: 11px; color: #64748b; font-family: Arial, sans-serif;">
+                    Representing Consultant: <strong style="color: #475569;">{{consultantName}}</strong> &nbsp;|&nbsp; HR Officer: <strong style="color: #475569;">{{hrName}}</strong> (<a href="mailto:{{hrEmail}}" style="color: {{companyPrimaryColor}}; text-decoration: none;">{{hrEmail}}</a>)<br />
+                    <span style="font-size: 9px; color: #94a3b8; display: inline-block; margin-top: 4px;">Audited on {{currentDate}} at {{currentTime}} (System Standard Timezone)</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{/if}}
+
+          <!-- Footer Area -->
+          <tr>
+            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px; color: #64748b; font-size: 11px; line-height: 1.6; font-family: Arial, sans-serif;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="left" style="padding-bottom: 12px;">
+                    <strong style="color: #334155; font-size: 12px;">{{companyName}} Support Operations</strong><br />
+                    {{companyAddress}}<br />
+                    Phone Support: {{companyPhone}} | Email Inquiry: <a href="mailto:{{companyEmail}}" style="color: {{companyPrimaryColor}}; text-decoration: none;">{{companyEmail}}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="left" style="color: #94a3b8; font-size: 10px;">
                           &copy; {{year}} {{companyName}}. All rights reserved.
                         </td>
                         <td align="right">
-                          <a href="{{website}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: none; font-weight: 600;">Visit Website</a>
+                          <a href="{{website}}" target="_blank" style="color: {{companyPrimaryColor}}; text-decoration: none; font-weight: 700; font-size: 11px;">Visit Official Portal</a>
                         </td>
                       </tr>
                     </table>

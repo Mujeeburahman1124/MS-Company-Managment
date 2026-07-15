@@ -46,7 +46,7 @@ export default function Payslips() {
     toast.success(`Salary marked as paid for ${p.staffName}`);
   };
 
-  const getPayslipHtml = (p: PayrollRecord) => {
+  const getPayslipHtml = (p: PayrollRecord, forPrint = true) => {
     const allowancesHtml = (() => {
       const details = Array.isArray(p.allowanceDetails)
         ? p.allowanceDetails
@@ -150,12 +150,18 @@ export default function Payslips() {
           </div>
           </div>
 
+          ${
+            forPrint
+              ? `
           <script>
             window.onload = function() {
               window.print();
               setTimeout(function() { window.close(); }, 500);
             };
           </script>
+          `
+              : ""
+          }
         </body>
       </html>
     `;
@@ -167,7 +173,7 @@ export default function Payslips() {
       toast.error("Popup blocker prevented opening the print window.");
       return;
     }
-    printWindow.document.write(getPayslipHtml(p));
+    printWindow.document.write(getPayslipHtml(p, true));
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();
@@ -175,7 +181,7 @@ export default function Payslips() {
   };
 
   const handleDownloadPayslip = (p: PayrollRecord) => {
-    const html = getPayslipHtml(p);
+    const html = getPayslipHtml(p, false);
     const blob = new Blob([html], { type: "text/html;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

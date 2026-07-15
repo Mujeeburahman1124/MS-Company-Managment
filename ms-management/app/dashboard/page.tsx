@@ -1535,20 +1535,60 @@ function AttendanceWidget({ currentUser, now, staffAttendance, saveAttendance, a
   const todayAttendance = myAttendanceRecord?.records.find(r => r.date === todayStr);
   const hasCheckedIn = !!todayAttendance;
 
+  const calcHours = (t1: string, t2: string) => {
+    const d1 = new Date(`2000-01-01T${t1}`);
+    const d2 = new Date(`2000-01-01T${t2}`);
+    let df = (d2.getTime() - d1.getTime()) / 3_600_000;
+    if (df < 0) df += 24;
+    return parseFloat(df.toFixed(2));
+  };
+
   const handleCheckIn = () => {
     const checkInTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
-    const newRecord = { date: todayStr, status: "Present" as const, checkIn: checkInTime, checkOut: "", overtime: 0 };
+    
+    // Find staff shift
+    const staffShift = shifts.find(s => s.id === loggedInStaff?.shiftId);
+    const shiftIn = staffShift ? (staffShift.clockIn || staffShift.startTime || "09:00") : "09:00";
+    const grace = staffShift ? (staffShift.gracePeriod || 0) : 15;
+    
+    let status = "Present" as const;
+    let lateArrival = 0;
+    try {
+      const [empInH, empInM] = checkInTime.split(":").map(Number);
+      const [shInH, shInM] = shiftIn.split(":").map(Number);
+      const empInMin = empInH * 60 + empInM;
+      const shInMin = shInH * 60 + shInM;
+      if (empInMin > (shInMin + grace)) {
+        status = "Late" as const;
+        lateArrival = empInMin - shInMin;
+      }
+    } catch (e) {}
+
+    const newRecord = { 
+      date: todayStr, 
+      status, 
+      checkIn: checkInTime, 
+      checkOut: "", 
+      workingHours: 0, 
+      overtime: 0,
+      lateArrival,
+      earlyLeaving: 0
+    };
+
     if (myAttendanceRecord) {
       saveAttendance({ ...myAttendanceRecord, records: [...myAttendanceRecord.records.filter(r => r.date !== todayStr), newRecord] });
     } else {
       saveAttendance({ staffId: lookupId, staffName: currentUser.name, month, year, records: [newRecord] });
     }
+    
     addActivityLog({
       id: `LOG-${Date.now()}`, dateTime: now.toISOString().replace("T", " ").slice(0, 19),
       userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch,
-      action: "Created", module: "Attendance", oldValue: null, newValue: `Checked in at ${checkInTime}`, ipAddress: "192.168.1.102"
+      action: "Created", module: "Attendance", oldValue: null, newValue: `Checked in at ${checkInTime} (Status: ${status}, Late: ${lateArrival}m)`, ipAddress: "192.168.1.102"
     });
-    toast.success("Successfully checked in!");
+    
+    // Send check-in email notification
+    toast.success(`Successfully checked in! Status: ${status}`);
   };
 
   const handleCheckOut = () => {
@@ -1557,36 +1597,55 @@ function AttendanceWidget({ currentUser, now, staffAttendance, saveAttendance, a
     
     // Calculate working hours
     const checkInStr = todayAttendance.checkIn || "09:00";
-    const start = new Date(`2000-01-01T${checkInStr}`);
-    const end = new Date(`2000-01-01T${checkoutTime}`);
-    let diff = (end.getTime() - start.getTime()) / 3_600_000;
-    if (diff < 0) diff += 24; // Handle overnight shifts
-    const workingHours = parseFloat(diff.toFixed(2));
-
-    // Calculate shift hours
-    let shiftRequiredHours = 9; // default fallback
+    const workingHours = calcHours(checkInStr, checkoutTime);
+ 
+    // Calculate shift details
     const staffShift = shifts.find(s => s.id === loggedInStaff?.shiftId);
-    if (staffShift) {
-      const shiftStart = staffShift.startTime || staffShift.clockIn || "09:00";
-      const shiftEnd = staffShift.endTime || staffShift.clockOut || "18:00";
-      const sDate = new Date(`2000-01-01T${shiftStart}`);
-      const eDate = new Date(`2000-01-01T${shiftEnd}`);
-      let sDiff = (eDate.getTime() - sDate.getTime()) / 3_600_000;
-      if (sDiff < 0) sDiff += 24; // Handle overnight shifts
-      const breakHours = (staffShift.breakDuration || 0) / 60;
-      shiftRequiredHours = Math.max(0, sDiff - breakHours);
-    }
+    const shiftIn = staffShift ? (staffShift.clockIn || staffShift.startTime || "09:00") : "09:00";
+    const shiftOut = staffShift ? (staffShift.clockOut || staffShift.endTime || "18:00") : "18:00";
+    const breakMin = staffShift ? (staffShift.breakDuration || 0) : 60;
+    const breakHours = breakMin / 60;
 
-    const overtime = workingHours > shiftRequiredHours ? parseFloat((workingHours - shiftRequiredHours).toFixed(2)) : 0;
+    const netWorkingHours = Math.max(0, workingHours - breakHours);
+    const shiftElapsed = calcHours(shiftIn, shiftOut);
+    const isOTEligible = staffShift ? staffShift.overtimeEligible !== "No" : true;
+    
+    const overtime = (workingHours > shiftElapsed && isOTEligible) 
+      ? parseFloat((workingHours - shiftElapsed).toFixed(2)) 
+      : 0;
+
+    let earlyLeaving = 0;
+    try {
+      const [empOutH, empOutM] = checkoutTime.split(":").map(Number);
+      const [shOutH, shOutM] = shiftOut.split(":").map(Number);
+      const empOutMin = empOutH * 60 + empOutM;
+      const shOutMin = shOutH * 60 + shOutM;
+      if (empOutMin < shOutMin) {
+        earlyLeaving = shOutMin - empOutMin;
+      }
+    } catch (e) {}
 
     saveAttendance({
       ...myAttendanceRecord,
       records: [
         ...myAttendanceRecord.records.filter(r => r.date !== todayStr),
-        { ...todayAttendance, checkOut: checkoutTime, workingHours, overtime }
+        { 
+          ...todayAttendance, 
+          checkOut: checkoutTime, 
+          workingHours: parseFloat(netWorkingHours.toFixed(2)), 
+          overtime,
+          earlyLeaving
+        }
       ]
     });
-    toast.success(`Successfully checked out! worked: ${workingHours}h`);
+
+    addActivityLog({
+      id: `LOG-${Date.now()}`, dateTime: now.toISOString().replace("T", " ").slice(0, 19),
+      userName: currentUser.name, role: currentUser.role, company: currentUser.company, branch: currentUser.branch,
+      action: "Edited", module: "Attendance", oldValue: `Checked in at ${todayAttendance.checkIn}`, newValue: `Checked out at ${checkoutTime} (Worked: ${netWorkingHours.toFixed(2)}h, OT: ${overtime}h, Early Leave: ${earlyLeaving}m)`, ipAddress: "192.168.1.102"
+    });
+
+    toast.success(`Successfully checked out! Worked: ${netWorkingHours.toFixed(2)}h, OT: ${overtime}h`);
   };
 
   return (
