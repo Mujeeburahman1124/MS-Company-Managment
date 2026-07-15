@@ -1,61 +1,68 @@
-{{> header companyPrimaryColor="#2563eb" bannerBg="#eff6ff" bannerBorder="#dbeafe" bannerColor="#1d4ed8" bannerIcon="📥" bannerText="APPLICATION REGISTERED"}}
+{{> header companyPrimaryColor="#1e3a8a" bannerIcon="📝" bannerText="REGISTRATION REGISTERED"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #1e3a8a; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Application Received Successfully
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
+      Dear <strong>{{recipientName}}</strong>,<br/><br/>
+      Thank you for registering. Your application profile has been registered in our database. Below are your tracking details:
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
-      Dear {{recipientName}},<br/><br/>
-      Thank you for registering. Your application has been successfully submitted to our recruitment system. We are reviewing your profile, and our HR team will get in touch with you if your qualifications match our open roles.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <!-- Details Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #1e3a8a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            📝 Registration Summary
-          </td>
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">👤 Candidate Name</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{recipientName}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Tracking Code:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif; font-family: monospace;">{{#if trackingCode}}{{trackingCode}}{{else}}{{trackingNumber}}{{/if}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">🔑 Tracking Code</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #ea580c; padding: 10px 14px; border-bottom: 1px solid #e2e8f0; font-family: monospace; font-size: 13px;">{{trackingCode}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Registered Date:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{#if applicationDate}}{{applicationDate}}{{else}}{{currentDate}}{{/if}}</td>
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">📅 Application Date</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{applicationDate}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Positions Applied:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{#if applyingPositions}}{{applyingPositions}}{{else}}{{position}}{{/if}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">💼 Applying Position</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px;">{{applyingPositions}}</td>
         </tr>
       </table>
     </td>
   </tr>
+
+  <!-- Alert Callout -->
   <tr>
-    <td align="center" style="padding-bottom: 24px;">
-      <!-- CTA Button -->
-      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 16px;">
         <tr>
-          <td align="center" style="background-color: #2563eb; border-radius: 8px;">
-            <a href="{{website}}/apply?code={{#if trackingCode}}{{trackingCode}}{{else}}{{trackingNumber}}{{/if}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif;">
-              🔎 Track Application Status
-            </a>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">ℹ️</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; color: #1e40af; line-height: 1.5; font-weight: 500;">
+            You can monitor your real-time recruitment and visa status inside the candidate portal using your unique tracking code.
           </td>
         </tr>
       </table>
     </td>
   </tr>
+
+  <!-- Signoff -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      If you did not make this submission, please contact us immediately or ignore this email.
-      <br/><br/>
-      Best Regards,<br/>
-      <strong>The HR Recruiting Team</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">Registration Support Desk</strong>
+          </td>
+          <td align="right" style="vertical-align: bottom;">
+            <span style="font-family: 'Dancing Script', cursive; font-size: 28px; color: #1e3a8a;">Thank You!</span>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

@@ -1,58 +1,74 @@
-{{> header companyPrimaryColor="#10b981" bannerBg="#ecfdf5" bannerBorder="#d1fae5" bannerColor="#047857" bannerIcon="🚀" bannerText="JOINING CONFIRMATION"}}
+{{> header companyPrimaryColor="#10b981" bannerIcon="🚀" bannerText="JOINING CONFIRMATION"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #047857; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Joining Confirmation Notice
-    </td>
-  </tr>
-  <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
       Dear <strong>{{recipientName}}</strong>,<br/><br/>
-      We are delighted to confirm that your employment joining date has been officially scheduled. Please ensure you are present at the designated time and location on your joining day, with all required original documents.
+      We are pleased to confirm your upcoming joining details at <strong style="color: #1e3a8a;">{{employerName}}</strong>. Please find the work start specifications below:
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            📅 Joining Details
-          </td>
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">🏢 Employer</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{employerName}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Employee Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">💼 Position / Job</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{position}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Position:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{position}}</td>
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">📅 Joining Date</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{joiningDate}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Employer:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{employerName}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">🕒 Reporting Time</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{reportingTime}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Joining Date:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #047857; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{joiningDate}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Reporting Time:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #047857; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{reportingTime}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Reporting Location:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{reportingLocation}}</td>
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">📍 Reporting Location</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px;">{{reportingLocation}}</td>
         </tr>
       </table>
     </td>
   </tr>
+
+  <!-- Alert Callout -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      <strong>Required Documents:</strong> Original Passport, Emirates ID (if available), Medical Fitness Certificate, and copies of all educational/experience certificates.
-      <br/><br/>
-      Best Regards,<br/>
-      <strong>Onboarding &amp; HR Department</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 16px;">
+        <tr>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">📋</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; color: #15803d; line-height: 1.5; font-weight: 500;">
+            Please report on time at the specified reporting location. Dress code: Formal / Business attire. Bring original passport and copies of documents.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Signoff -->
+  <tr>
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            We wish you a wonderful first day at work!<br/><br/>
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">HR &amp; Placement Operations Hub</strong>
+          </td>
+          <td align="right" style="vertical-align: bottom;">
+            <span style="font-family: 'Dancing Script', cursive; font-size: 28px; color: #10b981;">Best Wishes!</span>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

@@ -1,78 +1,62 @@
-{{> header companyPrimaryColor="#0f766e" bannerBg="#f0fdfa" bannerBorder="#ccfbf1" bannerColor="#0f766e" bannerIcon="📝" bannerText="LABOUR CONTRACT STATUS UPDATE"}}
+{{> header companyPrimaryColor="#0d9488" bannerIcon="📜" bannerText="LABOUR CONTRACT UPDATE"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #0f766e; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      MoHRE Labour Contract Status Update
-    </td>
-  </tr>
-  <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
       Dear <strong>{{recipientName}}</strong>,<br/><br/>
-      We are writing to provide a status update on your official UAE Labour Contract registration with the Ministry of Human Resources and Emiratisation (MoHRE). Details are as follows:
+      This is a status update regarding the processing of your Ministry of Human Resources and Emiratisation (MOHRE) Labour Contract:
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td>
-      <!-- Status Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #0f766e; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            📋 Contract Details
-          </td>
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">👤 Employee Name</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{recipientName}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">📋 Contract Status</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #0d9488; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{labourContractStatus}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Registration Status:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #0d9488; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">
-            <span style="background-color: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; border: 1px solid #bae6fd;">{{#if status}}{{status}}{{else}}Under Review{{/if}}</span>
-          </td>
-        </tr>
-        {{#if workPermitNumber}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Work Permit Number:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif; font-family: monospace;">{{workPermitNumber}}</td>
-        </tr>
-        {{/if}}
-        {{#if actionRequired}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Action Required:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #e11d48; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{actionRequired}}</td>
-        </tr>
-        {{/if}}
-        {{#if notes}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Description / Remarks:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #334155; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{notes}}</td>
+        {{#if contractExpiryDate}}
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">📅 Contract Expiry</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px;">{{contractExpiryDate}}</td>
         </tr>
         {{/if}}
       </table>
     </td>
   </tr>
-  {{#if signingLink}}
+
+  <!-- Alert Callout -->
   <tr>
-    <td align="center" style="padding-bottom: 24px;">
-      <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdfa; border-left: 4px solid #0d9488; border-radius: 8px; padding: 16px;">
         <tr>
-          <td align="center" style="background-color: #0f766e; border-radius: 8px;">
-            <a href="{{signingLink}}" target="_blank" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif;">
-              ✍️ Sign Labour Contract Digitally
-            </a>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">ℹ️</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; color: #0f766e; line-height: 1.5; font-weight: 500;">
+            Notes: {{#if notes}}{{notes}}{{else}}The contract has been submitted for MOHRE approvals. We will coordinate with you if digital signature or biometric verification is requested.{{/if}}
           </td>
         </tr>
       </table>
     </td>
   </tr>
-  {{/if}}
+
+  <!-- Signoff -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      Please ensure you review all clauses of the labour contract carefully. If you have any questions or require modifications, report it to our HR advisor immediately.
-      <br/><br/>
-      Best Regards,<br/>
-      <strong>MoHRE Relations Operations</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">MOHRE Processing Officer</strong>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

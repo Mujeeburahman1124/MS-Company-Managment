@@ -1,71 +1,62 @@
-{{> header companyPrimaryColor="#0d9488" bannerBg="#f0fdfa" bannerBorder="#ccfbf1" bannerColor="#0f766e" bannerIcon="🆔" bannerText="EMIRATES ID STATUS UPDATE"}}
+{{> header companyPrimaryColor="#0d9488" bannerIcon="🪪" bannerText="EMIRATES ID UPDATE"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #0f766e; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Emirates ID Application Update
-    </td>
-  </tr>
-  <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
       Dear <strong>{{recipientName}}</strong>,<br/><br/>
-      We have received an update from the Federal Authority for Identity, Citizenship, Customs and Port Security (ICP) regarding your Emirates ID application. Below are the current details and instructions:
+      This is a status update regarding your UAE Emirates Identity Card application:
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td>
-      <!-- Status Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #0f766e; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            📋 Emirates ID Details
-          </td>
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">👤 Employee Name</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{recipientName}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">📋 Application Status</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #0d9488; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{emiratesIdStatus}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Current Stage:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #0d9488; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">
-            <span style="background-color: #ccfbf1; color: #115e59; padding: 2px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; border: 1px solid #99f6e4;">{{#if status}}{{status}}{{else}}Processing{{/if}}</span>
-          </td>
-        </tr>
-        {{#if applicationNumber}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Application Number:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif; font-family: monospace;">{{applicationNumber}}</td>
-        </tr>
-        {{/if}}
-        {{#if biometricsDateTime}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Biometrics Appointment:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{biometricsDateTime}}</td>
-        </tr>
-        {{/if}}
-        {{#if biometricsCenter}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Biometrics Center:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{biometricsCenter}}</td>
-        </tr>
-        {{/if}}
-        {{#if notes}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">Instructions / Notes:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #334155; padding: 8px 0; font-family: 'Inter', Arial, sans-serif;">{{notes}}</td>
+        {{#if emiratesIdExpiry}}
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">📅 ID Expiry Date</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px;">{{emiratesIdExpiry}}</td>
         </tr>
         {{/if}}
       </table>
     </td>
   </tr>
+
+  <!-- Alert Callout -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      <strong>Important Reminder:</strong> If biometrics schedule is mentioned above, you MUST attend in person carrying your original passport and printed registration receipt. Our PRO representative will meet you at the venue.
-      <br/><br/>
-      For query updates, please contact our helpline at {{companyPhone}}.
-      <br/><br/>
-      Best Regards,<br/>
-      <strong>Visa Operations Committee</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdfa; border-left: 4px solid #0d9488; border-radius: 8px; padding: 16px;">
+        <tr>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">ℹ️</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; color: #0f766e; line-height: 1.5; font-weight: 500;">
+            Notes: {{#if notes}}{{notes}}{{else}}No action is required from your side. We will notify you once the biometrics schedule is registered or the card is dispatched for collection.{{/if}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Signoff -->
+  <tr>
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">PRO Card Operations</strong>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

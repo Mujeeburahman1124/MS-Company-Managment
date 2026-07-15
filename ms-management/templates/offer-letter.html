@@ -1,74 +1,50 @@
-{{> header companyPrimaryColor="#10b981" bannerBg="#ecfdf5" bannerBorder="#d1fae5" bannerColor="#047857" bannerIcon="🎉" bannerText="OFFER LETTER"}}
+{{> header companyPrimaryColor="#10b981" bannerIcon="✉️" bannerText="JOB OFFER LETTER"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #047857; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Official Job Offer Letter
-    </td>
-  </tr>
-  <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
       Dear <strong>{{recipientName}}</strong>,<br/><br/>
-      We are delighted to extend this official job offer to you from <strong>{{companyName}}</strong>. After a thorough review of your qualifications and interviews, we are confident that you are an excellent fit for this role.
+      We are delighted to extend this official job offer to you from <strong style="color: #1e3a8a;">{{companyName}}</strong>. Below is a summary of your employment conditions:
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td>
-      <!-- Offer Summary Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            💼 Offer Summary
-          </td>
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">💼 Target Position</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{position}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Offered Position:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{position}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">💵 Monthly Salary</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #10b981; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">AED {{salary}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Basic Monthly Salary:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #047857; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">AED {{salary}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Joining Date:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{joiningDate}}</td>
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">📅 Joining Date</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{joiningDate}}</td>
         </tr>
         {{#if allowances}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Allowances & Benefits:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{allowances}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">🎁 Allowances &amp; Benefits</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px;">{{allowances}}</td>
         </tr>
         {{/if}}
       </table>
-
-      <!-- Company Card -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0; padding: 20px; margin-bottom: 24px;">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #047857; border-bottom: 1px solid #bbf7d0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            🏢 Recruiting Agency
-          </td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #064e3b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Company Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #065f46; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{companyName}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #064e3b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Office Address:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #065f46; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{companyAddress}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #064e3b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">HR Contact:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #065f46; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{companyPhone}} | {{companyEmail}}</td>
-        </tr>
-      </table>
     </td>
   </tr>
+
+  <!-- Action Button -->
   {{#if offerLetterLink}}
   <tr>
     <td align="center" style="padding-bottom: 24px;">
       <table border="0" cellpadding="0" cellspacing="0" style="display: inline-block;">
         <tr>
           <td align="center" style="background-color: #10b981; border-radius: 8px;">
-            <a href="{{offerLetterLink}}" target="_blank" style="display: inline-block; padding: 12px 28px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif;">
+            <a href="{{offerLetterLink}}" target="_blank" style="display: inline-block; padding: 12px 28px; color: #ffffff; text-decoration: none; font-size: 13.5px; font-weight: 700; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">
               ✍️ Accept &amp; Sign Offer Letter
             </a>
           </td>
@@ -77,14 +53,36 @@
     </td>
   </tr>
   {{/if}}
+
+  <!-- Alert Callout -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      We kindly request you to review the offer and confirm your acceptance within 3 working days. Please reach out if you have any queries.
-      <br/><br/>
-      Welcome to the team!<br/><br/>
-      Best Regards,<br/>
-      <strong>HR Onboarding Committee</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 16px;">
+        <tr>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">⚠️</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; color: #15803d; line-height: 1.5; font-weight: 500;">
+            Please review the terms and accept/sign the offer within 3 working days to reserve your position.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Signoff -->
+  <tr>
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            We look forward to welcoming you to our team.<br/><br/>
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">HR Onboarding Team</strong>
+          </td>
+          <td align="right" style="vertical-align: bottom;">
+            <span style="font-family: 'Dancing Script', cursive; font-size: 28px; color: #10b981;">Welcome!</span>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

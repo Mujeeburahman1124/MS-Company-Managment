@@ -1,133 +1,190 @@
-{{> header companyPrimaryColor="#7c3aed" bannerBg="#f5f3ff" bannerBorder="#ddd6fe" bannerColor="#6d28d9" bannerIcon="📅" bannerText="INTERVIEW INVITATION"}}
+{{> header companyPrimaryColor="#1e3a8a" bannerIcon="📅" bannerText="INTERVIEW INVITATION"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <!-- Title / Introduction -->
   <tr>
-    <td style="color: #6d28d9; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Official Interview & Assessment Invitation
-    </td>
-  </tr>
-  <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
       Dear <strong>{{recipientName}}</strong>,<br/><br/>
-      We are pleased to invite you for an interview session. Below are the complete specifications and requirements for your upcoming assessment sync:
+      We are pleased to invite you for an interview for the position of <strong style="color: #1e3a8a;">{{role}}</strong> with our client. Please find the interview details below.
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td>
-      <!-- Section 1: Candidate & Role Specs -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #7c3aed; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            👤 Candidate & Position Overview
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <!-- Row 1: Position -->
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            💼 Position
+          </td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{role}}
           </td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
-        </tr>
-        {{#if trackingCode}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Tracking ID:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif; font-family: monospace;">{{trackingCode}}</td>
-        </tr>
-        {{/if}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Target Position:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{role}}</td>
-        </tr>
-        {{#if clientName}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Client Company:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{clientName}}</td>
-        </tr>
-        {{/if}}
-      </table>
-
-      <!-- Section 2: Date, Time & Logistics -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #7c3aed; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            🗓️ Interview Schedule & Location Info
+        <!-- Row 2: Client Company -->
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            🏢 Client Company
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{#if clientCompany}}{{clientCompany}}{{else}}Client of MS{{/if}}
           </td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Session Date & Time:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{dateTime}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Interview Format:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{onlinePhysical}} ({{meetingMode}})</td>
-        </tr>
-        {{#if meetingLink}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Online Meeting Link:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #7c3aed; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{meetingLink}}" target="_blank" style="color: #7c3aed;">{{meetingLink}}</a></td>
-        </tr>
-        {{/if}}
-        {{#if officeAddress}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Office Address:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{officeAddress}}</td>
-        </tr>
-        {{/if}}
-        {{#if googleMapLink}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Location Map:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #7c3aed; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;"><a href="{{googleMapLink}}" target="_blank" style="color: #7c3aed;">Click for Google Maps direction</a></td>
-        </tr>
-        {{/if}}
-      </table>
-
-      <!-- Section 3: Professional Requirements -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #7c3aed; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            ⚠️ Guidelines & Prerequisites
+        <!-- Row 3: Date -->
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            📅 Interview Date
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{interviewDate}}
           </td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Dress Code:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{#if dressCode}}{{dressCode}}{{else}}Business Professional / Formal Attire{{/if}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Required Documents:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{#if requiredDocuments}}{{requiredDocuments}}{{else}}Updated CV, Passport Copy, Emirates ID (if applicable){{/if}}</td>
-        </tr>
-        {{#if notes}}
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Special Instructions:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #b91c1c; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{notes}}</td>
-        </tr>
-        {{/if}}
-      </table>
-
-      <!-- Section 4: Conductor & Coordinator Contacts -->
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #7c3aed; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            🤝 Contacts & Coordinator Info
+        <!-- Row 4: Time -->
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            🕒 Interview Time
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{interviewTime}}
           </td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Interview Conducted By:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{conductPersonName}}</td>
+        <!-- Row 5: Location -->
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            📍 Interview Location
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e3a8a; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{#if meetingLink}}
+              <a href="{{meetingLink}}" target="_blank" style="color: #1e3a8a; text-decoration: underline;">Join Online Interview (Zoom/Meet)</a>
+            {{else if googleMapLink}}
+              <a href="{{googleMapLink}}" target="_blank" style="color: #1e3a8a; text-decoration: underline;">{{interviewLocation}} (Google Maps)</a>
+            {{else}}
+              {{interviewLocation}}
+            {{/if}}
+          </td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Assigned HR / Recruiter:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{#if consultantName}}{{consultantName}}{{else}}{{companyName}} Recruitment Team{{/if}}</td>
+        <!-- Row 6: Type -->
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            👥 Interview Type
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{onlinePhysical}} ({{meetingMode}})
+          </td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Recruiter Contact:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{#if consultantContact}}{{consultantContact}}{{else}}{{companyPhone}} | {{companyEmail}}{{/if}}</td>
+        <!-- Row 7: Contact Person -->
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            👤 Contact Person
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{conductPersonName}}
+          </td>
+        </tr>
+        <!-- Row 8: Contact Number -->
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            📞 Contact Number
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #1e293b; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">
+            {{companyPhone}}
+          </td>
+        </tr>
+        <!-- Row 9: Instructions -->
+        <tr style="background-color: #ffffff;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">
+            ℹ️ Instructions
+          </td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px;">
+            {{#if notes}}{{notes}}{{else}}Please bring your original passport, updated CV, and all relevant documents. Dress code: Formal{{/if}}
+          </td>
         </tr>
       </table>
     </td>
   </tr>
+
+  <!-- Alert Box Callout -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      We look forward to speaking with you. Please reply to this email to confirm your attendance availability.<br/><br/>
-      Best Regards,<br/>
-      <strong>Recruitment Operations Committee</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 16px;">
+        <tr>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">🔔</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; color: #1e40af; line-height: 1.5; font-weight: 500;">
+            If you are unable to attend the interview on the above date and time, please inform us as soon as possible.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Signoff & Cursive Handwriting "Thank You!" -->
+  <tr>
+    <td style="padding-bottom: 24px; position: relative;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            We look forward to meeting you.<br/><br/>
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">{{companyName}} Team</strong>
+          </td>
+          <td align="right" style="vertical-align: bottom; padding-bottom: 4px;">
+            <span style="font-family: 'Dancing Script', cursive; font-size: 28px; color: #1e3a8a; display: inline-block;">Thank You!</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Simulated Attachments Section -->
+  <tr>
+    <td style="border-top: 1px solid #f1f5f9; padding-top: 20px;">
+      <div style="font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: bold; color: #475569; margin-bottom: 10px;">Attachments (3)</div>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="width: 32%; padding-right: 8px;">
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; width: 100%;">
+              <tr>
+                <td style="font-size: 16px; width: 24px; vertical-align: middle;">🗺️</td>
+                <td style="font-family: 'Inter', sans-serif; font-size: 10px; line-height: 1.2;">
+                  <strong style="color: #334155; display: block; font-size: 10.5px;">Location Map.pdf</strong>
+                  <span style="color: #94a3b8; font-size: 8.5px;">245 KB</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td style="width: 32%; padding-right: 8px;">
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; width: 100%;">
+              <tr>
+                <td style="font-size: 16px; width: 24px; vertical-align: middle;">📄</td>
+                <td style="font-family: 'Inter', sans-serif; font-size: 10px; line-height: 1.2;">
+                  <strong style="color: #334155; display: block; font-size: 10.5px;">Company Profile.pdf</strong>
+                  <span style="color: #94a3b8; font-size: 8.5px;">512 KB</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td style="width: 32%;">
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; width: 100%;">
+              <tr>
+                <td style="font-size: 16px; width: 24px; vertical-align: middle;">💼</td>
+                <td style="font-family: 'Inter', sans-serif; font-size: 10px; line-height: 1.2;">
+                  <strong style="color: #334155; display: block; font-size: 10.5px;">Job Description.pdf</strong>
+                  <span style="color: #94a3b8; font-size: 8.5px;">189 KB</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>

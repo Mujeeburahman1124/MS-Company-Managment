@@ -1,48 +1,58 @@
-{{> header companyPrimaryColor="#ef4444" bannerBg="#fef2f2" bannerBorder="#fee2e2" bannerColor="#b91c1c" bannerIcon="❌" bannerText="INTERVIEW REJECTED"}}
+{{> header companyPrimaryColor="#ef4444" bannerIcon="❌" bannerText="APPLICATION UPDATE"}}
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr>
-    <td style="color: #b91c1c; font-size: 18px; font-weight: 700; padding-bottom: 12px; font-family: 'Outfit', Arial, sans-serif;">
-      Assessment Result Update
-    </td>
-  </tr>
-  <tr>
-    <td style="color: #334155; font-size: 14px; line-height: 1.6; padding-bottom: 24px; font-family: 'Inter', Arial, sans-serif;">
+    <td style="color: #334155; font-size: 13.5px; line-height: 1.6; padding-bottom: 16px; font-family: 'Inter', Arial, sans-serif;">
       Dear <strong>{{recipientName}}</strong>,<br/><br/>
-      Thank you for attending your recent interview with <strong>{{companyName}}</strong>. After careful review by our hiring team, we regret to inform you that we have decided not to move forward with your application for the position of <strong>{{role}}</strong>.
+      Thank you for attending your recent interview with <strong style="color: #1e3a8a;">{{companyName}}</strong>. We appreciate the opportunity to discuss your qualifications. 
+      <br/><br/>
+      After careful review by our hiring panel, we regret to inform you that we have decided not to move forward with your application for the position of <strong>{{role}}</strong> at this time.
     </td>
   </tr>
+
+  <!-- Details Table -->
   <tr>
-    <td>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-        <tr>
-          <td colspan="2" style="font-size: 13px; font-weight: bold; color: #b91c1c; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-transform: uppercase; font-family: 'Outfit', Arial, sans-serif;">
-            📋 Application Reference
-          </td>
+    <td style="padding-bottom: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #e2e8f0; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <tr style="background-color: #ffffff;">
+          <td style="width: 32%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">💼 Position</td>
+          <td style="width: 3%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">:</td>
+          <td style="width: 65%; font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #334155; padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">{{role}}</td>
         </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; width: 40%; font-family: 'Inter', Arial, sans-serif;">Candidate Name:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{recipientName}}</td>
+        <tr style="background-color: #f8fafc;">
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #475569; padding: 10px 14px;">📋 Status</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #94a3b8; padding: 10px 0;">:</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; font-weight: bold; color: #ef4444; padding: 10px 14px;">Not Selected</td>
         </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Alert Callout -->
+  <tr>
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-left: 4px solid #94a3b8; border-radius: 8px; padding: 16px;">
         <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Position:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #1e293b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">{{role}}</td>
-        </tr>
-        <tr>
-          <td style="font-size: 12px; color: #64748b; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">Assessment Decision:</td>
-          <td style="font-size: 12px; font-weight: bold; color: #ef4444; padding: 6px 0; font-family: 'Inter', Arial, sans-serif;">
-            <span style="background-color: #fef2f2; color: #991b1b; padding: 2px 8px; border-radius: 6px; font-size: 11px; text-transform: uppercase; border: 1px solid #fecaca;">Not Selected</span>
+          <td style="font-size: 20px; width: 32px; vertical-align: top; padding-top: 2px;">ℹ️</td>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #64748b; line-height: 1.5;">
+            We will retain your resume in our talent pool for future vacancies matching your profile and skills.
           </td>
         </tr>
       </table>
     </td>
   </tr>
+
+  <!-- Signoff -->
   <tr>
-    <td style="color: #64748b; font-size: 13px; line-height: 1.6; font-family: 'Inter', Arial, sans-serif; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-      We appreciate your time and wish you every success in your future endeavors. We will retain your profile for consideration in upcoming opportunities.
-      <br/><br/>
-      Best Regards,<br/>
-      <strong>Recruitment Evaluation Team</strong><br/>
-      {{companyName}}
+    <td style="padding-bottom: 24px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #475569; line-height: 1.6;">
+            We wish you success in your future job search and professional career.<br/><br/>
+            Best Regards,<br/>
+            <strong style="color: #1e3a8a;">Hiring Evaluation Panel</strong>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>
