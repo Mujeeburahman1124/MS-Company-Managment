@@ -17,7 +17,10 @@ export async function GET() {
 
     // Staff see only their own payroll logs
     if (user.role === "Staff") {
-      filter["staffId"] = user.id;
+      const staffMember = await prisma.staff.findFirst({
+        where: { email: user.email }
+      });
+      filter["staffId"] = staffMember ? staffMember.id : "NO_LINKED_STAFF";
     }
 
     const records = await prisma.payrollRecord.findMany({

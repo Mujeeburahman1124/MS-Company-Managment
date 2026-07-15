@@ -39,6 +39,20 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    // Prevent editing financial details of already approved or paid payroll
+    if (existing.status === "Approved" || existing.status === "Paid") {
+      const isStatusOnlyUpdate = data.status !== undefined && 
+                                 data.basicSalary === undefined && 
+                                 data.allowances === undefined && 
+                                 data.deductions === undefined && 
+                                 data.overtimeHours === undefined && 
+                                 data.overtime === undefined;
+      
+      if (!isStatusOnlyUpdate && !(await hasPermissionBackend(user, "payroll", "approve"))) {
+        return NextResponse.json({ error: "Forbidden: Cannot modify details of approved or paid payroll without approval permission" }, { status: 403 });
+      }
+    }
+
     const updated = await prisma.payrollRecord.update({
       where: { id },
       data: {

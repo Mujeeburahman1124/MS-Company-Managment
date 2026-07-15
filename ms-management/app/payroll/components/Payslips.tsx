@@ -15,9 +15,10 @@ import { toast } from "sonner";
 import { PayrollRecord } from "@/lib/types";
 
 export default function Payslips() {
-  const { currentRole, currentUser, payroll, updatePayroll, addActivityLog, siteSettings } = useAuthStore();
+  const { currentRole, currentUser, payroll, updatePayroll, addActivityLog, siteSettings, staff } = useAuthStore();
   const { filters } = useFilterStore();
   const [viewPayslip, setViewPayslip] = useState<PayrollRecord | null>(null);
+  const linkedStaff = staff.find(s => s.id === viewPayslip?.staffId);
   
   const f = filters.payroll;
   let list = payroll.filter(p => p.status === "Approved" || p.status === "Paid");
@@ -47,6 +48,7 @@ export default function Payslips() {
   };
 
   const getPayslipHtml = (p: PayrollRecord, forPrint = true) => {
+    const linkedStaff = staff.find(s => s.id === p.staffId);
     const allowancesHtml = (() => {
       const details = Array.isArray(p.allowanceDetails)
         ? p.allowanceDetails
@@ -126,6 +128,11 @@ export default function Payslips() {
               <div class="name">${p.staffName}</div>
               <div class="meta">${p.position}</div>
               <div class="meta">ID: ${p.staffId}</div>
+              ${linkedStaff?.email ? `<div class="meta">Email: ${linkedStaff.email}</div>` : ""}
+              ${linkedStaff?.mobile ? `<div class="meta">Mobile: ${linkedStaff.mobile}</div>` : ""}
+              ${linkedStaff?.emiratesId ? `<div class="meta">Emirates ID: ${linkedStaff.emiratesId}</div>` : ""}
+              ${linkedStaff?.joiningDate ? `<div class="meta">Joining Date: ${linkedStaff.joiningDate}</div>` : ""}
+              ${linkedStaff?.nationality ? `<div class="meta">Nationality: ${linkedStaff.nationality}</div>` : ""}
             </div>
             <div class="details-block" style="text-align: right;">
               <h4>Payment details</h4>
@@ -287,6 +294,15 @@ export default function Payslips() {
                     <div className="text-sm font-bold text-slate-800">{viewPayslip.staffName}</div>
                     <div className="text-xs text-slate-600">{viewPayslip.position}</div>
                     <div className="text-xs text-slate-500 mt-1">ID: {viewPayslip.staffId}</div>
+                    {linkedStaff && (
+                      <div className="text-[10px] text-slate-500 mt-2 space-y-0.5 border-t border-slate-200/50 pt-1.5">
+                        {linkedStaff.email && <div>Email: <span className="font-semibold text-slate-700">{linkedStaff.email}</span></div>}
+                        {linkedStaff.mobile && <div>Mobile: <span className="font-semibold text-slate-700">{linkedStaff.mobile}</span></div>}
+                        {linkedStaff.emiratesId && <div>Emirates ID: <span className="font-semibold text-slate-700">{linkedStaff.emiratesId}</span></div>}
+                        {linkedStaff.joiningDate && <div>Joining Date: <span className="font-semibold text-slate-700">{linkedStaff.joiningDate}</span></div>}
+                        {linkedStaff.nationality && <div>Nationality: <span className="font-semibold text-slate-700">{linkedStaff.nationality}</span></div>}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Payment Details</div>

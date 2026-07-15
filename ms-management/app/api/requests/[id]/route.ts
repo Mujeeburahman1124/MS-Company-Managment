@@ -32,7 +32,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // Authorization: Staff can only edit/cancel their own request while it is Pending.
     // Managers/Admins can update status, reply, and reject reasons.
-    const isOwner = existing.staffId === user.id;
+    const staffMember = await prisma.staff.findFirst({
+      where: { email: user.email }
+    });
+    const staffId = staffMember ? staffMember.id : user.id;
+    const isOwner = existing.staffId === staffId;
     const isStaff = user.role === "Staff";
 
     if (isStaff && !isOwner) {
@@ -227,7 +231,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     }
 
     // Only managers/admins of the same company (or Super Admin) can delete requests, or the owner if Pending
-    const isOwner = existing.staffId === user.id;
+    const staffMember = await prisma.staff.findFirst({
+      where: { email: user.email }
+    });
+    const staffId = staffMember ? staffMember.id : user.id;
+    const isOwner = existing.staffId === staffId;
     const isStaff = user.role === "Staff";
 
     if (isStaff) {

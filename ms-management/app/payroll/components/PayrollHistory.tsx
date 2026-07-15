@@ -14,12 +14,13 @@ import { toast } from "sonner";
 import { PayrollRecord } from "@/lib/types";
 
 export default function PayrollHistory() {
-  const { activityLogs, currentRole, currentUser, payroll, updatePayroll, addActivityLog } = useAuthStore();
+  const { activityLogs, currentRole, currentUser, payroll, updatePayroll, addActivityLog, staff } = useAuthStore();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [monthFilter, setMonthFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [viewPayslip, setViewPayslip] = useState<PayrollRecord | null>(null);
+  const linkedStaff = staff.find(s => s.id === viewPayslip?.staffId);
   const [showLogs, setShowLogs] = useState(false);
 
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -126,7 +127,8 @@ export default function PayrollHistory() {
     toast.success("Payroll history downloaded successfully as CSV");
   };
 
-  const getPayslipHtml = (p: PayrollRecord) => {
+  const getPayslipHtml = (p: PayrollRecord, forPrint = true) => {
+    const linkedStaff = staff.find(s => s.id === p.staffId);
     const allowancesHtml = (() => {
       const details = Array.isArray(p.allowanceDetails)
         ? p.allowanceDetails
@@ -206,6 +208,11 @@ export default function PayrollHistory() {
               <div class="name">${p.staffName}</div>
               <div class="meta">${p.position}</div>
               <div class="meta">ID: ${p.staffId}</div>
+              ${linkedStaff?.email ? `<div class="meta">Email: ${linkedStaff.email}</div>` : ""}
+              ${linkedStaff?.mobile ? `<div class="meta">Mobile: ${linkedStaff.mobile}</div>` : ""}
+              ${linkedStaff?.emiratesId ? `<div class="meta">Emirates ID: ${linkedStaff.emiratesId}</div>` : ""}
+              ${linkedStaff?.joiningDate ? `<div class="meta">Joining Date: ${linkedStaff.joiningDate}</div>` : ""}
+              ${linkedStaff?.nationality ? `<div class="meta">Nationality: ${linkedStaff.nationality}</div>` : ""}
             </div>
             <div class="details-block" style="text-align: right;">
               <h4>Payment details</h4>
@@ -231,6 +238,18 @@ export default function PayrollHistory() {
           <div class="footer-note">
             This is a computer generated payslip and does not require a physical signature.
           </div>
+          ${
+            forPrint
+              ? `
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+          `
+              : ""
+          }
         </body>
       </html>
     `;
@@ -242,15 +261,12 @@ export default function PayrollHistory() {
       toast.error("Popup blocker prevented opening the print window.");
       return;
     }
-    printWindow.document.write(getPayslipHtml(p));
+    printWindow.document.write(getPayslipHtml(p, true));
     printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
   };
 
   const handleDownloadPayslip = (p: PayrollRecord) => {
-    const html = getPayslipHtml(p);
+    const html = getPayslipHtml(p, false);
     const blob = new Blob([html], { type: "text/html;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -544,6 +560,15 @@ export default function PayrollHistory() {
                     <div className="text-sm font-bold text-slate-800">{viewPayslip.staffName}</div>
                     <div className="text-xs text-slate-600">{viewPayslip.position}</div>
                     <div className="text-xs text-slate-500 mt-1">ID: {viewPayslip.staffId}</div>
+                    {linkedStaff && (
+                      <div className="text-[10px] text-slate-500 mt-2 space-y-0.5 border-t border-slate-200/50 pt-1.5">
+                        {linkedStaff.email && <div>Email: <span className="font-semibold text-slate-700">{linkedStaff.email}</span></div>}
+                        {linkedStaff.mobile && <div>Mobile: <span className="font-semibold text-slate-700">{linkedStaff.mobile}</span></div>}
+                        {linkedStaff.emiratesId && <div>Emirates ID: <span className="font-semibold text-slate-700">{linkedStaff.emiratesId}</span></div>}
+                        {linkedStaff.joiningDate && <div>Joining Date: <span className="font-semibold text-slate-700">{linkedStaff.joiningDate}</span></div>}
+                        {linkedStaff.nationality && <div>Nationality: <span className="font-semibold text-slate-700">{linkedStaff.nationality}</span></div>}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Payment Details</div>

@@ -12,7 +12,10 @@ export async function GET() {
     const filter = getTenantScopeFilter(user, "company", "branch");
 
     if (user.role === "Staff") {
-      filter["staffId"] = user.id;
+      const staffMember = await prisma.staff.findFirst({
+        where: { email: user.email }
+      });
+      filter["staffId"] = staffMember ? staffMember.id : "NO_LINKED_STAFF";
     }
 
     const requests = await prisma.overtimeRequest.findMany({
