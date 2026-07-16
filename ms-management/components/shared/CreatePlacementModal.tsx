@@ -24,7 +24,7 @@ export default function CreatePlacementModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     clientTradeLicense: "", clientAddress: "", clientCountry: "", clientContactPerson: "", clientContactNumber: "", clientEmail: "", clientLogo: "",
-    companyName: "", position: applicant?.applyingPositions?.[0] || "", department: "", workLocation: "", city: "", joiningDate: "", contractDuration: "", probationPeriod: "", workingHours: "", weeklyOff: "", shiftDetails: "",
+    companyName: "", position: applicant?.applyingPositions?.[0] || "", department: "", workLocation: "", city: "", joiningDate: "", contractDuration: "", probationPeriod: "", workingHours: "", weeklyOff: "",
     salary: "", currency: "AED", paymentFrequency: "Monthly", foodAllowance: "", accommodation: "", transportation: "", overtime: "", medicalInsurance: "", airTicket: "", annualLeave: "", otherBenefits: "",
     visaStatus: "", placementVisaType: "", visaNumber: "", visaExpiryDate: "", visaProcessingStage: "", medicalStatus: "", emiratesIdStatus: "", labourContractStatus: "", joiningStatus: "",
     registrationFee: 0, placementFee: 0, paymentStatus: "Unpaid", paymentMethod: "", receiptNumber: "", dueAmount: 0, paidAmount: 0,
@@ -177,20 +177,7 @@ export default function CreatePlacementModal({
                 <Label className="text-[10px] font-bold text-slate-500 uppercase">Weekly Off</Label>
                 <Input name="weeklyOff" value={formData.weeklyOff} placeholder="e.g. 1 Day (Friday)" onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" />
               </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500 uppercase">Shift Timing</Label>
-                <select 
-                  name="shiftDetails" 
-                  value={formData.shiftDetails} 
-                  onChange={handleChange} 
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs h-10 px-3 outline-none focus:bg-white focus:border-blue-400 transition-all font-semibold text-slate-700"
-                >
-                  <option value="">Select Shift</option>
-                  <option value="Morning Shift (07:30 AM - 05:30 PM Dubai / 09:00 AM - 07:00 PM Sri Lanka)">Morning Shift (07:30 AM - 05:30 PM Dubai / 09:00 AM - 07:00 PM Sri Lanka)</option>
-                  <option value="Morning Shift (08:30 AM - 06:30 PM Dubai / 10:00 AM - 08:00 PM Sri Lanka)">Morning Shift (08:30 AM - 06:30 PM Dubai / 10:00 AM - 08:00 PM Sri Lanka)</option>
-                  <option value="Night Shift (05:00 PM - 02:00 AM Dubai / 06:30 PM - 03:30 AM Sri Lanka)">Night Shift (05:00 PM - 02:00 AM Dubai / 06:30 PM - 03:30 AM Sri Lanka)</option>
-                </select>
-              </div>
+
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold text-slate-500 uppercase">Placement Date *</Label>
                 <Input name="placementDate" type="date" value={formData.placementDate} onChange={handleChange} className="bg-slate-50 border-slate-200 rounded-xl text-xs h-10" required />

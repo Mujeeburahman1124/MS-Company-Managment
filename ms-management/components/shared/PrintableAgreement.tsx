@@ -337,9 +337,8 @@ function buildAgreementHtml(placement: Placement, terms: any[], settings: any): 
         ${infoRow("Joining Date", placement.joiningDate ? new Date(placement.joiningDate).toLocaleDateString("en-GB") : "—")}
         ${infoRow("Contract Duration", (placement as any).contractDuration)}
         ${infoRow("Probation Period", (placement as any).probationPeriod)}
-        ${infoRow("Working Hours / Days", (placement as any).workingHours)}
+        ${infoRow("Working Hours", (placement as any).workingHours)}
         ${infoRow("Weekly Off", (placement as any).weeklyOff)}
-        ${infoRow("Shift Timing", (placement as any).shiftDetails)}
       </div>
     </div>
 
