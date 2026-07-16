@@ -168,6 +168,16 @@ export async function sendEmail({
     }
   }
 
+  let companyLicense = "";
+  try {
+    const settings = await prisma.siteSettings.findFirst();
+    if (settings && settings.companyLicense) {
+      companyLicense = settings.companyLicense;
+    }
+  } catch (settingsErr) {
+    console.error("Error loading site settings companyLicense inside sendEmail:", settingsErr);
+  }
+
   // Register partials/helpers once
   registerPartials();
 
@@ -375,6 +385,7 @@ export async function sendEmail({
       companyEmail,
       companyPhone,
       companyAddress,
+      companyLicense,
       logoText,
       companyLogo: companyLogo || "",
       website: `https://${(companyEmail.match(/@(.+)$/)||["","msjobs.net"])[1]}`,
