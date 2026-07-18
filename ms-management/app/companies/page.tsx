@@ -49,7 +49,7 @@ export default function CompaniesPage() {
     name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [],
     tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active",
     separateDatabase: true, databaseStatus: "Ready",
-    branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "",
+    brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "",
     themeConfig: null
   });
 
@@ -157,7 +157,7 @@ export default function CompaniesPage() {
       toast.success(`Company "${form.name}" created`);
     }
     setAddModal(false); setEditCompany(null); setLogoPreview(null);
-    setForm({ name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [], tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active", separateDatabase: true, databaseStatus: "Ready", branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "", themeConfig: null });
+    setForm({ name: "", telephone: "", hrMobile: "", ownerMobile: "", whatsapp: "", email: "", address: "", notes: "", googleMapLink: "", logo: null, documents: [], tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active", separateDatabase: true, databaseStatus: "Ready", brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "", themeConfig: null });
   };
 
   const openEdit = (c: any) => {
@@ -190,7 +190,6 @@ export default function CompaniesPage() {
       name: c.name, telephone: c.telephone, hrMobile: c.hrMobile, ownerMobile: c.ownerMobile, whatsapp: c.whatsapp, email: c.email, address: c.address, notes: c.notes || "", googleMapLink: c.googleMapLink || "", logo: c.logo || null, documents: c.documents || [],
       tradeLicenseNumber: c.tradeLicenseNumber || "", licenseIssueDate: c.licenseIssueDate || "", licenseExpiryDate: c.licenseExpiryDate || "", companyType: c.companyType || "", ownerName: c.ownerName || "", emirateLocation: c.emirateLocation || "", trnNumber: c.trnNumber || "", status: c.status || "Active",
       separateDatabase: c.separateDatabase !== false, databaseStatus: c.databaseStatus || (c.separateDatabase !== false ? "Ready" : "Not Provisioned"),
-      branchLogo: c.branchLogo || null, coverImage: c.coverImage || null, profileImage: c.profileImage || null,
       brandColor: c.brandColor || "#1e293b", secondaryColor: c.secondaryColor || "#3b82f6", website: c.website || "", description: c.description || "",
       themeConfig: tc
     });
@@ -228,7 +227,7 @@ export default function CompaniesPage() {
   return (
     <div className="flex flex-col select-none">
       <PageHeader title="Client Company Management" subtitle="Manage all registered client companies and their settings"
-        actions={<Button onClick={() => { setEditCompany(null); setLogoPreview(null); setForm({ name:"",telephone:"",hrMobile:"",ownerMobile:"",whatsapp:"",email:"",address:"",notes:"",googleMapLink:"",logo:null,documents:[], tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active", separateDatabase: true, databaseStatus: "Ready", branchLogo: null, coverImage: null, profileImage: null, brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "" }); setAddModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>Add Client Company</Button>}
+        actions={<Button onClick={() => { setEditCompany(null); setLogoPreview(null); setForm({ name:"",telephone:"",hrMobile:"",ownerMobile:"",whatsapp:"",email:"",address:"",notes:"",googleMapLink:"",logo:null,documents:[], tradeLicenseNumber: "", licenseIssueDate: "", licenseExpiryDate: "", companyType: "", ownerName: "", emirateLocation: "", trnNumber: "", status: "Active", separateDatabase: true, databaseStatus: "Ready", brandColor: "#1e293b", secondaryColor: "#3b82f6", website: "", description: "", themeConfig: null }); setAddModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 gap-1.5"><Plus className="w-4 h-4"/>Add Client Company</Button>}
       />
  
       {/* Stats Cards Dashboard Summary */}

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -8,12 +8,12 @@ type RouteParams = {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
     const data = await request.json();
 
     const existing = await prisma.placement.findUnique({
@@ -22,6 +22,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Placement not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "placement", "edit", existing))) {
+      await createAuditLog(user, "Status Changed", "placement", null, `Unauthorized attempt to edit placement agreement ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check
@@ -158,12 +163,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { id } = await params;
 
     const existing = await prisma.placement.findUnique({
       where: { id }
@@ -171,6 +175,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Placement not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "placement", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "placement", null, `Unauthorized attempt to delete placement agreement ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check

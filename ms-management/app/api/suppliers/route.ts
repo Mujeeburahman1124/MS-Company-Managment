@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const filter = getTenantScopeFilter(user, "company");
+    const filter = await getPermissionScopedFilter(user, "suppliers", "view", "company");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "suppliers", null, "Unauthorized attempt to view suppliers", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     const suppliers = await prisma.supplier.findMany({
       where: filter,
@@ -28,6 +32,11 @@ export async function POST(request: Request) {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "suppliers", "create"))) {
+      await createAuditLog(user, "Status Changed", "suppliers", null, "Unauthorized attempt to create supplier", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

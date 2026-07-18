@@ -12,6 +12,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import EmptyState from "@/components/shared/EmptyState";
 import FilterBar from "@/components/shared/FilterBar";
 import DocumentUploader from "@/components/shared/DocumentUploader";
+import AccessDenied from "@/components/shared/AccessDenied";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,12 @@ export default function DocumentsPage() {
     currentRole, currentUser, applicants, staff, suppliers, vehicles, companies,
     updateApplicant, updateStaff, updateSupplier, updateVehicle, updateCompany, addActivityLog, hasPermission 
   } = useAuthStore();
+
+  const canView = currentRole === "Super Admin" || hasPermission("documents", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
+
   const { filters, setFilter } = useFilterStore();
   
   const [activeTab, setActiveTab] = useState<"all" | "applicants" | "staff" | "suppliers" | "companies" | "vehicles">("all");

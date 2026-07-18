@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
@@ -22,9 +22,11 @@ export async function GET() {
       return NextResponse.json(companies);
     }
 
-    // Apply tenancy scoping
-    // For Companies list, Company Admin/Branch Admin should see only their own company, Super Admin sees all.
-    const filter = getTenantScopeFilter(user, "name");
+    const filter = await getPermissionScopedFilter(user, "companies", "view", "name");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "companies", null, "Unauthorized attempt to view companies", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     const companies = await prisma.company.findMany({
       where: filter,
@@ -45,9 +47,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only Super Admin can create client companies
-    if (user.role !== "Super Admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasPermissionBackend(user, "companies", "create"))) {
+      await createAuditLog(user, "Status Changed", "companies", null, "Unauthorized attempt to create company", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

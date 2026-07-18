@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 import { sendEmail, sendWhatsApp, generateEmailContent } from "@/lib/notifications";
 
 type RouteParams = {
@@ -9,12 +9,12 @@ type RouteParams = {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
     const data = await request.json();
 
     const existing = await prisma.applicant.findUnique({
@@ -23,6 +23,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "applicants", "edit", existing))) {
+      await createAuditLog(user, "Status Changed", "applicants", null, `Unauthorized attempt to edit applicant ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check
@@ -379,12 +384,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { id } = await params;
 
     const existing = await prisma.applicant.findUnique({
       where: { id }
@@ -392,6 +396,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "applicants", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "applicants", null, `Unauthorized attempt to delete applicant ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check

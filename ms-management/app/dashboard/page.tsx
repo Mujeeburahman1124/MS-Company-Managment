@@ -1551,7 +1551,7 @@ function AttendanceWidget({ currentUser, now, staffAttendance, saveAttendance, a
     const shiftIn = staffShift ? (staffShift.clockIn || staffShift.startTime || "09:00") : "09:00";
     const grace = staffShift ? (staffShift.gracePeriod || 0) : 15;
     
-    let status = "Present" as const;
+    let status: "Present" | "Late" | "Absent" | "Leave" | "Half Day" = "Present";
     let lateArrival = 0;
     try {
       const [empInH, empInM] = checkInTime.split(":").map(Number);

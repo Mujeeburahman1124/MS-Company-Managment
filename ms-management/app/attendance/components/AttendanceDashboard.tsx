@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { AttendanceWidget } from "@/components/dashboard/attendance-widget";
 
 export default function AttendanceDashboard() {
-  const { currentRole, currentUser, staff, staffAttendance } = useAuthStore();
+  const { currentRole, currentUser, staff, staffAttendance, hasPermission } = useAuthStore();
   const today = new Date().toISOString().slice(0, 10);
 
   const isSuperAdmin = currentRole === "Super Admin";
@@ -15,13 +15,8 @@ export default function AttendanceDashboard() {
   const allowedStaff = (isSuperAdmin || isSystemUser) ? staff : staff.filter(s => s.company === currentUser.company);
 
   const isAdmin = isSuperAdmin || 
-                  currentRole === "Company Admin" || 
-                  currentRole === "Branch Admin" || 
-                  currentRole === "HR Manager" || 
-                  currentRole === "Admin" || 
-                  currentRole === "HR" ||
-                  currentRole === "Recruiter" ||
-                  currentRole === "Accountant";
+                  hasPermission("attendance", "edit") || 
+                  hasPermission("attendance", "create");
 
   if (!isAdmin) {
     return (

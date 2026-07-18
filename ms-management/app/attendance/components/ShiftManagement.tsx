@@ -91,7 +91,7 @@ export default function ShiftManagement() {
           role: currentUser.role,
           company: currentUser.company,
           branch: currentUser.branch,
-          action: "Shift Updated",
+          action: "Edited",
           module: "Shift",
           oldValue: oldShift ? `${oldShift.name} (${oldShift.startTime}-${oldShift.endTime})` : "",
           newValue: `${form.name} (${form.startTime}-${form.endTime})`,
@@ -120,7 +120,7 @@ export default function ShiftManagement() {
           role: currentUser.role,
           company: currentUser.company,
           branch: currentUser.branch,
-          action: "Shift Created",
+          action: "Created",
           module: "Shift",
           oldValue: "",
           newValue: `${form.name} (${form.startTime}-${form.endTime})`,
@@ -151,7 +151,7 @@ export default function ShiftManagement() {
         role: currentUser.role,
         company: currentUser.company,
         branch: currentUser.branch,
-        action: "Shift Deleted",
+        action: "Deleted",
         module: "Shift",
         oldValue: targetShift ? targetShift.name : "",
         newValue: "Deleted",
@@ -323,8 +323,8 @@ export default function ShiftManagement() {
                           <div>
                             <span className={cn(
                               "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white text-white",
-                              log.action === "Shift Created" ? "bg-emerald-500" :
-                              log.action === "Shift Deleted" ? "bg-rose-500" : "bg-blue-500"
+                              log.action === "Created" ? "bg-emerald-500" :
+                              log.action === "Deleted" ? "bg-rose-500" : "bg-blue-500"
                             )}>
                               <Clock className="w-4 h-4" />
                             </span>

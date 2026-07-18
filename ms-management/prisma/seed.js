@@ -64,41 +64,77 @@ async function main() {
   const readOnlyPerms = {};
 
   modules.forEach(m => {
-    fullAccessPerms[m] = { view: true, create: true, edit: true, delete: true };
+    fullAccessPerms[m] = { 
+      view: true, viewAll: true, create: true, edit: true, editAll: true, delete: true, deleteAll: true, 
+      approve: true, reject: true, export: true, print: true, download: true, upload: true 
+    };
     
-    // For standard staff, mostly view their own, no delete
-    if (["Tasks", "Leave Requests", "Staff Requests", "Attendance"].includes(m)) {
-      staffAccessPerms[m] = { view: true, create: true, edit: true, delete: false };
+    // For standard staff, mostly view their own (View/Create/Edit), no delete, no 'All' access
+    if (["Tasks", "Leave Requests", "Staff Requests", "Attendance", "Payroll"].includes(m)) {
+      staffAccessPerms[m] = { 
+        view: true, viewAll: false, create: true, edit: true, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     } else {
-      staffAccessPerms[m] = { view: false, create: false, edit: false, delete: false };
+      staffAccessPerms[m] = { 
+        view: false, viewAll: false, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     }
 
     // For managers (HR, Recruiter), give create/edit but no delete/user administration
     if (["Users", "Roles", "Site Settings", "Companies"].includes(m)) {
-      limitedAccessPerms[m] = { view: true, create: false, edit: false, delete: false };
+      limitedAccessPerms[m] = { 
+        view: true, viewAll: true, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     } else {
-      limitedAccessPerms[m] = { view: true, create: true, edit: true, delete: false };
+      limitedAccessPerms[m] = { 
+        view: true, viewAll: true, create: true, edit: true, editAll: true, delete: true, deleteAll: true, 
+        approve: true, reject: true, export: true, print: true, download: true, upload: true 
+      };
     }
 
     // For Read Only User
-    readOnlyPerms[m] = { view: true, create: false, edit: false, delete: false };
+    readOnlyPerms[m] = { 
+      view: true, viewAll: true, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+      approve: false, reject: false, export: false, print: false, download: false, upload: false 
+    };
 
     // For Vehicle Coordinator
     if (m === "Vehicles") {
-      vehicleCoordinatorPerms[m] = { view: true, create: true, edit: true, delete: true };
+      vehicleCoordinatorPerms[m] = { 
+        view: true, viewAll: true, create: true, edit: true, editAll: true, delete: true, deleteAll: true, 
+        approve: true, reject: true, export: true, print: true, download: true, upload: true 
+      };
     } else if (["Staff", "Tasks", "Notifications", "Visa Expiry"].includes(m)) {
-      vehicleCoordinatorPerms[m] = { view: true, create: false, edit: false, delete: false };
+      vehicleCoordinatorPerms[m] = { 
+        view: true, viewAll: true, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     } else {
-      vehicleCoordinatorPerms[m] = { view: false, create: false, edit: false, delete: false };
+      vehicleCoordinatorPerms[m] = { 
+        view: false, viewAll: false, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     }
 
     // For Task Manager
     if (m === "Tasks") {
-      taskManagerPerms[m] = { view: true, create: true, edit: true, delete: true };
+      taskManagerPerms[m] = { 
+        view: true, viewAll: true, create: true, edit: true, editAll: true, delete: true, deleteAll: true, 
+        approve: true, reject: true, export: true, print: true, download: true, upload: true 
+      };
     } else if (["Staff", "Notifications"].includes(m)) {
-      taskManagerPerms[m] = { view: true, create: false, edit: false, delete: false };
+      taskManagerPerms[m] = { 
+        view: true, viewAll: true, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     } else {
-      taskManagerPerms[m] = { view: false, create: false, edit: false, delete: false };
+      taskManagerPerms[m] = { 
+        view: false, viewAll: false, create: false, edit: false, editAll: false, delete: false, deleteAll: false, 
+        approve: false, reject: false, export: false, print: false, download: false, upload: false 
+      };
     }
   });
 

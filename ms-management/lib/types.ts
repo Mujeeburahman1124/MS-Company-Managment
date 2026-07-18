@@ -46,7 +46,7 @@ export interface Applicant {
   visaExpiry: string;
   passportExpiry: string;
   passportNumber: string;
-  status: "Registered" | "Pending" | "Processing" | "Interview Scheduled" | "Selected" | "Visa Processing" | "Ready To Travel" | "Placed" | "Rejected" | "Returned";
+  status: "Registered" | "Pending" | "Processing" | "Interview Scheduled" | "Interview Completed" | "Selected" | "Visa Processing" | "Ready to Travel" | "Ready To Travel" | "Placed" | "Rejected" | "Returned";
   trackingCode: string;
   company: string;
   branch: string;
@@ -543,9 +543,12 @@ export interface Role {
   permissions: {
     [moduleName: string]: {
       view: boolean;
+      viewAll?: boolean;
       create: boolean;
       edit: boolean;
+      editAll?: boolean;
       delete: boolean;
+      deleteAll?: boolean;
       download?: boolean;
       upload?: boolean;
       export?: boolean;
@@ -731,6 +734,9 @@ export interface ModuleFilter {
   pageSize: number;
   interviewType?: string;
   clientCompany?: string;
+  position?: string;
+  visaStatus?: string;
+  interviewDate?: string;
 }
 
 export interface SentEmail {

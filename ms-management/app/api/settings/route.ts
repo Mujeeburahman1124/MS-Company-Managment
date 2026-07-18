@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog } from "@/lib/auth-helpers";
 
-export async function GET() {
+type RouteParams = {};
+
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     let settings = await prisma.siteSettings.findUnique({
@@ -74,9 +76,10 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only Super Admin can modify general portal site settings
-    if (user.role !== "Super Admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Only Super Admin or authorized users can modify general portal site settings
+    if (user.role !== "Super Admin" && !(await hasPermissionBackend(user, "settings", "edit"))) {
+      await createAuditLog(user, "Status Changed", "settings", null, "Unauthorized attempt to modify site settings", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

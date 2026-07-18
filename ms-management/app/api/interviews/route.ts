@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 import { sendEmail, sendWhatsApp, generateEmailContent } from "@/lib/notifications";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const filter = getTenantScopeFilter(user, "company", "branch");
+    const filter = await getPermissionScopedFilter(user, "interviews", "view", "company", "branch");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "interviews", null, "Unauthorized attempt to view interviews", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     // Interviews are for recruiters/managers, staff don't see them usually.
     // In this dashboard we return interviews based on tenancy filter
@@ -60,6 +64,11 @@ export async function POST(request: Request) {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "interviews", "create"))) {
+      await createAuditLog(user, "Status Changed", "interviews", null, "Unauthorized attempt to create interview", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

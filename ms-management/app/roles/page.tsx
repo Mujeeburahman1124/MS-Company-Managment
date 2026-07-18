@@ -19,12 +19,22 @@ const ALL_MODULES = [
   "Notifications", "Activity Log", "Site Settings", "Reports", "Applicant Tracking"
 ];
 
-const PERMISSIONS = ["view","create","edit","delete","download","upload","export","print","approve","reject","assign","statusChange","restore"];
+const PERMISSIONS = ["view", "viewAll", "create", "edit", "editAll", "delete", "deleteAll", "approve", "reject", "export", "print", "download", "upload"];
 
 const PERMISSION_LABELS: Record<string,string> = {
-  view: "View", create: "Create", edit: "Edit", delete: "Delete",
-  download: "Download", upload: "Upload", export: "Export", print: "Print",
-  approve: "Approve", reject: "Reject", assign: "Assign", statusChange: "Status", restore: "Restore"
+  view: "View", 
+  viewAll: "View All", 
+  create: "Create", 
+  edit: "Edit", 
+  editAll: "Edit All", 
+  delete: "Delete", 
+  deleteAll: "Delete All",
+  approve: "Approve", 
+  reject: "Reject", 
+  export: "Export", 
+  print: "Print",
+  download: "Download", 
+  upload: "Upload"
 };
 
 // Default permission matrix per role
@@ -35,22 +45,22 @@ const buildDefaultMatrix = (role: string): Role["permissions"] => {
     const readOnly = role === "Read Only User";
     const companyAdmin = role === "Company Admin";
     const branchAdmin = role === "Branch Admin";
-    const branchSet = new Set(["view", "create", "edit", "download", "upload", "statusChange"]);
-    const staffSet = new Set(["view", "create", "edit"]);
+    const isManager = ["HR Manager", "Recruiter", "Accountant"].includes(role);
+    
     matrix[m] = {
-      view:         all || readOnly || companyAdmin || branchAdmin ? (all || readOnly || companyAdmin || branchAdmin) : staffSet.has("view"),
-      create:       all || (!readOnly && (companyAdmin || branchAdmin || staffSet.has("create"))),
-      edit:         all || (!readOnly && (companyAdmin || branchAdmin || staffSet.has("edit"))),
-      delete:       all,
-      download:     all || (!readOnly && (companyAdmin || branchAdmin)),
-      upload:       all || (!readOnly && (companyAdmin || branchAdmin)),
-      export:       all || (!readOnly && companyAdmin),
-      print:        all || (!readOnly && companyAdmin),
-      approve:      all || (!readOnly && companyAdmin),
-      reject:       all || (!readOnly && companyAdmin),
-      assign:       all || (!readOnly && (companyAdmin || branchAdmin)),
-      statusChange: all || (!readOnly && (companyAdmin || branchAdmin)),
-      restore:      all,
+      view:         all || readOnly || companyAdmin || branchAdmin || isManager || role === "Staff",
+      viewAll:      all || companyAdmin || branchAdmin || isManager,
+      create:       all || companyAdmin || branchAdmin || isManager || (role === "Staff" && ["Tasks", "Leave Requests", "Staff Requests", "Attendance"].includes(m)),
+      edit:         all || companyAdmin || branchAdmin || isManager || (role === "Staff" && ["Tasks", "Leave Requests", "Staff Requests", "Attendance"].includes(m)),
+      editAll:      all || companyAdmin || branchAdmin || isManager,
+      delete:       all || companyAdmin,
+      deleteAll:    all || companyAdmin,
+      approve:      all || companyAdmin || (isManager && m === "Leave Requests"),
+      reject:       all || companyAdmin || (isManager && m === "Leave Requests"),
+      export:       all || companyAdmin || isManager,
+      print:        all || companyAdmin || isManager,
+      download:     all || companyAdmin || branchAdmin || isManager,
+      upload:       all || companyAdmin || branchAdmin || isManager,
     };
   });
   return matrix;
@@ -62,18 +72,18 @@ const buildPermissionMatrixFromRole = (role: Role): Role["permissions"] => {
     const src = role.permissions?.[module];
     matrix[module] = {
       view:         Boolean(src?.view),
+      viewAll:      Boolean(src?.viewAll),
       create:       Boolean(src?.create),
       edit:         Boolean(src?.edit),
+      editAll:      Boolean(src?.editAll),
       delete:       Boolean(src?.delete),
-      download:     Boolean(src?.download),
-      upload:       Boolean(src?.upload),
-      export:       Boolean(src?.export),
-      print:        Boolean(src?.print),
+      deleteAll:    Boolean(src?.deleteAll),
       approve:      Boolean(src?.approve),
       reject:       Boolean(src?.reject),
-      assign:       Boolean(src?.assign),
-      statusChange: Boolean(src?.statusChange),
-      restore:      Boolean(src?.restore),
+      export:       Boolean(src?.export),
+      print:        Boolean(src?.print),
+      download:     Boolean(src?.download),
+      upload:       Boolean(src?.upload),
     };
   });
   return matrix;
@@ -223,13 +233,13 @@ export default function RolesPage() {
               {currentRole === "Super Admin" && (
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => {
-                    const allOn: Role["permissions"][string] = { view:true,create:true,edit:true,delete:true,download:true,upload:true,export:true,print:true,approve:true,reject:true,assign:true,statusChange:true,restore:true };
+                    const allOn: Role["permissions"][string] = { view:true,viewAll:true,create:true,edit:true,editAll:true,delete:true,deleteAll:true,approve:true,reject:true,export:true,print:true,download:true,upload:true };
                     const m: Role["permissions"] = {};
                     ALL_MODULES.forEach(mod => { m[mod] = { ...allOn }; });
                     setMatrix(m);
                   }} className="text-[10px] font-bold rounded-xl border-emerald-200 text-emerald-600 hover:bg-emerald-50 h-8 px-3">All On</Button>
                   <Button variant="outline" size="sm" onClick={() => {
-                    const allOff: Role["permissions"][string] = { view:false,create:false,edit:false,delete:false,download:false,upload:false,export:false,print:false,approve:false,reject:false,assign:false,statusChange:false,restore:false };
+                    const allOff: Role["permissions"][string] = { view:false,viewAll:false,create:false,edit:false,editAll:false,delete:false,deleteAll:false,approve:false,reject:false,export:false,print:false,download:false,upload:false };
                     const m: Role["permissions"] = {};
                     ALL_MODULES.forEach(mod => { m[mod] = { ...allOff }; });
                     setMatrix(m);

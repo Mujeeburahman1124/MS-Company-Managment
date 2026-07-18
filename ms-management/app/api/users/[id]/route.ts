@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -26,15 +26,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Tenancy/Role check:
-    // 1. Super Admin can edit anyone.
-    // 2. Company Admin can edit users in their own company.
-    // 3. User can edit their own profile.
     const isSelf = currentUser.id === id;
-    const isCompanyAdminOfSameCompany = currentUser.role === "Company Admin" && currentUser.company === existing.company;
+    const canEdit = isSelf || (await canModifyRecord(currentUser, "users", "edit", existing));
     
-    if (currentUser.role !== "Super Admin" && !isCompanyAdminOfSameCompany && !isSelf) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!canEdit) {
+      await createAuditLog(currentUser, "Status Changed", "users", null, `Unauthorized attempt to edit user account ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const updatedCompany = data.company !== undefined ? data.company : existing.company;
@@ -104,11 +101,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Tenancy/Role check: Company Admin can delete users of their own company, Super Admin can delete anyone
-    const isCompanyAdminOfSameCompany = currentUser.role === "Company Admin" && currentUser.company === existing.company;
+    const canDelete = await canModifyRecord(currentUser, "users", "delete", existing);
     
-    if (currentUser.role !== "Super Admin" && !isCompanyAdminOfSameCompany) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!canDelete) {
+      await createAuditLog(currentUser, "Status Changed", "users", null, `Unauthorized attempt to delete user account ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Prevent deleting oneself

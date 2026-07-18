@@ -1,26 +1,18 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter, hasPermissionBackend } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!(await hasPermissionBackend(user, "payroll", "view"))) {
+    const filter = await getPermissionScopedFilter(user, "payroll", "view", "company", "branch");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "payroll", null, "Unauthorized attempt to view payroll logs", request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-    }
-
-    const filter = getTenantScopeFilter(user, "company", "branch");
-
-    // Staff see only their own payroll logs
-    if (user.role === "Staff") {
-      const staffMember = await prisma.staff.findFirst({
-        where: { email: user.email }
-      });
-      filter["staffId"] = staffMember ? staffMember.id : "NO_LINKED_STAFF";
     }
 
     const records = await prisma.payrollRecord.findMany({
@@ -44,6 +36,7 @@ export async function POST(request: Request) {
 
     // Permission check
     if (!(await hasPermissionBackend(user, "payroll", "create"))) {
+      await createAuditLog(user, "Status Changed", "payroll", null, "Unauthorized attempt to create payroll record", request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 

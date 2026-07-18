@@ -97,6 +97,10 @@ const NAV_ITEM_PERMISSIONS = [
   { href: '/reports',      permissionKey: 'reports',      hiddenFor: ['Staff'] },
   { href: '/activity-log', permissionKey: 'activityLog',  hiddenFor: ['Staff', 'Recruiter'] },
   { href: '/settings',     permissionKey: 'settings',     hiddenFor: ['Staff', 'HR Manager', 'Recruiter', 'Accountant', 'Branch Admin'] },
+  { href: '/emails',       permissionKey: 'emails' },
+  { href: '/whatsapp',     permissionKey: 'emails' },
+  { href: '/templates',    superAdminOnly: true },
+  { href: '/notifications', permissionKey: 'notifications' },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {

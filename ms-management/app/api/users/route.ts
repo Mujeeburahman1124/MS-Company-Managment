@@ -1,18 +1,21 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Apply tenancy scoping
-    const filter = getTenantScopeFilter(user, "company", "branch");
+    const filter = await getPermissionScopedFilter(user, "users", "view", "company", "branch");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "users", null, "Unauthorized attempt to view user list", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     // Don't fetch password hashes to frontend
     const users = await prisma.user.findMany({
@@ -40,9 +43,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only Super Admin and Company Admin can create users
-    if (currentUser.role !== "Super Admin" && currentUser.role !== "Company Admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasPermissionBackend(currentUser, "users", "create"))) {
+      await createAuditLog(currentUser, "Status Changed", "users", null, "Unauthorized attempt to create user account", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

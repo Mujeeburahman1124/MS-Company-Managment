@@ -51,7 +51,7 @@ export default function AttendanceReports() {
 
       return targetStaff.map(s => {
         const attDoc = staffAttendance.find(a => a.staffId === s.id && a.month === m && a.year === y);
-        let records = [];
+        let records: any[] = [];
         try {
           records = typeof attDoc?.records === "string" ? JSON.parse(attDoc.records) : (attDoc?.records || []);
         } catch (e) {}
@@ -77,7 +77,7 @@ export default function AttendanceReports() {
     // For monthly, overtime, lateness summary
     return targetStaff.map(s => {
       const attDoc = staffAttendance.find(a => a.staffId === s.id && a.month === selectedMonth && a.year === selectedYear);
-      let records = [];
+      let records: any[] = [];
       try {
         records = typeof attDoc?.records === "string" ? JSON.parse(attDoc.records) : (attDoc?.records || []);
       } catch (e) {}

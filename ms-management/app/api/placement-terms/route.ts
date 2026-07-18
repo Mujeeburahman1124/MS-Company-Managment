@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getSessionUser, hasPermissionBackend, createAuditLog } from "@/lib/auth-helpers";
 
 export async function GET() {
   try {
@@ -15,6 +16,16 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "placement", "edit"))) {
+      await createAuditLog(user, "Status Changed", "placement", null, "Unauthorized attempt to create placement terms", req.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
+
     const data = await req.json();
     const { title, content, order, isActive } = data;
     const term = await prisma.placementTerm.create({
@@ -29,6 +40,16 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    const user = await getSessionUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "placement", "edit"))) {
+      await createAuditLog(user, "Status Changed", "placement", null, "Unauthorized attempt to update placement terms order", req.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
+
     const data = await req.json();
     // Assuming data is an array of terms for bulk reordering
     if (Array.isArray(data)) {

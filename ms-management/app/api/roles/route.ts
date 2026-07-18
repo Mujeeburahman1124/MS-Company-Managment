@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog } from "@/lib/auth-helpers";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const hasView = await hasPermissionBackend(user, "roles", "view");
+    const hasViewAll = await hasPermissionBackend(user, "roles", "viewAll");
+    if (!hasView && !hasViewAll) {
+      await createAuditLog(user, "Status Changed", "roles", null, "Unauthorized attempt to view roles list", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     let roles;
@@ -43,9 +50,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only Super Admin and Company Admin can create custom roles
-    if (user.role !== "Super Admin" && user.role !== "Company Admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasPermissionBackend(user, "roles", "create"))) {
+      await createAuditLog(user, "Status Changed", "roles", null, "Unauthorized attempt to create a custom role", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

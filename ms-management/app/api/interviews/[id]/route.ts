@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -10,12 +10,12 @@ import { sendEmail, sendWhatsApp } from "@/lib/notifications";
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
     const data = await request.json();
 
     const existing = await prisma.interview.findUnique({
@@ -24,6 +24,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Interview/Meeting not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "interviews", "edit", existing))) {
+      await createAuditLog(user, "Status Changed", "interviews", null, `Unauthorized attempt to edit interview ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check scoping
@@ -308,12 +313,24 @@ ${mappedResponse.company} Recruitment Team`;
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
+    const existing = await prisma.interview.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Interview/Meeting not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "interviews", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "interviews", null, `Unauthorized attempt to delete interview ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     await prisma.interview.delete({
       where: { id }

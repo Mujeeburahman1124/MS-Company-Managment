@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 import { sendEmail, sendWhatsApp } from "@/lib/notifications";
 import bcrypt from "bcryptjs";
 
@@ -10,12 +10,12 @@ type RouteParams = {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
     const data = await request.json();
 
     const existing = await prisma.staff.findUnique({
@@ -24,6 +24,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Staff member not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "staff", "edit", existing))) {
+      await createAuditLog(user, "Status Changed", "staff", null, `Unauthorized attempt to edit staff record ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check
@@ -345,12 +350,11 @@ ${data.company || existing.company} HR Team`;
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { id } = await params;
 
     const existing = await prisma.staff.findUnique({
       where: { id }
@@ -358,6 +362,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Staff member not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "staff", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "staff", null, `Unauthorized attempt to delete staff record ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Tenancy Check

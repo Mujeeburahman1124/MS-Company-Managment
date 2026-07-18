@@ -13,20 +13,16 @@ import EmptyState from "@/components/shared/EmptyState";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 export default function OvertimeManagement() {
-  const { currentRole, currentUser, overtimeRequests, updateOvertimeRequest, deleteOvertimeRequest, addActivityLog, staff } = useAuthStore();
+  const { currentRole, currentUser, overtimeRequests, updateOvertimeRequest, deleteOvertimeRequest, addActivityLog, staff, hasPermission } = useAuthStore();
   const [approveModal, setApproveModal] = useState<{ req: any; action: "Approved" | "Rejected" } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const isSystemUser = currentUser.company === "System";
   const isAdmin = currentRole === "Super Admin" || 
-                  currentRole === "Company Admin" || 
-                  currentRole === "Branch Admin" || 
-                  currentRole === "HR Manager" || 
-                  currentRole === "Admin" || 
-                  currentRole === "HR" ||
-                  currentRole === "Recruiter" ||
-                  currentRole === "Accountant";
+                  hasPermission("attendance", "edit") || 
+                  hasPermission("attendance", "create") ||
+                  hasPermission("attendance", "approve");
 
   const currentStaff = staff.find(
     s => s.email?.toLowerCase() === currentUser.email?.toLowerCase() || 

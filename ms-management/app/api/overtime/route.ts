@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend } from "@/lib/auth-helpers";
 
 export async function GET() {
   try {
@@ -11,7 +11,11 @@ export async function GET() {
 
     const filter = getTenantScopeFilter(user, "company", "branch");
 
-    if (user.role === "Staff") {
+    // Check view permission
+    const hasViewPerm = user.role === "Super Admin" || 
+                        (await hasPermissionBackend(user, "attendance", "view"));
+    
+    if (!hasViewPerm) {
       const staffMember = await prisma.staff.findFirst({
         where: { email: user.email }
       });
@@ -46,14 +50,25 @@ export async function POST(request: Request) {
       );
     }
 
+    const targetStaff = await prisma.staff.findUnique({
+      where: { id: data.staffId }
+    });
+    if (!targetStaff) {
+      return NextResponse.json({ error: "Staff member not found" }, { status: 404 });
+    }
+
+    const isSelf = targetStaff.email?.toLowerCase() === user.email?.toLowerCase();
+    const canCreateOthers = user.role === "Super Admin" || 
+                            (await hasPermissionBackend(user, "attendance", "create")) ||
+                            (await hasPermissionBackend(user, "attendance", "edit"));
+    
+    if (!canCreateOthers && !isSelf) {
+      return NextResponse.json({ error: "Forbidden: Cannot create overtime request for another staff member" }, { status: 403 });
+    }
+
     // Tenancy Check
-    if (user.role !== "Super Admin") {
-      if (data.company !== user.company) {
-        return NextResponse.json({ error: "Forbidden: Cannot access other company" }, { status: 403 });
-      }
-      if (user.role !== "Company Admin" && data.branch !== user.branch) {
-        return NextResponse.json({ error: "Forbidden: Cannot access other branch" }, { status: 403 });
-      }
+    if (user.role !== "Super Admin" && targetStaff.company !== user.company) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const req = await prisma.overtimeRequest.create({
@@ -65,8 +80,8 @@ export async function POST(request: Request) {
         hours: Number(data.hours) || 0,
         reason: data.reason || "",
         status: data.status || "Pending",
-        company: data.company,
-        branch: data.branch,
+        company: targetStaff.company,
+        branch: targetStaff.branch,
         createdAt: data.createdAt || new Date().toISOString()
       }
     });

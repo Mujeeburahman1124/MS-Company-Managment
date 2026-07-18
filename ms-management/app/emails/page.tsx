@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 // Templates metadata matching our HTML files and templateTypes
 const EMAIL_TEMPLATES = [
@@ -551,6 +552,11 @@ type Contact = {
 
 export default function EmailsPage() {
   const { staff, applicants, hasPermission, currentRole, currentUser } = useAuthStore();
+
+  const canView = currentRole === "Super Admin" || hasPermission("emails", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
 
   const [tab, setTab] = useState<"compose" | "history">("compose");
   const [to, setTo] = useState("");

@@ -380,14 +380,12 @@ export async function sendEmail({
     const showClientCompany = hasApplicantDetails && safeData.clientCompany !== "N/A";
 
     const context = {
-      recipientName,
       companyName: company || "MS Management",
       companyEmail,
       companyPhone,
       companyAddress,
       companyLicense,
       logoText,
-      companyLogo: companyLogo || "",
       website: `https://${(companyEmail.match(/@(.+)$/)||["","msjobs.net"])[1]}`,
       year: new Date().getFullYear(),
       companyPrimaryColor: templateData?.companyPrimaryColor || companyPrimaryColor || process.env.PRIMARY_COLOR || '#2563eb',

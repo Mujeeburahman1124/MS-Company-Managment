@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter, hasPermissionBackend } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 // Normalize Prisma Task → frontend Task shape
@@ -17,22 +17,17 @@ function normalizeTask(t: any) {
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!(await hasPermissionBackend(user, "tasks", "view"))) {
+    const filter = await getPermissionScopedFilter(user, "tasks", "view", "company", "branch");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "tasks", null, "Unauthorized attempt to view tasks", request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-    }
-
-    const filter = getTenantScopeFilter(user, "company", "branch");
-
-    // Scoping check for Staff: Staff see only tasks assigned to them (by staffId/name)
-    if (user.role === "Staff") {
-      filter["assignedTo"] = user.name; // match name or id (assignedTo holds staff name or id)
     }
 
     const tasks = await prisma.task.findMany({
@@ -55,6 +50,7 @@ export async function POST(request: Request) {
     }
 
     if (!(await hasPermissionBackend(user, "tasks", "create")) && !(await hasPermissionBackend(user, "tasks", "assign"))) {
+      await createAuditLog(user, "Status Changed", "tasks", null, "Unauthorized attempt to create/assign task", request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 

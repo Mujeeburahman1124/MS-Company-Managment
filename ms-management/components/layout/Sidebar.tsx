@@ -84,8 +84,8 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Alerts",
     items: [
       { name: 'Visa Expiry',   href: '/visa-expiry',   icon: Shield,          permissionKey: 'visaExpiry' },
-      { name: 'Notifications', href: '/notifications', icon: Bell },
-      { name: 'WhatsApp',      href: '/whatsapp',      icon: MessageCircle },
+      { name: 'Notifications', href: '/notifications', icon: Bell,            permissionKey: 'notifications' },
+      { name: 'WhatsApp',      href: '/whatsapp',      icon: MessageCircle,   permissionKey: 'emails' },
     ]
   },
   {

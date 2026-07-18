@@ -10,7 +10,7 @@ import EmptyState from "@/components/shared/EmptyState";
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 export default function AttendanceCalendar() {
-  const { currentRole, currentUser, staff, staffAttendance, ownCompanies, branches } = useAuthStore();
+  const { currentRole, currentUser, staff, staffAttendance, ownCompanies, branches, hasPermission } = useAuthStore();
   const today = new Date();
   
   const [selectedMonth, setSelectedMonth] = useState(MONTHS[today.getMonth()]);
@@ -20,13 +20,8 @@ export default function AttendanceCalendar() {
 
   const isSystemUser = currentUser.company === "System";
   const isAdmin = currentRole === "Super Admin" || 
-                  currentRole === "Company Admin" || 
-                  currentRole === "Branch Admin" || 
-                  currentRole === "HR Manager" || 
-                  currentRole === "Admin" || 
-                  currentRole === "HR" ||
-                  currentRole === "Recruiter" ||
-                  currentRole === "Accountant";
+                  hasPermission("attendance", "edit") || 
+                  hasPermission("attendance", "create");
 
   const currentStaff = staff.find(
     s => s.email?.toLowerCase() === currentUser.email?.toLowerCase() || 

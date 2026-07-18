@@ -415,8 +415,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const matrix = userPermissions.matrix || userPermissions;
         if (matrix[permissionModule] !== undefined && matrix[permissionModule] !== null) {
           const modulePerms = matrix[permissionModule];
-          if (modulePerms && modulePerms[action] !== undefined) {
-            return Boolean(modulePerms[action]);
+          if (modulePerms) {
+            if (modulePerms[action] !== undefined && Boolean(modulePerms[action])) {
+              return true;
+            }
+            if (action === "view" && modulePerms["viewAll"] !== undefined && Boolean(modulePerms["viewAll"])) {
+              return true;
+            }
+            if (action === "edit" && modulePerms["editAll"] !== undefined && Boolean(modulePerms["editAll"])) {
+              return true;
+            }
+            if (action === "delete" && modulePerms["deleteAll"] !== undefined && Boolean(modulePerms["deleteAll"])) {
+              return true;
+            }
           }
         }
       }
@@ -463,8 +474,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       ) : null;
       if (permissions && permissions[permissionModule]) {
         const modulePerms = permissions[permissionModule];
-        if (modulePerms && modulePerms[action] !== undefined) {
-          return Boolean(modulePerms[action]);
+        if (modulePerms) {
+          if (modulePerms[action] !== undefined && Boolean(modulePerms[action])) {
+            return true;
+          }
+          if (action === "view" && modulePerms["viewAll"] !== undefined && Boolean(modulePerms["viewAll"])) {
+            return true;
+          }
+          if (action === "edit" && modulePerms["editAll"] !== undefined && Boolean(modulePerms["editAll"])) {
+            return true;
+          }
+          if (action === "delete" && modulePerms["deleteAll"] !== undefined && Boolean(modulePerms["deleteAll"])) {
+            return true;
+          }
         }
       }
     }
@@ -1295,20 +1317,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(record)
     });
-    if (res.ok) {
-      const saved = await res.json();
-      set((state) => {
-        const existing = state.staffAttendance.findIndex(
-          (a) => a.staffId === saved.staffId && a.month === saved.month && a.year === saved.year
-        );
-        if (existing >= 0) {
-          const updated = [...state.staffAttendance];
-          updated[existing] = saved;
-          return { staffAttendance: updated };
-        }
-        return { staffAttendance: [...state.staffAttendance, saved] };
-      });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Failed to save attendance");
     }
+    const saved = await res.json();
+    set((state) => {
+      const existing = state.staffAttendance.findIndex(
+        (a) => a.staffId === saved.staffId && a.month === saved.month && a.year === saved.year
+      );
+      if (existing >= 0) {
+        const updated = [...state.staffAttendance];
+        updated[existing] = saved;
+        return { staffAttendance: updated };
+      }
+      return { staffAttendance: [...state.staffAttendance, saved] };
+    });
   },
   
   // Site Settings PUT API

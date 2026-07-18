@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 type RouteParams = {
@@ -9,12 +9,11 @@ type RouteParams = {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { id } = await params;
     const data = await request.json();
 
     const existing = await prisma.staffRequest.findUnique({
@@ -47,14 +46,17 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (!isStaff) {
       if (data.status === "Approved") {
         if (!(await hasPermissionBackend(user, "requests", "approve"))) {
+          await createAuditLog(user, "Status Changed", "requests", null, `Unauthorized attempt to approve request ${id}`, request.headers.get("x-forwarded-for"));
           return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
         }
       } else if (data.status === "Rejected" || data.status === "Returned") {
         if (!(await hasPermissionBackend(user, "requests", "reject"))) {
+          await createAuditLog(user, "Status Changed", "requests", null, `Unauthorized attempt to reject request ${id}`, request.headers.get("x-forwarded-for"));
           return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
         }
       } else {
-        if (!(await hasPermissionBackend(user, "requests", "edit"))) {
+        if (!(await canModifyRecord(user, "requests", "edit", existing))) {
+          await createAuditLog(user, "Status Changed", "requests", null, `Unauthorized attempt to edit request ${id}`, request.headers.get("x-forwarded-for"));
           return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
         }
       }
@@ -222,12 +224,11 @@ ${updated.company} HR Department`;
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { id } = await params;
 
     const existing = await prisma.staffRequest.findUnique({
       where: { id }
@@ -247,13 +248,12 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     if (isStaff) {
       if (!isOwner || existing.status !== "Pending") {
+        await createAuditLog(user, "Status Changed", "requests", null, `Unauthorized attempt to delete request ${id} (not owner or not pending)`, request.headers.get("x-forwarded-for"));
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
     } else {
-      if (user.role !== "Super Admin" && existing.company !== user.company) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-      }
-      if (!(await hasPermissionBackend(user, "requests", "delete"))) {
+      if (!(await canModifyRecord(user, "requests", "delete", existing))) {
+        await createAuditLog(user, "Status Changed", "requests", null, `Unauthorized attempt to delete request ${id}`, request.headers.get("x-forwarded-for"));
         return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
       }
     }

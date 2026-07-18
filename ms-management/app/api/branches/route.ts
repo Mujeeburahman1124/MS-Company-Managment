@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
@@ -20,7 +20,11 @@ export async function GET() {
       return NextResponse.json(branches);
     }
 
-    const filter = getTenantScopeFilter(user, "company", "name");
+    const filter = await getPermissionScopedFilter(user, "branches", "view", "company", "name");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "branches", null, "Unauthorized attempt to view branches", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     const branches = await prisma.branch.findMany({
       where: filter,
@@ -41,9 +45,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Super Admin and Company Admin can create branches
-    if (user.role !== "Super Admin" && user.role !== "Company Admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await hasPermissionBackend(user, "branches", "create"))) {
+      await createAuditLog(user, "Status Changed", "branches", null, "Unauthorized attempt to create branch", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

@@ -1,36 +1,19 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter, hasPermissionBackend } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!(await hasPermissionBackend(user, "leave", "view"))) {
+    const filter = await getPermissionScopedFilter(user, "leave", "view", "company", "branch");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "leave", null, "Unauthorized attempt to view leave requests", request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-    }
-
-    const filter = getTenantScopeFilter(user, "company", "branch");
-
-    const isAdmin = user.role === "Super Admin" || 
-                    user.role === "Company Admin" || 
-                    user.role === "Branch Admin" || 
-                    user.role === "HR Manager" || 
-                    user.role === "Admin" || 
-                    user.role === "HR" ||
-                    user.role === "Recruiter" ||
-                    user.role === "Accountant";
-
-    // Standard staff members see only their own leave requests
-    if (!isAdmin) {
-      const staffMember = await prisma.staff.findFirst({
-        where: { email: user.email }
-      });
-      filter["staffId"] = staffMember ? staffMember.id : "NOT_FOUND";
     }
 
     const leaveRequests = await prisma.leaveRequest.findMany({
@@ -106,6 +89,7 @@ export async function POST(request: Request) {
     }
 
     if (!(await hasPermissionBackend(user, "leave", "create"))) {
+      await createAuditLog(user, "Status Changed", "leave", null, "Unauthorized attempt to create leave request", request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 

@@ -36,13 +36,8 @@ function AttendanceContent() {
   const tabParam = searchParams.get("tab");
 
   const isAdmin = currentRole === "Super Admin" || 
-                  currentRole === "Company Admin" || 
-                  currentRole === "Branch Admin" || 
-                  currentRole === "HR Manager" || 
-                  currentRole === "Admin" || 
-                  currentRole === "HR" ||
-                  currentRole === "Recruiter" ||
-                  currentRole === "Accountant";
+                  hasPermission("attendance", "edit") || 
+                  hasPermission("attendance", "create");
 
   const visibleTabs = useMemo(() => {
     if (isAdmin) {

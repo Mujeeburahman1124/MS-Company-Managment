@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog, getPermissionScopedFilter } from "@/lib/auth-helpers";
 import { sendEmail, sendWhatsApp } from "@/lib/notifications";
 import bcrypt from "bcryptjs";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const filter = getTenantScopeFilter(user, "company", "branch");
+    const filter = await getPermissionScopedFilter(user, "staff", "view", "company", "branch");
+    if (!filter) {
+      await createAuditLog(user, "Status Changed", "staff", null, "Unauthorized attempt to view staff records", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     const staff = await prisma.staff.findMany({
       where: filter,
@@ -30,6 +34,11 @@ export async function POST(request: Request) {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "staff", "create"))) {
+      await createAuditLog(user, "Status Changed", "staff", null, "Unauthorized attempt to create staff record", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const data = await request.json();

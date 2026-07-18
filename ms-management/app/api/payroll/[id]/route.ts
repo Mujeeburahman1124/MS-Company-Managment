@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -16,22 +16,24 @@ export async function PUT(request: Request, { params }: RouteParams) {
     const { id } = await params;
     const data = await request.json();
 
-    if (data.status === "Approved") {
-      if (!(await hasPermissionBackend(user, "payroll", "approve"))) {
-        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-      }
-    } else {
-      if (!(await hasPermissionBackend(user, "payroll", "edit"))) {
-        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-      }
-    }
-
     const existing = await prisma.payrollRecord.findUnique({
       where: { id }
     });
 
     if (!existing) {
       return NextResponse.json({ error: "Payroll record not found" }, { status: 404 });
+    }
+
+    if (data.status === "Approved") {
+      if (!(await hasPermissionBackend(user, "payroll", "approve"))) {
+        await createAuditLog(user, "Status Changed", "payroll", null, `Unauthorized attempt to approve payroll record ${id}`, request.headers.get("x-forwarded-for"));
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
+    } else {
+      if (!(await canModifyRecord(user, "payroll", "edit", existing))) {
+        await createAuditLog(user, "Status Changed", "payroll", null, `Unauthorized attempt to edit payroll record ${id}`, request.headers.get("x-forwarded-for"));
+        return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+      }
     }
 
     // Tenancy Check
@@ -134,16 +136,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    if (!(await hasPermissionBackend(user, "payroll", "delete"))) {
-      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-    }
-
-    const { id } = await params;
 
     const existing = await prisma.payrollRecord.findUnique({
       where: { id }
@@ -153,9 +150,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Payroll record not found" }, { status: 404 });
     }
 
-    // Tenancy Check
-    if (user.role !== "Super Admin" && existing.company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!(await canModifyRecord(user, "payroll", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "payroll", null, `Unauthorized attempt to delete payroll record ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     await prisma.payrollRecord.delete({

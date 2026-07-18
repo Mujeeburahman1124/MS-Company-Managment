@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import AccessDenied from "@/components/shared/AccessDenied";
 
 const TEMPLATES = [
   {
@@ -68,7 +69,12 @@ type Recipient = {
 };
 
 export default function WhatsAppPage() {
-  const { staff, applicants, sentWhatsApp, currentUser } = useAuthStore();
+  const { staff, applicants, sentWhatsApp, currentUser, currentRole, hasPermission } = useAuthStore();
+
+  const canView = currentRole === "Super Admin" || hasPermission("emails", "view");
+  if (!canView) {
+    return <AccessDenied />;
+  }
   const [localSent, setLocalSent] = useState<any[]>([]);
 
   const [search, setSearch] = useState("");

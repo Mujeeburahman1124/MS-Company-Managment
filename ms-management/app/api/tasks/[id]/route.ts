@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, hasPermissionBackend } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 import { sendEmail } from "@/lib/notifications";
 
 type RouteParams = {
@@ -60,15 +60,20 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // Authorization & Action checks:
     // Staff can only update task status and complete tasks assigned to them.
     // Managers/Admins can edit anything.
-    const isAssignedToUser = existing.assignedTo.trim().toLowerCase() === user.name.trim().toLowerCase();
+    const userStaff = await prisma.staff.findFirst({ where: { email: user.email } });
+    const userStaffId = userStaff?.id;
+    const isAssignedToUser = (userStaffId && existing.assignedToId === userStaffId) ||
+                             existing.assignedTo.trim().toLowerCase() === user.name.trim().toLowerCase() ||
+                             existing.createdBy === user.name;
     const isStaff = user.role === "Staff";
 
-    if (isStaff && !isAssignedToUser) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    if (!isStaff) {
-      if (!(await hasPermissionBackend(user, "tasks", "edit")) && !(await hasPermissionBackend(user, "tasks", "assign"))) {
+    if (isStaff) {
+      if (!isAssignedToUser) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    } else {
+      if (!(await canModifyRecord(user, "tasks", "edit", existing))) {
+        await createAuditLog(user, "Status Changed", "tasks", null, `Unauthorized attempt to edit task ${id}`, request.headers.get("x-forwarded-for"));
         return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
       }
     }
@@ -269,14 +274,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    // Only managers/admins of the same company (or Super Admin / System users) can delete tasks
-    if (!(await hasPermissionBackend(user, "tasks", "delete"))) {
+    if (!(await canModifyRecord(user, "tasks", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "tasks", null, `Unauthorized attempt to delete task ${id}`, request.headers.get("x-forwarded-for"));
       return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
-    }
-
-    const isSystemUser = user.company === "System" || user.role === "Super Admin";
-    if (!isSystemUser && existing.company !== user.company) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.task.delete({

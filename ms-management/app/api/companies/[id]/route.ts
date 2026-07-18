@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser } from "@/lib/auth-helpers";
+import { getSessionUser, hasPermissionBackend, createAuditLog, canModifyRecord } from "@/lib/auth-helpers";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -8,12 +8,12 @@ type RouteParams = {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
     const data = await request.json();
 
     // Query existing company to check tenancy
@@ -23,6 +23,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json({ error: "Company not found" }, { status: 404 });
+    }
+
+    if (!(await canModifyRecord(user, "companies", "edit", existing))) {
+      await createAuditLog(user, "Status Changed", "companies", null, `Unauthorized attempt to edit company ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     // Role verification: Super Admin can edit any company; Company Admin can edit only their own
@@ -72,17 +77,24 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only Super Admin can delete companies
-    if (user.role !== "Super Admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const existing = await prisma.company.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Company not found" }, { status: 404 });
     }
 
-    const { id } = await params;
+    if (!(await canModifyRecord(user, "companies", "delete", existing))) {
+      await createAuditLog(user, "Status Changed", "companies", null, `Unauthorized attempt to delete company ${id}`, request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
+    }
 
     await prisma.company.delete({
       where: { id }

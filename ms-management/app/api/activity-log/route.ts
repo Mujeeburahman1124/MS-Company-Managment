@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSessionUser, getTenantScopeFilter } from "@/lib/auth-helpers";
+import { getSessionUser, getTenantScopeFilter, hasPermissionBackend, createAuditLog } from "@/lib/auth-helpers";
 
 export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!(await hasPermissionBackend(user, "reports", "view"))) {
+      await createAuditLog(user, "Status Changed", "reports", null, "Unauthorized attempt to view activity logs", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -34,8 +39,13 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   try {
     const user = await getSessionUser();
-    if (!user || user.role !== "Super Admin") {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (user.role !== "Super Admin" && !(await hasPermissionBackend(user, "reports", "edit"))) {
+      await createAuditLog(user, "Status Changed", "reports", null, "Unauthorized attempt to archive/restore activity logs", request.headers.get("x-forwarded-for"));
+      return NextResponse.json({ error: "Forbidden: Access Denied" }, { status: 403 });
     }
 
     const { action } = await request.json(); // "archive" | "restore"
