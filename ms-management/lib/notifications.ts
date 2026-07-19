@@ -7,7 +7,7 @@ import Handlebars from "handlebars";
 
 const cleanEnvVar = (val: string | undefined) => {
   if (!val) return val;
-  return val.replace(/^["']|["']$/g, "");
+  return val.trim().replace(/^["']|["']$/g, "").trim();
 };
 
 // ─── HTML Email Template ──────────────────────────────────────────────────────
@@ -411,13 +411,18 @@ export async function sendEmail({
 
   if (htmlContent && host && user && pass) {
     try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-        tls: { rejectUnauthorized: false },
-      });
+      const transporter = host === "smtp.gmail.com" 
+        ? nodemailer.createTransport({
+            service: "gmail",
+            auth: { user, pass },
+          })
+        : nodemailer.createTransport({
+            host,
+            port,
+            secure: port === 465,
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false },
+          });
 
       const info = await transporter.sendMail({
         from,
