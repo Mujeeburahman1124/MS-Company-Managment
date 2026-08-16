@@ -13,7 +13,7 @@ export async function GET() {
     process.env.HOSTINGER_DATABASE_URL ||
     process.env.DATABASE_URL ||
     (isHostinger
-      ? "mysql://u568514543_Mshorizon2026:Safayar1992@localhost:3306/u568514543_ms_company_db?connect_timeout=5"
+      ? "mysql://u568514543_Mshorizon2026:Safayar1992@srv1496.hstgr.io:3306/u568514543_ms_company_db?connect_timeout=5"
       : "NOT SET");
 
   const maskedUrl = dbUrl.replace(/:([^@]+)@/, ":***@");

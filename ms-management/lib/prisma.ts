@@ -36,9 +36,9 @@ const getDatabaseUrl = (): string => {
       console.log("[Prisma] Using DATABASE_URL from environment.");
       return ensureTimeouts(process.env.DATABASE_URL);
     }
-    console.log("[Prisma] Using fallback localhost MySQL configuration.");
+    console.log("[Prisma] Using fallback srv1496.hstgr.io MySQL configuration.");
     return ensureTimeouts(
-      "mysql://u568514543_Mshorizon2026:Safayar1992@localhost:3306/u568514543_ms_company_db"
+      "mysql://u568514543_Mshorizon2026:Safayar1992@srv1496.hstgr.io:3306/u568514543_ms_company_db"
     );
   }
 
@@ -52,8 +52,8 @@ const getDatabaseUrl = (): string => {
   }
 
   // Last-resort fallback (should never be reached in production)
-  console.warn("[Prisma] WARNING: No DATABASE_URL found — using fallback localhost.");
-  return "mysql://u568514543_Mshorizon2026:Safayar1992@localhost:3306/u568514543_ms_company_db";
+  console.warn("[Prisma] WARNING: No DATABASE_URL found — using fallback srv1496.hstgr.io.");
+  return "mysql://u568514543_Mshorizon2026:Safayar1992@srv1496.hstgr.io:3306/u568514543_ms_company_db";
 };
 
 const prismaClientSingleton = () => {
