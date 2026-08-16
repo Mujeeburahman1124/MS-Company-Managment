@@ -9,9 +9,12 @@ export async function GET() {
     !process.env.VERCEL &&
     !process.env.NEXT_PUBLIC_VERCEL_URL;
 
-  const dbUrl = isHostinger
-    ? "mysql://u568514543_Mshorizon2026:MSHorizon2026!@localhost:3306/u568514543_ms_company_db?connect_timeout=5"
-    : process.env.DATABASE_URL || "NOT SET";
+  const dbUrl =
+    process.env.HOSTINGER_DATABASE_URL ||
+    process.env.DATABASE_URL ||
+    (isHostinger
+      ? "mysql://u568514543_Mshorizon2026:Safayar1992@localhost:3306/u568514543_ms_company_db?connect_timeout=5"
+      : "NOT SET");
 
   const maskedUrl = dbUrl.replace(/:([^@]+)@/, ":***@");
 

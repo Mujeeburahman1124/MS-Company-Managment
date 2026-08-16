@@ -8,6 +8,14 @@ import { PrismaClient } from "./generated/client";
  *  2. DATABASE_URL env variable (Vercel / local dev)
  *  3. HOSTINGER_DATABASE_URL env variable
  */
+const ensureTimeouts = (url: string): string => {
+  if (!url.includes("connect_timeout")) {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}connection_limit=5&pool_timeout=10&connect_timeout=5&socket_timeout=10`;
+  }
+  return url;
+};
+
 const getDatabaseUrl = (): string => {
   // ── Hostinger detection ──────────────────────────────────────────────────
   // Hostinger Node.js hosting runs on Linux and is NOT Vercel.
@@ -19,12 +27,18 @@ const getDatabaseUrl = (): string => {
     !process.env.NEXT_PUBLIC_VERCEL_URL;
 
   if (isHostinger) {
-    console.log("[Prisma] Hostinger detected → using localhost MySQL.");
-    // Add connection timeouts so a misconfigured DB fails fast (5 s) instead
-    // of hanging for 30+ seconds and causing an empty-body 500 response.
-    return (
-      "mysql://u568514543_Mshorizon2026:MSHorizon2026!@localhost:3306/u568514543_ms_company_db" +
-      "?connection_limit=5&pool_timeout=10&connect_timeout=5&socket_timeout=10"
+    console.log("[Prisma] Hostinger detected.");
+    if (process.env.HOSTINGER_DATABASE_URL) {
+      console.log("[Prisma] Using HOSTINGER_DATABASE_URL from environment.");
+      return ensureTimeouts(process.env.HOSTINGER_DATABASE_URL);
+    }
+    if (process.env.DATABASE_URL) {
+      console.log("[Prisma] Using DATABASE_URL from environment.");
+      return ensureTimeouts(process.env.DATABASE_URL);
+    }
+    console.log("[Prisma] Using fallback localhost MySQL configuration.");
+    return ensureTimeouts(
+      "mysql://u568514543_Mshorizon2026:Safayar1992@localhost:3306/u568514543_ms_company_db"
     );
   }
 
@@ -39,7 +53,7 @@ const getDatabaseUrl = (): string => {
 
   // Last-resort fallback (should never be reached in production)
   console.warn("[Prisma] WARNING: No DATABASE_URL found — using fallback localhost.");
-  return "mysql://u568514543_Mshorizon2026:MSHorizon2026!@localhost:3306/u568514543_ms_company_db";
+  return "mysql://u568514543_Mshorizon2026:Safayar1992@localhost:3306/u568514543_ms_company_db";
 };
 
 const prismaClientSingleton = () => {
